@@ -6,6 +6,8 @@ url: "https://chaudhary.github.io"
 markdown: kramdown
 theme: minima
 
+permalink: /blog/:title/
+
 plugins:
   - jekyll-seo-tag
 

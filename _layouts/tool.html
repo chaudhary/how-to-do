@@ -9,7 +9,13 @@
 <body>
   <header class="site-header">
     <div class="container">
-      <a href="{{ '/' | relative_url }}" class="site-title">{{ site.title }}</a>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <a href="{{ '/' | relative_url }}" class="site-title">{{ site.title }}</a>
+        <nav style="display:flex;gap:1.25rem;font-size:0.95rem;">
+          <a href="{{ '/' | relative_url }}" style="color:var(--color-text);text-decoration:none;">Tools</a>
+          <a href="{{ '/blog' | relative_url }}" style="color:var(--color-text);text-decoration:none;">Blog</a>
+        </nav>
+      </div>
       <p class="site-tagline">{{ site.description }}</p>
     </div>
   </header>

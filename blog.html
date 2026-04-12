@@ -1,0 +1,26 @@
+---
+layout: default
+title: Blog
+---
+
+<h1>Blog</h1>
+<p>Guides, explainers, and practical tips for the tools you use every day.</p>
+
+{% assign categories = "Financial,Everyday Math,Health,Tech / Dev,Productivity,Personal Finance" | split: "," %}
+{% for cat in categories %}
+  {% assign cat_posts = site.posts | where: "category", cat %}
+  {% if cat_posts.size > 0 %}
+  <h2 style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">{{ cat }}</h2>
+  <ul class="blog-list">
+    {% for post in cat_posts %}
+    <li>
+      <a href="{{ post.url | relative_url }}">
+        <div class="blog-meta">{{ post.date | date: "%B %d, %Y" }} &middot; {{ post.reading_time }} min read</div>
+        <h3>{{ post.title }}</h3>
+        <p class="blog-excerpt">{{ post.description }}</p>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+{% endfor %}
