@@ -3,109 +3,187 @@ layout: default
 title: Home
 ---
 
+<div class="search-box">
+  <input type="text" id="search" placeholder="Search tools and articles..." oninput="filterAll()">
+</div>
+
+<div id="searchable-content">
+
 <h1>Tools</h1>
 <p>Useful calculators and tools for everyday decisions.</p>
 
-<h2 style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Financial</h2>
+<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Financial</h2>
 <div class="tools-grid">
-  <a href="{{ '/tools/emi-calculator' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/emi-calculator' | relative_url }}" class="tool-card" data-search="emi calculator loan monthly payment interest amortization financial">
     <h2>EMI Calculator</h2>
     <p>Calculate monthly loan EMI, total interest, and view a full amortization schedule.</p>
   </a>
-  <a href="{{ '/tools/sip-calculator' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/sip-calculator' | relative_url }}" class="tool-card" data-search="sip systematic investment plan mutual fund returns financial">
     <h2>SIP Calculator</h2>
     <p>Estimate returns on your Systematic Investment Plan over time.</p>
   </a>
-  <a href="{{ '/tools/fd-rd-calculator' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/fd-rd-calculator' | relative_url }}" class="tool-card" data-search="fd rd fixed deposit recurring deposit maturity interest financial">
     <h2>FD/RD Calculator</h2>
     <p>Calculate maturity amount for Fixed Deposits and Recurring Deposits.</p>
   </a>
-  <a href="{{ '/tools/loan-comparison' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/loan-comparison' | relative_url }}" class="tool-card" data-search="loan comparison compare two loans interest rate financial">
     <h2>Loan Comparison</h2>
     <p>Compare two loans side by side to find the better deal.</p>
   </a>
-  <a href="{{ '/tools/cagr-calculator' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/cagr-calculator' | relative_url }}" class="tool-card" data-search="cagr compound annual growth rate investment returns financial">
     <h2>CAGR Calculator</h2>
     <p>Calculate the Compound Annual Growth Rate of any investment.</p>
   </a>
-  <a href="{{ '/tools/rent-vs-buy' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/rent-vs-buy' | relative_url }}" class="tool-card" data-search="rent vs buy house property home emi financial">
     <h2>Rent vs Buy</h2>
     <p>Compare renting and buying to make a smarter housing decision.</p>
   </a>
 </div>
 
-<h2 style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Everyday Math</h2>
+<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Everyday Math</h2>
 <div class="tools-grid">
-  <a href="{{ '/tools/percentage-calculator' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/percentage-calculator' | relative_url }}" class="tool-card" data-search="percentage calculator percent math discount tax gst">
     <h2>Percentage Calculator</h2>
     <p>Solve any percentage problem: X% of Y, percentage change, increase/decrease.</p>
   </a>
-  <a href="{{ '/tools/unit-converter' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/unit-converter' | relative_url }}" class="tool-card" data-search="unit converter length weight temperature volume area speed metric imperial">
     <h2>Unit Converter</h2>
     <p>Convert between units of length, weight, temperature, volume, area, and speed.</p>
   </a>
-  <a href="{{ '/tools/age-calculator' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/age-calculator' | relative_url }}" class="tool-card" data-search="age calculator birthday date years months days">
     <h2>Age Calculator</h2>
     <p>Calculate exact age in years, months, days, weeks, and total days.</p>
   </a>
-  <a href="{{ '/tools/tip-calculator' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/tip-calculator' | relative_url }}" class="tool-card" data-search="tip calculator bill splitter restaurant split">
     <h2>Tip Calculator</h2>
     <p>Calculate tip and split the bill among friends.</p>
   </a>
 </div>
 
-<h2 style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Health</h2>
+<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Health</h2>
 <div class="tools-grid">
-  <a href="{{ '/tools/bmi-calculator' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/bmi-calculator' | relative_url }}" class="tool-card" data-search="bmi body mass index weight height health">
     <h2>BMI Calculator</h2>
     <p>Calculate your Body Mass Index and see your healthy weight range.</p>
   </a>
-  <a href="{{ '/tools/calorie-calculator' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/calorie-calculator' | relative_url }}" class="tool-card" data-search="calorie calculator tdee bmr diet weight loss gain health">
     <h2>Calorie Calculator</h2>
     <p>Estimate daily calorie needs based on BMR and activity level.</p>
   </a>
-  <a href="{{ '/tools/water-intake-calculator' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/water-intake-calculator' | relative_url }}" class="tool-card" data-search="water intake hydration drink health">
     <h2>Water Intake Calculator</h2>
     <p>Find out how much water you should drink daily.</p>
   </a>
 </div>
 
-<h2 style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Tech / Dev</h2>
+<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Tech / Dev</h2>
 <div class="tools-grid">
-  <a href="{{ '/tools/json-formatter' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/json-formatter' | relative_url }}" class="tool-card" data-search="json formatter validator minify format api developer tech">
     <h2>JSON Formatter</h2>
     <p>Format, validate, and minify JSON data instantly.</p>
   </a>
-  <a href="{{ '/tools/base64-codec' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/base64-codec' | relative_url }}" class="tool-card" data-search="base64 encode decode encoding text binary developer tech">
     <h2>Base64 Encode/Decode</h2>
     <p>Encode text to Base64 or decode Base64 back to text.</p>
   </a>
-  <a href="{{ '/tools/color-converter' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/color-converter' | relative_url }}" class="tool-card" data-search="color converter hex rgb hsl css design developer tech">
     <h2>Color Converter</h2>
     <p>Convert between HEX, RGB, and HSL color formats with live preview.</p>
   </a>
-  <a href="{{ '/tools/regex-tester' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/regex-tester' | relative_url }}" class="tool-card" data-search="regex regular expression tester pattern match developer tech">
     <h2>Regex Tester</h2>
     <p>Test regular expressions with real-time highlighting and match details.</p>
   </a>
 </div>
 
-<h2 style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Productivity</h2>
+<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Productivity</h2>
 <div class="tools-grid">
-  <a href="{{ '/tools/pomodoro-timer' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/pomodoro-timer' | relative_url }}" class="tool-card" data-search="pomodoro timer focus work break productivity">
     <h2>Pomodoro Timer</h2>
     <p>Stay focused with timed work and break intervals.</p>
   </a>
-  <a href="{{ '/tools/word-counter' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/word-counter' | relative_url }}" class="tool-card" data-search="word counter character sentence paragraph reading time text productivity">
     <h2>Word Counter</h2>
     <p>Count words, characters, sentences, paragraphs, and reading time.</p>
   </a>
-  <a href="{{ '/tools/date-difference' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/date-difference' | relative_url }}" class="tool-card" data-search="date difference duration between two dates days weeks months productivity">
     <h2>Date Difference</h2>
     <p>Find the exact duration between any two dates.</p>
   </a>
-  <a href="{{ '/tools/timezone-converter' | relative_url }}" class="tool-card">
+  <a href="{{ '/tools/timezone-converter' | relative_url }}" class="tool-card" data-search="timezone time zone converter world clock remote productivity">
     <h2>Time Zone Converter</h2>
     <p>Convert time between zones with a live world clock.</p>
   </a>
 </div>
+
+<h1 style="margin-top:3rem;">Blog</h1>
+<p>Guides, explainers, and practical tips.</p>
+
+{% assign categories = "Financial,Everyday Math,Health,Tech / Dev,Productivity,Personal Finance" | split: "," %}
+{% for cat in categories %}
+  {% assign cat_posts = site.posts | where: "category", cat %}
+  {% if cat_posts.size > 0 %}
+  <h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">{{ cat }}</h2>
+  <div class="tools-grid">
+    {% for post in cat_posts %}
+    <a href="{{ post.url | relative_url }}" class="tool-card" data-search="{{ post.title | downcase }} {{ post.description | downcase }} {{ post.category | downcase }}">
+      <div class="blog-meta" style="font-size:0.75rem;color:var(--color-muted);margin-bottom:0.35rem;">{{ post.date | date: "%B %d, %Y" }} &middot; {{ post.reading_time }} min read</div>
+      <h2>{{ post.title }}</h2>
+      <p>{{ post.description }}</p>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endfor %}
+
+</div>
+
+<div id="no-results" style="display:none;text-align:center;padding:3rem 0;color:var(--color-muted);">
+  <p style="font-size:1.2rem;font-weight:600;">No results found</p>
+  <p>Try a different search term.</p>
+</div>
+
+<script>
+function filterAll() {
+  var query = document.getElementById('search').value.toLowerCase().trim();
+  var cards = document.querySelectorAll('.tool-card');
+  var categories = document.querySelectorAll('.section-cat');
+  var noResults = document.getElementById('no-results');
+  var visibleCount = 0;
+
+  if (!query) {
+    cards.forEach(function(c) { c.style.display = ''; });
+    categories.forEach(function(c) { c.style.display = ''; });
+    document.querySelectorAll('h1, #searchable-content > p').forEach(function(el) { el.style.display = ''; });
+    noResults.style.display = 'none';
+    return;
+  }
+
+  var words = query.split(/\s+/);
+
+  cards.forEach(function(card) {
+    var text = (card.getAttribute('data-search') || '') + ' ' + card.textContent.toLowerCase();
+    var match = words.every(function(w) { return text.indexOf(w) >= 0; });
+    card.style.display = match ? '' : 'none';
+    if (match) visibleCount++;
+  });
+
+  // Hide category headers if all their cards are hidden
+  categories.forEach(function(cat) {
+    var grid = cat.nextElementSibling;
+    if (!grid || !grid.classList.contains('tools-grid')) return;
+    var hasVisible = Array.from(grid.querySelectorAll('.tool-card')).some(function(c) {
+      return c.style.display !== 'none';
+    });
+    cat.style.display = hasVisible ? '' : 'none';
+    grid.style.display = hasVisible ? '' : 'none';
+  });
+
+  // Hide section headings (h1, p) if no cards visible in that section
+  document.querySelectorAll('#searchable-content > h1, #searchable-content > p').forEach(function(el) {
+    el.style.display = visibleCount > 0 ? '' : 'none';
+  });
+
+  noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+}
+</script>
