@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Home
+description: "Free online calculators, tools, and how-to guides for finance, health, math, developer utilities, and productivity. No sign-up required."
 ---
 
 <div class="search-box">
@@ -21,7 +22,7 @@ title: Home
     {% for post in cat_posts %}
     <a href="{{ post.url | relative_url }}" class="tool-card" data-search="{{ post.title | downcase }} {{ post.description | downcase }} {{ post.category | downcase }}">
       <div class="blog-meta" style="font-size:0.75rem;color:var(--color-muted);margin-bottom:0.35rem;">{{ post.date | date: "%B %d, %Y" }} &middot; {{ post.reading_time }} min read</div>
-      <h2>{{ post.title }}</h2>
+      <h3>{{ post.title }}</h3>
       <p>{{ post.description }}</p>
     </a>
     {% endfor %}

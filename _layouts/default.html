@@ -3,16 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+  {% seo %}
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
   <link rel="icon" type="image/svg+xml" href="{{ '/assets/images/favicon.svg' | relative_url }}">
+  {% if page.url == '/' %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "{{ site.title }}",
+    "url": "{{ site.url }}",
+    "description": "{{ site.description | escape }}",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "{{ site.url }}/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  {% endif %}
 </head>
 <body>
   <header class="site-header">
     <div class="container">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <a href="{{ '/' | relative_url }}" class="site-title">
-          <img src="{{ '/assets/images/logo-icon.svg' | relative_url }}" alt="" class="site-logo" width="28" height="28">
+          <img src="{{ '/assets/images/logo-icon.svg' | relative_url }}" alt="{{ site.title }}" class="site-logo" width="28" height="28">
           {{ site.title }}
         </a>
         <nav style="display:flex;gap:1.25rem;font-size:0.95rem;">
