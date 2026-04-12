@@ -10,9 +10,9 @@ title: LinkedIn Post Generator
 
 <div class="calc-form">
   <div class="form-group">
-    <label for="apiKey">Gemini API Key</label>
-    <div class="hint">Free from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--color-primary);">Google AI Studio</a>. Stored locally in your browser only.</div>
-    <input type="password" id="apiKey" placeholder="Paste your Gemini API key">
+    <label for="apiKey">Groq API Key</label>
+    <div class="hint">Free from <a href="https://console.groq.com/keys" target="_blank" rel="noopener" style="color:var(--color-primary);">Groq Console</a>. Stored locally in your browser only.</div>
+    <input type="password" id="apiKey" placeholder="Paste your Groq API key">
   </div>
   <div class="form-group">
     <label for="topic">Topic or Context</label>
@@ -58,23 +58,22 @@ title: LinkedIn Post Generator
 <div class="calc-form" style="margin-top:1.5rem;">
   <h3 style="margin-bottom:0.75rem;">How to get a free API key</h3>
   <ol style="padding-left:1.25rem;color:var(--color-muted);font-size:0.9rem;line-height:1.8;">
-    <li>Go to <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--color-primary);">Google AI Studio</a></li>
-    <li>Sign in with your Google account</li>
+    <li>Go to <a href="https://console.groq.com/keys" target="_blank" rel="noopener" style="color:var(--color-primary);">console.groq.com/keys</a></li>
+    <li>Sign up or log in (free)</li>
     <li>Click "Create API Key"</li>
     <li>Copy the key and paste it above</li>
   </ol>
-  <p style="font-size:0.85rem;color:var(--color-muted);margin-top:0.75rem;">Your API key is stored only in your browser's local storage. It is never sent to any server other than Google's Gemini API.</p>
+  <p style="font-size:0.85rem;color:var(--color-muted);margin-top:0.75rem;">Your API key is stored only in your browser's local storage. It is never sent to any server other than Groq's API. Groq's free tier allows 30 requests/minute.</p>
 </div>
 
 <script>
-// Persist API key in localStorage
 (function() {
-  var saved = localStorage.getItem('gemini_api_key');
+  var saved = localStorage.getItem('groq_api_key');
   if (saved) document.getElementById('apiKey').value = saved;
 })();
 
 document.getElementById('apiKey').addEventListener('change', function() {
-  localStorage.setItem('gemini_api_key', this.value.trim());
+  localStorage.setItem('groq_api_key', this.value.trim());
 });
 
 async function generate() {
@@ -91,7 +90,7 @@ async function generate() {
   errorDiv.style.display = 'none';
 
   if (!apiKey) {
-    errorDiv.textContent = 'Please enter your Gemini API key.';
+    errorDiv.textContent = 'Please enter your Groq API key.';
     errorDiv.style.display = 'block';
     return;
   }
@@ -101,11 +100,13 @@ async function generate() {
     return;
   }
 
-  localStorage.setItem('gemini_api_key', apiKey);
+  localStorage.setItem('groq_api_key', apiKey);
 
   var lengthGuide = {short: 'under 100 words', medium: '100-200 words', long: '200-300 words'}[length];
 
-  var prompt = 'You are an expert LinkedIn content writer. Write a LinkedIn post based on the following input.\n\n' +
+  var systemPrompt = 'You are an expert LinkedIn content writer. You write posts that are authentic, engaging, and get real engagement. You never sound like AI. You never use em dashes.';
+
+  var userPrompt = 'Write a LinkedIn post based on the following:\n\n' +
     'Topic/Context: ' + topic + '\n\n' +
     'Tone: ' + tone + '\n' +
     'Length: ' + lengthGuide + '\n\n' +
@@ -119,7 +120,7 @@ async function generate() {
     '- Do NOT use emojis excessively, 2-3 max if they fit naturally\n' +
     '- Do NOT use generic motivational fluff\n' +
     '- Sound human, not like AI\n' +
-    '- Do NOT use em dashes\n\n' +
+    '- Do NOT use em dashes anywhere\n\n' +
     'Output ONLY the post text, ready to copy and paste into LinkedIn. No explanations or preamble.';
 
   btn.disabled = true;
@@ -128,15 +129,20 @@ async function generate() {
   outputGroup.style.display = 'none';
 
   try {
-    var response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey, {
+    var response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
       body: JSON.stringify({
-        contents: [{parts: [{text: prompt}]}],
-        generationConfig: {
-          temperature: 0.9,
-          maxOutputTokens: 1024
-        }
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          {role: 'system', content: systemPrompt},
+          {role: 'user', content: userPrompt}
+        ],
+        temperature: 0.9,
+        max_tokens: 1024
       })
     });
 
@@ -147,7 +153,7 @@ async function generate() {
       throw new Error(msg);
     }
 
-    var text = data.candidates[0].content.parts[0].text;
+    var text = data.choices[0].message.content;
     output.value = text.trim();
     outputGroup.style.display = 'block';
     loading.style.display = 'none';
