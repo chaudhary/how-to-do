@@ -124,7 +124,7 @@ title: Home
   {% assign cat_posts = site.posts | where: "category", cat %}
   {% if cat_posts.size > 0 %}
   <h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">{{ cat }}</h2>
-  <div class="tools-grid">
+  <div class="blog-grid">
     {% for post in cat_posts %}
     <a href="{{ post.url | relative_url }}" class="tool-card" data-search="{{ post.title | downcase }} {{ post.description | downcase }} {{ post.category | downcase }}">
       <div class="blog-meta" style="font-size:0.75rem;color:var(--color-muted);margin-bottom:0.35rem;">{{ post.date | date: "%B %d, %Y" }} &middot; {{ post.reading_time }} min read</div>
@@ -171,7 +171,7 @@ function filterAll() {
   // Hide category headers if all their cards are hidden
   categories.forEach(function(cat) {
     var grid = cat.nextElementSibling;
-    if (!grid || !grid.classList.contains('tools-grid')) return;
+    if (!grid || (!grid.classList.contains('tools-grid') && !grid.classList.contains('blog-grid'))) return;
     var hasVisible = Array.from(grid.querySelectorAll('.tool-card')).some(function(c) {
       return c.style.display !== 'none';
     });

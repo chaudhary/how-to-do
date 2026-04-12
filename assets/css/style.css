@@ -477,8 +477,16 @@ main {
   flex: 1;
 }
 
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
 @media (max-width: 600px) {
-  .tools-grid {
+  .tools-grid,
+  .blog-grid {
     grid-template-columns: 1fr;
   }
 }
