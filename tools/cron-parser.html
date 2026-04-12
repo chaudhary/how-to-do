@@ -1,0 +1,102 @@
+---
+layout: tool
+title: Cron Expression Parser
+---
+
+<div class="tool-header">
+  <h1>Cron Expression Parser</h1>
+  <p>Understand what a cron schedule means in plain English.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="cron">Cron Expression</label>
+    <div class="hint">Format: minute hour day-of-month month day-of-week</div>
+    <input type="text" id="cron" placeholder="e.g. */5 * * * *" value="0 9 * * 1-5" style="font-family:monospace;" oninput="parse()">
+  </div>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+    <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;" onclick="setCron('* * * * *')">Every minute</button>
+    <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;" onclick="setCron('*/5 * * * *')">Every 5 min</button>
+    <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;" onclick="setCron('0 * * * *')">Every hour</button>
+    <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;" onclick="setCron('0 0 * * *')">Daily midnight</button>
+    <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;" onclick="setCron('0 9 * * 1-5')">Weekdays 9am</button>
+    <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;" onclick="setCron('0 0 1 * *')">Monthly</button>
+    <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;" onclick="setCron('0 0 * * 0')">Weekly Sunday</button>
+  </div>
+</div>
+
+<div class="results visible" style="display:block;">
+  <h2>Explanation</h2>
+  <div id="explanation" style="font-size:1.1rem;font-weight:600;color:var(--color-primary);margin-bottom:1rem;"></div>
+  <table class="amortization-table">
+    <thead><tr><th style="text-align:left">Field</th><th>Value</th><th style="text-align:left">Meaning</th></tr></thead>
+    <tbody id="fields"></tbody>
+  </table>
+  <h3 style="margin-top:1.5rem;margin-bottom:0.75rem;">Next 5 runs</h3>
+  <div id="nextRuns"></div>
+</div>
+
+<script>
+var MONTHS=['','January','February','March','April','May','June','July','August','September','October','November','December'];
+var DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function setCron(v){document.getElementById('cron').value=v;parse();}
+function parseField(val,names,max){
+  if(val==='*')return 'every';
+  if(val.indexOf('/')>=0){var p=val.split('/');return 'every '+p[1]+(p[0]!=='*'?' starting at '+p[0]:'');}
+  if(val.indexOf('-')>=0){var p=val.split('-');var a=names?names[parseInt(p[0])]||p[0]:p[0];var b=names?names[parseInt(p[1])]||p[1]:p[1];return a+' through '+b;}
+  if(val.indexOf(',')>=0){return val.split(',').map(function(v){return names?names[parseInt(v)]||v:v;}).join(', ');}
+  return names?names[parseInt(val)]||val:val;
+}
+function describe(parts){
+  var min=parts[0],hr=parts[1],dom=parts[2],mon=parts[3],dow=parts[4];
+  var s='';
+  if(min==='*'&&hr==='*')s='Every minute';
+  else if(min.indexOf('/')>=0&&hr==='*')s='Every '+min.split('/')[1]+' minutes';
+  else if(hr.indexOf('/')>=0)s='Every '+hr.split('/')[1]+' hours'+(min!=='0'?' at minute '+min:'');
+  else if(min!=='*'&&hr!=='*')s='At '+hr.padStart(2,'0')+':'+min.padStart(2,'0');
+  else if(min!=='*')s='At minute '+min+' of every hour';
+  else s='Every minute of hour '+hr;
+  if(dom!=='*')s+=', on day '+dom+' of the month';
+  if(mon!=='*')s+=', in '+parseField(mon,MONTHS);
+  if(dow!=='*')s+=', on '+parseField(dow,DAYS);
+  return s;
+}
+function getNextRuns(parts,count){
+  var now=new Date();var runs=[];
+  var d=new Date(now);d.setSeconds(0);d.setMilliseconds(0);d.setMinutes(d.getMinutes()+1);
+  for(var i=0;i<525600&&runs.length<count;i++){
+    if(matches(parts,d))runs.push(new Date(d));
+    d.setMinutes(d.getMinutes()+1);
+  }
+  return runs;
+}
+function matchField(val,num,max){
+  if(val==='*')return true;
+  if(val.indexOf('/')>=0){var p=val.split('/');var start=p[0]==='*'?0:parseInt(p[0]);var step=parseInt(p[1]);return num>=start&&(num-start)%step===0;}
+  if(val.indexOf('-')>=0){var p=val.split('-');return num>=parseInt(p[0])&&num<=parseInt(p[1]);}
+  if(val.indexOf(',')>=0){return val.split(',').map(Number).indexOf(num)>=0;}
+  return parseInt(val)===num;
+}
+function matches(parts,d){
+  return matchField(parts[0],d.getMinutes())&&matchField(parts[1],d.getHours())&&matchField(parts[2],d.getDate())&&matchField(parts[3],d.getMonth()+1)&&matchField(parts[4],d.getDay());
+}
+function parse(){
+  var expr=document.getElementById('cron').value.trim();
+  var parts=expr.split(/\s+/);
+  if(parts.length!==5){document.getElementById('explanation').textContent='Invalid: need exactly 5 fields';document.getElementById('fields').innerHTML='';document.getElementById('nextRuns').innerHTML='';return;}
+  document.getElementById('explanation').textContent=describe(parts);
+  var labels=['Minute','Hour','Day of Month','Month','Day of Week'];
+  var names=[null,null,null,MONTHS,DAYS];
+  var tbody=document.getElementById('fields');tbody.innerHTML='';
+  parts.forEach(function(p,i){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td>'+labels[i]+'</td><td style="font-family:monospace;">'+p+'</td><td>'+parseField(p,names[i])+'</td>';
+    tbody.appendChild(tr);
+  });
+  var runs=getNextRuns(parts,5);
+  document.getElementById('nextRuns').innerHTML=runs.map(function(r){
+    return '<div class="result-row"><span class="result-value">'+r.toLocaleString('en-US',{weekday:'short',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+'</span></div>';
+  }).join('');
+}
+parse();
+</script>

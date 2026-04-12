@@ -1,0 +1,85 @@
+---
+layout: tool
+title: GST Calculator
+---
+
+<div class="tool-header">
+  <h1>GST Calculator</h1>
+  <p>Add or remove GST at standard Indian rates.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="amount">Amount</label>
+    <input type="number" id="amount" placeholder="e.g. 10000" min="0.01" step="any">
+  </div>
+  <div class="form-group">
+    <label for="rate">GST Rate</label>
+    <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+      <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.85rem;" onclick="setRate(5)">5%</button>
+      <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.85rem;" onclick="setRate(12)">12%</button>
+      <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.85rem;" onclick="setRate(18)">18%</button>
+      <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.85rem;" onclick="setRate(28)">28%</button>
+    </div>
+    <input type="number" id="rate" placeholder="e.g. 18" min="0" step="any" value="18">
+  </div>
+  <div class="form-group">
+    <label>Calculation Type</label>
+    <div style="display:flex;gap:1rem;">
+      <label style="font-weight:normal;display:flex;align-items:center;gap:0.35rem;cursor:pointer;">
+        <input type="radio" name="type" value="add" checked> Add GST (exclusive)
+      </label>
+      <label style="font-weight:normal;display:flex;align-items:center;gap:0.35rem;cursor:pointer;">
+        <input type="radio" name="type" value="remove"> Remove GST (inclusive)
+      </label>
+    </div>
+  </div>
+  <button class="btn" onclick="calculate()">Calculate</button>
+</div>
+
+<div class="results" id="results">
+  <h2>Breakdown</h2>
+  <div class="result-row">
+    <span class="result-label">Base Amount</span>
+    <span class="result-value" id="base"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">CGST (<span id="cgst-rate"></span>%)</span>
+    <span class="result-value" id="cgst"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">SGST (<span id="sgst-rate"></span>%)</span>
+    <span class="result-value" id="sgst"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Total GST</span>
+    <span class="result-value" id="gst"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Total Amount</span>
+    <span class="result-value" id="total"></span>
+  </div>
+</div>
+
+<script>
+function fmt(n){return n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+function setRate(v){document.getElementById('rate').value=v;}
+function calculate(){
+  var amt=parseFloat(document.getElementById('amount').value);
+  var rate=parseFloat(document.getElementById('rate').value);
+  var type=document.querySelector('input[name="type"]:checked').value;
+  if(!amt||amt<=0||isNaN(rate)||rate<0){alert('Enter valid values.');return;}
+  var base,gst,total;
+  if(type==='add'){base=amt;gst=amt*rate/100;total=amt+gst;}
+  else{total=amt;base=amt*100/(100+rate);gst=total-base;}
+  var half=rate/2;
+  document.getElementById('base').textContent=fmt(base);
+  document.getElementById('cgst-rate').textContent=half;
+  document.getElementById('sgst-rate').textContent=half;
+  document.getElementById('cgst').textContent=fmt(gst/2);
+  document.getElementById('sgst').textContent=fmt(gst/2);
+  document.getElementById('gst').textContent=fmt(gst);
+  document.getElementById('total').textContent=fmt(total);
+  document.getElementById('results').classList.add('visible');
+}
+</script>

@@ -1,0 +1,60 @@
+---
+layout: tool
+title: Image to Base64 Converter
+---
+
+<div class="tool-header">
+  <h1>Image to Base64 Converter</h1>
+  <p>Convert images to Base64 encoded strings for embedding in HTML/CSS.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="fileInput">Select Image</label>
+    <input type="file" id="fileInput" accept="image/*" onchange="convertImage()" style="padding:0.5rem 0;">
+  </div>
+  <div id="imagePreview" style="display:none;margin:1rem 0;text-align:center;">
+    <img id="preview" style="max-width:100%;max-height:300px;border-radius:var(--radius);border:1px solid var(--color-border);">
+  </div>
+  <div id="info" style="display:none;margin-bottom:1rem;">
+    <div class="result-row"><span class="result-label">File name</span><span class="result-value" id="fname"></span></div>
+    <div class="result-row"><span class="result-label">File size</span><span class="result-value" id="fsize"></span></div>
+    <div class="result-row"><span class="result-label">MIME type</span><span class="result-value" id="ftype"></span></div>
+    <div class="result-row"><span class="result-label">Base64 length</span><span class="result-value" id="b64len"></span></div>
+  </div>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+    <button class="btn" onclick="copyDataURI()">Copy Data URI</button>
+    <button class="btn" onclick="copyBase64()" style="background:var(--color-muted);">Copy Base64 Only</button>
+    <button class="btn" onclick="copyImgTag()" style="background:var(--color-accent);">Copy &lt;img&gt; Tag</button>
+  </div>
+</div>
+
+<div class="form-group" id="outputGroup" style="display:none;margin-top:1.5rem;">
+  <label>Data URI</label>
+  <textarea id="output" rows="6" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.75rem;resize:vertical;word-break:break-all;" readonly></textarea>
+</div>
+
+<script>
+var currentDataURI='';
+function convertImage(){
+  var file=document.getElementById('fileInput').files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    currentDataURI=e.target.result;
+    document.getElementById('preview').src=currentDataURI;
+    document.getElementById('imagePreview').style.display='block';
+    document.getElementById('fname').textContent=file.name;
+    document.getElementById('fsize').textContent=(file.size/1024).toFixed(1)+' KB';
+    document.getElementById('ftype').textContent=file.type;
+    document.getElementById('b64len').textContent=(currentDataURI.length/1024).toFixed(1)+' KB';
+    document.getElementById('output').value=currentDataURI;
+    document.getElementById('info').style.display='block';
+    document.getElementById('outputGroup').style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+function copyDataURI(){if(currentDataURI)navigator.clipboard.writeText(currentDataURI);}
+function copyBase64(){if(currentDataURI){var b64=currentDataURI.split(',')[1];navigator.clipboard.writeText(b64);}}
+function copyImgTag(){if(currentDataURI)navigator.clipboard.writeText('<img src="'+currentDataURI+'" alt="">');}
+</script>

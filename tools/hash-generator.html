@@ -1,0 +1,68 @@
+---
+layout: tool
+title: Hash Generator
+---
+
+<div class="tool-header">
+  <h1>Hash Generator</h1>
+  <p>Generate MD5, SHA-1, SHA-256, and SHA-512 hashes from text.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="input">Input Text</label>
+    <textarea id="input" rows="4" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.9rem;resize:vertical;" placeholder="Enter text to hash" oninput="generateAll()"></textarea>
+  </div>
+</div>
+
+<div class="results visible" id="results" style="display:block;">
+  <h2>Hashes</h2>
+  <div class="form-group" style="margin-bottom:1rem;">
+    <label>MD5</label>
+    <div style="display:flex;gap:0.5rem;">
+      <input type="text" id="md5" readonly style="font-family:monospace;font-size:0.85rem;">
+      <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;flex-shrink:0;" onclick="copy('md5')">Copy</button>
+    </div>
+  </div>
+  <div class="form-group" style="margin-bottom:1rem;">
+    <label>SHA-1</label>
+    <div style="display:flex;gap:0.5rem;">
+      <input type="text" id="sha1" readonly style="font-family:monospace;font-size:0.85rem;">
+      <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;flex-shrink:0;" onclick="copy('sha1')">Copy</button>
+    </div>
+  </div>
+  <div class="form-group" style="margin-bottom:1rem;">
+    <label>SHA-256</label>
+    <div style="display:flex;gap:0.5rem;">
+      <input type="text" id="sha256" readonly style="font-family:monospace;font-size:0.85rem;">
+      <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;flex-shrink:0;" onclick="copy('sha256')">Copy</button>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>SHA-512</label>
+    <div style="display:flex;gap:0.5rem;">
+      <input type="text" id="sha512" readonly style="font-family:monospace;font-size:0.85rem;">
+      <button class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;flex-shrink:0;" onclick="copy('sha512')">Copy</button>
+    </div>
+  </div>
+</div>
+
+<script>
+async function hashText(algo, text){
+  var enc=new TextEncoder();
+  var data=enc.encode(text);
+  var buf=await crypto.subtle.digest(algo,data);
+  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
+}
+// MD5 is not in SubtleCrypto, use a minimal implementation
+function md5(s){var k=[],i;for(i=0;i<64;)k[i]=0|Math.abs(Math.sin(++i)*4294967296);function add(a,b){return(a+b)|0}function F(a,b,c,d,x,s,t){a=add(add(a,(b&c)|(~b&d)),add(x,t));return add((a<<s)|(a>>>(32-s)),b)}function G(a,b,c,d,x,s,t){a=add(add(a,(b&d)|(c&~d)),add(x,t));return add((a<<s)|(a>>>(32-s)),b)}function H(a,b,c,d,x,s,t){a=add(add(a,b^c^d),add(x,t));return add((a<<s)|(a>>>(32-s)),b)}function I(a,b,c,d,x,s,t){a=add(add(a,c^(b|~d)),add(x,t));return add((a<<s)|(a>>>(32-s)),b)}var bytes=[];for(i=0;i<s.length;i++){var c=s.charCodeAt(i);if(c<128)bytes.push(c);else if(c<2048){bytes.push(192|(c>>6));bytes.push(128|(c&63));}else{bytes.push(224|(c>>12));bytes.push(128|((c>>6)&63));bytes.push(128|(c&63));}}var l=bytes.length;bytes.push(128);while(bytes.length%64!==56)bytes.push(0);var bl=l*8;for(i=0;i<4;i++)bytes.push((bl>>>(i*8))&255);for(i=0;i<4;i++)bytes.push(0);var a0=1732584193,b0=-271733879,c0=-1732584194,d0=271733878;for(var off=0;off<bytes.length;off+=64){var w=[];for(i=0;i<16;i++)w[i]=bytes[off+i*4]|(bytes[off+i*4+1]<<8)|(bytes[off+i*4+2]<<16)|(bytes[off+i*4+3]<<24);var a=a0,b=b0,c=c0,d=d0;a=F(a,b,c,d,w[0],7,k[0]);d=F(d,a,b,c,w[1],12,k[1]);c=F(c,d,a,b,w[2],17,k[2]);b=F(b,c,d,a,w[3],22,k[3]);a=F(a,b,c,d,w[4],7,k[4]);d=F(d,a,b,c,w[5],12,k[5]);c=F(c,d,a,b,w[6],17,k[6]);b=F(b,c,d,a,w[7],22,k[7]);a=F(a,b,c,d,w[8],7,k[8]);d=F(d,a,b,c,w[9],12,k[9]);c=F(c,d,a,b,w[10],17,k[10]);b=F(b,c,d,a,w[11],22,k[11]);a=F(a,b,c,d,w[12],7,k[12]);d=F(d,a,b,c,w[13],12,k[13]);c=F(c,d,a,b,w[14],17,k[14]);b=F(b,c,d,a,w[15],22,k[15]);a=G(a,b,c,d,w[1],5,k[16]);d=G(d,a,b,c,w[6],9,k[17]);c=G(c,d,a,b,w[11],14,k[18]);b=G(b,c,d,a,w[0],20,k[19]);a=G(a,b,c,d,w[5],5,k[20]);d=G(d,a,b,c,w[10],9,k[21]);c=G(c,d,a,b,w[15],14,k[22]);b=G(b,c,d,a,w[4],20,k[23]);a=G(a,b,c,d,w[9],5,k[24]);d=G(d,a,b,c,w[14],9,k[25]);c=G(c,d,a,b,w[3],14,k[26]);b=G(b,c,d,a,w[8],20,k[27]);a=G(a,b,c,d,w[13],5,k[28]);d=G(d,a,b,c,w[2],9,k[29]);c=G(c,d,a,b,w[7],14,k[30]);b=G(b,c,d,a,w[12],20,k[31]);a=H(a,b,c,d,w[5],4,k[32]);d=H(d,a,b,c,w[8],11,k[33]);c=H(c,d,a,b,w[11],16,k[34]);b=H(b,c,d,a,w[14],23,k[35]);a=H(a,b,c,d,w[1],4,k[36]);d=H(d,a,b,c,w[4],11,k[37]);c=H(c,d,a,b,w[7],16,k[38]);b=H(b,c,d,a,w[10],23,k[39]);a=H(a,b,c,d,w[13],4,k[40]);d=H(d,a,b,c,w[0],11,k[41]);c=H(c,d,a,b,w[3],16,k[42]);b=H(b,c,d,a,w[6],23,k[43]);a=H(a,b,c,d,w[9],4,k[44]);d=H(d,a,b,c,w[12],11,k[45]);c=H(c,d,a,b,w[15],16,k[46]);b=H(b,c,d,a,w[2],23,k[47]);a=I(a,b,c,d,w[0],6,k[48]);d=I(d,a,b,c,w[7],10,k[49]);c=I(c,d,a,b,w[14],15,k[50]);b=I(b,c,d,a,w[5],21,k[51]);a=I(a,b,c,d,w[12],6,k[52]);d=I(d,a,b,c,w[3],10,k[53]);c=I(c,d,a,b,w[10],15,k[54]);b=I(b,c,d,a,w[1],21,k[55]);a=I(a,b,c,d,w[8],6,k[56]);d=I(d,a,b,c,w[15],10,k[57]);c=I(c,d,a,b,w[6],15,k[58]);b=I(b,c,d,a,w[13],21,k[59]);a=I(a,b,c,d,w[4],6,k[60]);d=I(d,a,b,c,w[11],10,k[61]);c=I(c,d,a,b,w[2],15,k[62]);b=I(b,c,d,a,w[9],21,k[63]);a0=add(a0,a);b0=add(b0,b);c0=add(c0,c);d0=add(d0,d);}function hex(n){var s='';for(i=0;i<4;i++)s+=('0'+((n>>>(i*8))&255).toString(16)).slice(-2);return s;}return hex(a0)+hex(b0)+hex(c0)+hex(d0);}
+async function generateAll(){
+  var text=document.getElementById('input').value;
+  if(!text){document.getElementById('md5').value='';document.getElementById('sha1').value='';document.getElementById('sha256').value='';document.getElementById('sha512').value='';return;}
+  document.getElementById('md5').value=md5(text);
+  document.getElementById('sha1').value=await hashText('SHA-1',text);
+  document.getElementById('sha256').value=await hashText('SHA-256',text);
+  document.getElementById('sha512').value=await hashText('SHA-512',text);
+}
+function copy(id){var v=document.getElementById(id).value;if(v)navigator.clipboard.writeText(v);}
+</script>

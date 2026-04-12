@@ -1,0 +1,63 @@
+---
+layout: tool
+title: Diff Checker
+---
+
+<div class="tool-header">
+  <h1>Diff Checker</h1>
+  <p>Compare two text blocks and see the differences highlighted.</p>
+</div>
+
+<div class="calc-form">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+    <div class="form-group">
+      <label for="text1">Original</label>
+      <textarea id="text1" rows="12" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.85rem;resize:vertical;" placeholder="Paste original text"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="text2">Modified</label>
+      <textarea id="text2" rows="12" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.85rem;resize:vertical;" placeholder="Paste modified text"></textarea>
+    </div>
+  </div>
+  <button class="btn" onclick="compare()">Compare</button>
+</div>
+
+<div id="diffResult" style="display:none;margin-top:1.5rem;">
+  <h2 style="margin-bottom:1rem;">Differences</h2>
+  <div id="stats" style="font-size:0.9rem;color:var(--color-muted);margin-bottom:1rem;"></div>
+  <div id="diffOutput" style="padding:1rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.85rem;line-height:1.8;overflow-x:auto;background:var(--color-card-bg);white-space:pre-wrap;"></div>
+</div>
+
+<script>
+function compare(){
+  var t1=document.getElementById('text1').value;
+  var t2=document.getElementById('text2').value;
+  if(!t1&&!t2){alert('Enter text in both fields.');return;}
+  var lines1=t1.split('\n'),lines2=t2.split('\n');
+  var maxLen=Math.max(lines1.length,lines2.length);
+  var html='',added=0,removed=0,unchanged=0;
+  // Simple line-by-line diff
+  var dp=[];
+  for(var i=0;i<=lines1.length;i++){dp[i]=[];for(var j=0;j<=lines2.length;j++)dp[i][j]=0;}
+  for(var i=1;i<=lines1.length;i++)for(var j=1;j<=lines2.length;j++)dp[i][j]=lines1[i-1]===lines2[j-1]?dp[i-1][j-1]+1:Math.max(dp[i-1][j],dp[i][j-1]);
+  // Backtrack
+  var result=[];
+  var i=lines1.length,j=lines2.length;
+  while(i>0||j>0){
+    if(i>0&&j>0&&lines1[i-1]===lines2[j-1]){result.unshift({type:'same',text:lines1[i-1]});i--;j--;}
+    else if(j>0&&(i===0||dp[i][j-1]>=dp[i-1][j])){result.unshift({type:'add',text:lines2[j-1]});j--;}
+    else{result.unshift({type:'del',text:lines1[i-1]});i--;}
+  }
+  result.forEach(function(r,idx){
+    var ln=idx+1;
+    var esc=r.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    if(r.type==='same'){html+='<div style="color:var(--color-muted);">  '+esc+'</div>';unchanged++;}
+    else if(r.type==='add'){html+='<div style="background:#dcfce7;color:#166534;">+ '+esc+'</div>';added++;}
+    else{html+='<div style="background:#fef2f2;color:#dc2626;">- '+esc+'</div>';removed++;}
+  });
+  if(added===0&&removed===0)html='<div style="color:var(--color-accent);font-weight:600;padding:1rem;">No differences found. The texts are identical.</div>';
+  document.getElementById('stats').textContent=added+' added, '+removed+' removed, '+unchanged+' unchanged lines';
+  document.getElementById('diffOutput').innerHTML=html;
+  document.getElementById('diffResult').style.display='block';
+}
+</script>

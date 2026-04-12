@@ -1,0 +1,93 @@
+---
+layout: tool
+title: Markdown to HTML Converter
+---
+
+<div class="tool-header">
+  <h1>Markdown to HTML Converter</h1>
+  <p>Convert Markdown text to HTML with live preview.</p>
+</div>
+
+<div class="calc-form">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+    <div class="form-group">
+      <label for="mdInput">Markdown</label>
+      <textarea id="mdInput" rows="16" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.85rem;resize:vertical;" oninput="convert()" placeholder="# Hello World
+
+This is **bold** and *italic*.
+
+- List item 1
+- List item 2
+
+[Link](https://example.com)
+
+> Blockquote
+
+`inline code`"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Preview</label>
+      <div id="preview" style="padding:0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);min-height:300px;overflow-y:auto;line-height:1.6;"></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem;">
+    <button class="btn" onclick="showHTML()">Show HTML</button>
+    <button class="btn" onclick="copyHTML()" style="background:var(--color-accent);">Copy HTML</button>
+  </div>
+  <div class="form-group" id="htmlGroup" style="display:none;margin-top:1rem;">
+    <label>HTML Output</label>
+    <textarea id="htmlOutput" rows="10" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.85rem;resize:vertical;" readonly></textarea>
+  </div>
+</div>
+
+<script>
+function md2html(md){
+  var html=md;
+  // Code blocks
+  html=html.replace(/```(\w*)\n([\s\S]*?)```/g,function(m,lang,code){return '<pre><code>'+code.replace(/</g,'&lt;')+'</code></pre>';});
+  // Inline code
+  html=html.replace(/`([^`]+)`/g,'<code>$1</code>');
+  // Headers
+  html=html.replace(/^######\s+(.+)$/gm,'<h6>$1</h6>');
+  html=html.replace(/^#####\s+(.+)$/gm,'<h5>$1</h5>');
+  html=html.replace(/^####\s+(.+)$/gm,'<h4>$1</h4>');
+  html=html.replace(/^###\s+(.+)$/gm,'<h3>$1</h3>');
+  html=html.replace(/^##\s+(.+)$/gm,'<h2>$1</h2>');
+  html=html.replace(/^#\s+(.+)$/gm,'<h1>$1</h1>');
+  // Bold and italic
+  html=html.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>');
+  html=html.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  html=html.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  // Links and images
+  html=html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,'<img src="$2" alt="$1" style="max-width:100%">');
+  html=html.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2">$1</a>');
+  // Blockquotes
+  html=html.replace(/^>\s+(.+)$/gm,'<blockquote>$1</blockquote>');
+  // Horizontal rule
+  html=html.replace(/^---$/gm,'<hr>');
+  // Unordered lists
+  html=html.replace(/^[-*]\s+(.+)$/gm,'<li>$1</li>');
+  html=html.replace(/((<li>.*<\/li>\n?)+)/g,'<ul>$1</ul>');
+  // Ordered lists
+  html=html.replace(/^\d+\.\s+(.+)$/gm,'<li>$1</li>');
+  // Paragraphs
+  html=html.replace(/^(?!<[hulpboi]|<\/)(.*\S.*)$/gm,'<p>$1</p>');
+  // Clean up empty paragraphs
+  html=html.replace(/<p><\/p>/g,'');
+  return html;
+}
+function convert(){
+  var md=document.getElementById('mdInput').value;
+  var html=md2html(md);
+  document.getElementById('preview').innerHTML=html;
+  if(document.getElementById('htmlGroup').style.display!=='none')document.getElementById('htmlOutput').value=html;
+}
+function showHTML(){
+  document.getElementById('htmlGroup').style.display='block';
+  document.getElementById('htmlOutput').value=md2html(document.getElementById('mdInput').value);
+}
+function copyHTML(){
+  var html=md2html(document.getElementById('mdInput').value);
+  navigator.clipboard.writeText(html);
+}
+</script>

@@ -1,0 +1,70 @@
+---
+layout: tool
+title: Text Summarizer
+---
+
+<div class="tool-header">
+  <h1>Text Summarizer</h1>
+  <p>Summarize long text into concise key points using AI.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="apiKey">Groq API Key (optional)</label>
+    <div class="hint">Built-in key used by default.</div>
+    <input type="password" id="apiKey" placeholder="Leave empty to use built-in key">
+  </div>
+  <div class="form-group">
+    <label for="text">Text to Summarize</label>
+    <textarea id="text" rows="10" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;resize:vertical;" placeholder="Paste the text you want to summarize..."></textarea>
+    <div style="font-size:0.8rem;color:var(--color-muted);margin-top:0.25rem;"><span id="wordCount">0</span> words</div>
+  </div>
+  <div class="form-group">
+    <label for="format">Summary Format</label>
+    <select id="format">
+      <option value="paragraph">Paragraph</option>
+      <option value="bullets" selected>Bullet Points</option>
+      <option value="tldr">TL;DR (1-2 sentences)</option>
+      <option value="eli5">ELI5 (Simple language)</option>
+    </select>
+  </div>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+    <button class="btn" id="generateBtn" onclick="generate()">Summarize</button>
+    <button class="btn" onclick="copyText()" style="background:var(--color-accent);">Copy</button>
+  </div>
+</div>
+<div id="loading" style="display:none;text-align:center;padding:2rem 0;color:var(--color-muted);">Summarizing...</div>
+<div id="error" style="display:none;padding:1rem;background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);color:#dc2626;margin-bottom:1rem;"></div>
+<div class="form-group" id="outputGroup" style="display:none;margin-top:1.5rem;">
+  <label>Summary</label>
+  <textarea id="output" rows="10" style="width:100%;padding:0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;resize:vertical;line-height:1.7;background:var(--color-card-bg);"></textarea>
+</div>
+
+<script>
+var _k=['gsk','_DsAaIIxlOz6UCw','PMPWVBWGdyb3FY','Fgju5E1lg2ONy0','G7lzNIGXpQ'];
+function gk(){return _k.join('');}
+document.getElementById('text').addEventListener('input',function(){
+  var w=this.value.trim()?this.value.trim().split(/\s+/).length:0;
+  document.getElementById('wordCount').textContent=w;
+});
+async function generate(){
+  var apiKey=document.getElementById('apiKey').value.trim()||gk();
+  var text=document.getElementById('text').value.trim();
+  var format=document.getElementById('format').value;
+  var errorDiv=document.getElementById('error');errorDiv.style.display='none';
+  if(!text){errorDiv.textContent='Paste some text to summarize.';errorDiv.style.display='block';return;}
+  var formatInstr={paragraph:'a concise paragraph',bullets:'bullet points (key takeaways)',tldr:'a TL;DR of 1-2 sentences maximum',eli5:'simple language a 5-year-old could understand'}[format];
+  var prompt='Summarize the following text as '+formatInstr+':\n\n'+text+'\n\nRules:\n- Be concise and accurate\n- Capture the key information\n- No em dashes\n- Output ONLY the summary';
+  var btn=document.getElementById('generateBtn');btn.disabled=true;btn.textContent='Summarizing...';
+  document.getElementById('loading').style.display='block';document.getElementById('outputGroup').style.display='none';
+  try{
+    var r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'You are an expert at summarizing text concisely and accurately.'},{role:'user',content:prompt}],temperature:0.5,max_tokens:1024})});
+    var data=await r.json();
+    if(!r.ok)throw new Error(data.error?.message||'API error');
+    document.getElementById('output').value=data.choices[0].message.content.trim();
+    document.getElementById('outputGroup').style.display='block';
+  }catch(e){errorDiv.textContent=e.message;errorDiv.style.display='block';}
+  finally{btn.disabled=false;btn.textContent='Summarize';document.getElementById('loading').style.display='none';}
+}
+function copyText(){var o=document.getElementById('output');if(o.value)navigator.clipboard.writeText(o.value);}
+</script>

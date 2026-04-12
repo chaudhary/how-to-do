@@ -1,0 +1,71 @@
+---
+layout: tool
+title: PPF Calculator
+---
+
+<div class="tool-header">
+  <h1>PPF Calculator</h1>
+  <p>Calculate maturity amount for Public Provident Fund investments.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="yearly">Annual Investment</label>
+    <div class="hint">Min 500, Max 1,50,000 per year</div>
+    <input type="number" id="yearly" placeholder="e.g. 150000" min="500" max="150000" step="any">
+  </div>
+  <div class="form-group">
+    <label for="rate">Interest Rate (%)</label>
+    <div class="hint">Current PPF rate: 7.1%</div>
+    <input type="number" id="rate" value="7.1" min="1" step="0.1">
+  </div>
+  <div class="form-group">
+    <label for="tenure">Tenure (years)</label>
+    <div class="hint">Minimum 15 years, extendable in blocks of 5</div>
+    <input type="number" id="tenure" value="15" min="15" step="5">
+  </div>
+  <button class="btn" onclick="calculate()">Calculate</button>
+</div>
+
+<div class="results" id="results">
+  <h2>PPF Maturity</h2>
+  <div class="result-row"><span class="result-label">Total Investment</span><span class="result-value" id="invested"></span></div>
+  <div class="result-row"><span class="result-label">Interest Earned</span><span class="result-value" id="interest"></span></div>
+  <div class="result-row"><span class="result-label">Maturity Amount</span><span class="result-value" id="maturity"></span></div>
+</div>
+
+<div class="amortization-section" id="yearwise">
+  <h2>Year-wise Breakdown</h2>
+  <div class="table-wrap">
+    <table class="amortization-table">
+      <thead><tr><th>Year</th><th>Deposit</th><th>Interest</th><th>Balance</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function fmt(n){return Math.round(n).toLocaleString();}
+function calculate(){
+  var yearly=parseFloat(document.getElementById('yearly').value);
+  var rate=parseFloat(document.getElementById('rate').value)/100;
+  var tenure=parseInt(document.getElementById('tenure').value);
+  if(!yearly||!rate||!tenure){alert('Fill all fields.');return;}
+  var balance=0,totalInvested=0,tbody=document.getElementById('tbody');
+  tbody.innerHTML='';
+  for(var y=1;y<=tenure;y++){
+    balance+=yearly;
+    var interest=balance*rate;
+    balance+=interest;
+    totalInvested+=yearly;
+    var row=document.createElement('tr');
+    row.innerHTML='<td>'+y+'</td><td>'+fmt(yearly)+'</td><td>'+fmt(interest)+'</td><td>'+fmt(balance)+'</td>';
+    tbody.appendChild(row);
+  }
+  document.getElementById('invested').textContent=fmt(totalInvested);
+  document.getElementById('interest').textContent=fmt(balance-totalInvested);
+  document.getElementById('maturity').textContent=fmt(balance);
+  document.getElementById('results').classList.add('visible');
+  document.getElementById('yearwise').classList.add('visible');
+}
+</script>

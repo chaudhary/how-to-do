@@ -1,0 +1,99 @@
+---
+layout: tool
+title: Invoice Generator
+---
+
+<div class="tool-header">
+  <h1>Invoice Generator</h1>
+  <p>Create a professional invoice and print or save as PDF.</p>
+</div>
+
+<div class="calc-form" id="invoiceForm">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+    <div>
+      <h3 style="margin-bottom:1rem;">From</h3>
+      <div class="form-group"><label for="fromName">Business Name</label><input type="text" id="fromName" placeholder="Your Business"></div>
+      <div class="form-group"><label for="fromEmail">Email</label><input type="email" id="fromEmail" placeholder="you@business.com"></div>
+      <div class="form-group"><label for="fromAddr">Address</label><textarea id="fromAddr" rows="2" style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.9rem;resize:vertical;" placeholder="Street, City, State"></textarea></div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:1rem;">Bill To</h3>
+      <div class="form-group"><label for="toName">Client Name</label><input type="text" id="toName" placeholder="Client Name"></div>
+      <div class="form-group"><label for="toEmail">Email</label><input type="email" id="toEmail" placeholder="client@company.com"></div>
+      <div class="form-group"><label for="toAddr">Address</label><textarea id="toAddr" rows="2" style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.9rem;resize:vertical;" placeholder="Street, City, State"></textarea></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem;">
+    <div class="form-group" style="flex:1;min-width:150px;"><label for="invNum">Invoice #</label><input type="text" id="invNum" value="INV-001"></div>
+    <div class="form-group" style="flex:1;min-width:150px;"><label for="invDate">Date</label><input type="date" id="invDate"></div>
+    <div class="form-group" style="flex:1;min-width:150px;"><label for="dueDate">Due Date</label><input type="date" id="dueDate"></div>
+  </div>
+  <h3 style="margin:1.5rem 0 1rem;">Items</h3>
+  <div id="items"></div>
+  <button type="button" onclick="addItem()" style="background:none;border:1px dashed var(--color-border);padding:0.5rem 1rem;border-radius:var(--radius);color:var(--color-primary);cursor:pointer;font-size:0.9rem;margin-bottom:1rem;">+ Add Item</button>
+  <div class="form-group">
+    <label for="taxRate">Tax Rate (%)</label>
+    <input type="number" id="taxRate" value="18" min="0" step="any" style="width:100px;" oninput="updateTotals()">
+  </div>
+  <div class="form-group">
+    <label for="notes">Notes</label>
+    <textarea id="notes" rows="2" style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.9rem;resize:vertical;" placeholder="Payment terms, bank details, etc."></textarea>
+  </div>
+  <div style="text-align:right;margin-top:1rem;">
+    <div style="font-size:0.95rem;color:var(--color-muted);">Subtotal: <strong id="subtotal">0</strong></div>
+    <div style="font-size:0.95rem;color:var(--color-muted);">Tax: <strong id="taxAmt">0</strong></div>
+    <div style="font-size:1.25rem;font-weight:700;color:var(--color-primary);margin-top:0.25rem;">Total: <strong id="grandTotal">0</strong></div>
+  </div>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1.5rem;">
+    <button class="btn" onclick="printInvoice()">Print / Save PDF</button>
+  </div>
+</div>
+
+<script>
+var today=new Date().toISOString().split('T')[0];
+document.getElementById('invDate').value=today;
+var due=new Date();due.setDate(due.getDate()+30);
+document.getElementById('dueDate').value=due.toISOString().split('T')[0];
+var itemCount=0;
+function addItem(){
+  itemCount++;
+  var div=document.createElement('div');
+  div.id='item-'+itemCount;
+  div.style.cssText='display:flex;gap:0.5rem;align-items:flex-end;margin-bottom:0.5rem;flex-wrap:wrap;';
+  div.innerHTML='<div class="form-group" style="flex:3;min-width:150px;margin-bottom:0;"><label style="font-size:0.8rem;">Description</label><input type="text" class="item-desc" placeholder="Service/Product"></div><div class="form-group" style="flex:1;min-width:60px;margin-bottom:0;"><label style="font-size:0.8rem;">Qty</label><input type="number" class="item-qty" value="1" min="1" oninput="updateTotals()"></div><div class="form-group" style="flex:1;min-width:80px;margin-bottom:0;"><label style="font-size:0.8rem;">Rate</label><input type="number" class="item-rate" placeholder="0" min="0" step="any" oninput="updateTotals()"></div><div class="form-group" style="flex:1;min-width:80px;margin-bottom:0;"><label style="font-size:0.8rem;">Amount</label><input type="text" class="item-amount" readonly style="background:var(--color-card-bg);"></div><button onclick="this.parentElement.remove();updateTotals();" style="background:#dc2626;color:white;border:none;border-radius:var(--radius);padding:0.4rem 0.6rem;cursor:pointer;margin-bottom:0;">X</button>';
+  document.getElementById('items').appendChild(div);
+}
+function updateTotals(){
+  var subtotal=0;
+  var rows=document.getElementById('items').children;
+  for(var i=0;i<rows.length;i++){
+    var qty=parseFloat(rows[i].querySelector('.item-qty').value)||0;
+    var rate=parseFloat(rows[i].querySelector('.item-rate').value)||0;
+    var amt=qty*rate;
+    rows[i].querySelector('.item-amount').value=amt.toFixed(2);
+    subtotal+=amt;
+  }
+  var taxRate=parseFloat(document.getElementById('taxRate').value)||0;
+  var tax=subtotal*taxRate/100;
+  document.getElementById('subtotal').textContent=subtotal.toFixed(2);
+  document.getElementById('taxAmt').textContent=tax.toFixed(2);
+  document.getElementById('grandTotal').textContent=(subtotal+tax).toFixed(2);
+}
+function printInvoice(){
+  var items=[];var rows=document.getElementById('items').children;
+  for(var i=0;i<rows.length;i++){items.push({desc:rows[i].querySelector('.item-desc').value,qty:rows[i].querySelector('.item-qty').value,rate:rows[i].querySelector('.item-rate').value,amount:rows[i].querySelector('.item-amount').value});}
+  var w=window.open('','','width=800,height=600');
+  w.document.write('<html><head><title>Invoice '+document.getElementById('invNum').value+'</title><style>body{font-family:-apple-system,sans-serif;padding:40px;color:#1a1a2e;max-width:800px;margin:0 auto;}table{width:100%;border-collapse:collapse;margin:20px 0;}th,td{padding:8px 12px;border-bottom:1px solid #e2e8f0;text-align:left;}th{background:#f8fafc;font-size:0.85rem;text-transform:uppercase;color:#64748b;}h1{font-size:1.5rem;}.header{display:flex;justify-content:space-between;margin-bottom:30px;}.totals{text-align:right;margin-top:20px;}.notes{margin-top:30px;font-size:0.9rem;color:#64748b;}@media print{body{padding:20px;}}</style></head><body>');
+  w.document.write('<div class="header"><div><h1>INVOICE</h1><p>'+document.getElementById('fromName').value+'</p><p style="font-size:0.85rem;color:#64748b;">'+document.getElementById('fromEmail').value+'</p><p style="font-size:0.85rem;color:#64748b;white-space:pre-line;">'+document.getElementById('fromAddr').value+'</p></div><div style="text-align:right;"><p><strong>Invoice #:</strong> '+document.getElementById('invNum').value+'</p><p><strong>Date:</strong> '+document.getElementById('invDate').value+'</p><p><strong>Due:</strong> '+document.getElementById('dueDate').value+'</p></div></div>');
+  w.document.write('<div style="margin-bottom:20px;"><strong>Bill To:</strong><br>'+document.getElementById('toName').value+'<br><span style="font-size:0.85rem;color:#64748b;">'+document.getElementById('toEmail').value+'</span><br><span style="font-size:0.85rem;color:#64748b;white-space:pre-line;">'+document.getElementById('toAddr').value+'</span></div>');
+  w.document.write('<table><thead><tr><th>Description</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>');
+  items.forEach(function(it){w.document.write('<tr><td>'+it.desc+'</td><td>'+it.qty+'</td><td>'+it.rate+'</td><td>'+it.amount+'</td></tr>');});
+  w.document.write('</tbody></table>');
+  w.document.write('<div class="totals"><p>Subtotal: <strong>'+document.getElementById('subtotal').textContent+'</strong></p><p>Tax ('+document.getElementById('taxRate').value+'%): <strong>'+document.getElementById('taxAmt').textContent+'</strong></p><p style="font-size:1.2rem;">Total: <strong>'+document.getElementById('grandTotal').textContent+'</strong></p></div>');
+  if(document.getElementById('notes').value)w.document.write('<div class="notes"><strong>Notes:</strong><br>'+document.getElementById('notes').value+'</div>');
+  w.document.write('</body></html>');
+  w.document.close();
+  w.print();
+}
+addItem();addItem();
+</script>

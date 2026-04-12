@@ -1,0 +1,111 @@
+---
+layout: tool
+title: Salary Calculator
+---
+
+<div class="tool-header">
+  <h1>Salary Calculator</h1>
+  <p>Convert CTC to in-hand salary with tax breakdown (India, new regime).</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="ctc">Annual CTC</label>
+    <input type="number" id="ctc" placeholder="e.g. 1200000" min="1" step="any">
+  </div>
+  <div class="form-group">
+    <label for="basicPct">Basic Salary (% of CTC)</label>
+    <input type="number" id="basicPct" value="40" min="1" max="100" step="1">
+  </div>
+  <div class="form-group">
+    <label for="hra">HRA Included?</label>
+    <select id="hra">
+      <option value="yes">Yes</option>
+      <option value="no">No</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="pf">Employer PF Contribution</label>
+    <select id="pf">
+      <option value="yes" selected>Yes (12% of basic, capped at 1800/month)</option>
+      <option value="no">No</option>
+    </select>
+  </div>
+  <button class="btn" onclick="calculate()">Calculate</button>
+</div>
+
+<div class="results" id="results">
+  <h2>Monthly Breakdown</h2>
+  <div class="result-row"><span class="result-label">Basic Salary</span><span class="result-value" id="basic"></span></div>
+  <div class="result-row"><span class="result-label">HRA</span><span class="result-value" id="hraVal"></span></div>
+  <div class="result-row"><span class="result-label">Special Allowance</span><span class="result-value" id="special"></span></div>
+  <div class="result-row"><span class="result-label">Employer PF</span><span class="result-value" id="epf"></span></div>
+  <div class="result-row"><span class="result-label">Employee PF Deduction</span><span class="result-value" id="empPf"></span></div>
+  <div class="result-row"><span class="result-label">Income Tax (est.)</span><span class="result-value" id="tax"></span></div>
+  <div class="result-row"><span class="result-label">Monthly In-Hand</span><span class="result-value" id="inhand"></span></div>
+</div>
+
+<div class="results" id="annual" style="display:none;margin-top:1rem;">
+  <h2>Annual Summary</h2>
+  <div class="result-row"><span class="result-label">Gross Salary</span><span class="result-value" id="aGross"></span></div>
+  <div class="result-row"><span class="result-label">Total Deductions</span><span class="result-value" id="aDeduct"></span></div>
+  <div class="result-row"><span class="result-label">Income Tax</span><span class="result-value" id="aTax"></span></div>
+  <div class="result-row"><span class="result-label">Annual In-Hand</span><span class="result-value" id="aInhand"></span></div>
+</div>
+
+<script>
+function fmt(n){return Math.round(n).toLocaleString();}
+function calcTax(income){
+  // New regime FY 2025-26
+  var std=75000;
+  var taxable=income-std;
+  if(taxable<=0) return 0;
+  var slabs=[[400000,0],[400000,0.05],[400000,0.10],[400000,0.15],[400000,0.20],[Infinity,0.30]];
+  var tax=0,rem=taxable;
+  for(var i=0;i<slabs.length&&rem>0;i++){
+    var s=Math.min(rem,slabs[i][0]);
+    tax+=s*slabs[i][1];
+    rem-=s;
+  }
+  tax+=tax*0.04; // cess
+  // Rebate u/s 87A: if taxable <= 12L, tax = 0 (new regime)
+  if(taxable<=1200000) tax=0;
+  return tax;
+}
+function calculate(){
+  var ctc=parseFloat(document.getElementById('ctc').value);
+  var basicPct=parseFloat(document.getElementById('basicPct').value)/100;
+  var hasHRA=document.getElementById('hra').value==='yes';
+  var hasPF=document.getElementById('pf').value==='yes';
+  if(!ctc||ctc<=0){alert('Enter a valid CTC.');return;}
+
+  var basic=ctc*basicPct;
+  var hra=hasHRA?basic*0.5:0;
+  var epfEmployer=hasPF?Math.min(basic*0.12,21600):0;
+  var remaining=ctc-basic-hra-epfEmployer;
+  var special=Math.max(remaining,0);
+
+  var gross=basic+hra+special;
+  var empPf=hasPF?Math.min(basic*0.12,21600):0;
+  var taxableIncome=gross;
+  var tax=calcTax(taxableIncome);
+  var annualInHand=gross-empPf-tax;
+  var monthlyInHand=annualInHand/12;
+
+  document.getElementById('basic').textContent=fmt(basic/12);
+  document.getElementById('hraVal').textContent=fmt(hra/12);
+  document.getElementById('special').textContent=fmt(special/12);
+  document.getElementById('epf').textContent=fmt(epfEmployer/12);
+  document.getElementById('empPf').textContent='-'+fmt(empPf/12);
+  document.getElementById('tax').textContent='-'+fmt(tax/12);
+  document.getElementById('inhand').textContent=fmt(monthlyInHand);
+  document.getElementById('results').classList.add('visible');
+
+  document.getElementById('aGross').textContent=fmt(gross);
+  document.getElementById('aDeduct').textContent=fmt(empPf+tax);
+  document.getElementById('aTax').textContent=fmt(tax);
+  document.getElementById('aInhand').textContent=fmt(annualInHand);
+  document.getElementById('annual').style.display='block';
+  document.getElementById('annual').classList.add('visible');
+}
+</script>

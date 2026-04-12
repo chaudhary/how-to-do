@@ -1,0 +1,52 @@
+---
+layout: tool
+title: Lorem Ipsum Generator
+---
+
+<div class="tool-header">
+  <h1>Lorem Ipsum Generator</h1>
+  <p>Generate placeholder text for designs and mockups.</p>
+</div>
+
+<div class="calc-form">
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+    <div class="form-group" style="flex:1;min-width:120px;">
+      <label for="count">Count</label>
+      <input type="number" id="count" value="3" min="1" max="100" step="1">
+    </div>
+    <div class="form-group" style="flex:1;min-width:150px;">
+      <label for="unit">Unit</label>
+      <select id="unit">
+        <option value="paragraphs" selected>Paragraphs</option>
+        <option value="sentences">Sentences</option>
+        <option value="words">Words</option>
+      </select>
+    </div>
+  </div>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+    <button class="btn" onclick="generate()">Generate</button>
+    <button class="btn" onclick="copyText()" style="background:var(--color-accent);">Copy</button>
+  </div>
+</div>
+
+<div class="form-group" style="margin-top:1.5rem;">
+  <label>Output</label>
+  <textarea id="output" rows="14" style="width:100%;padding:0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;resize:vertical;line-height:1.7;"></textarea>
+</div>
+
+<script>
+var WORDS='lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo consequat duis aute irure in reprehenderit voluptate velit esse cillum fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt culpa qui officia deserunt mollit anim id est laborum perspiciatis unde omnis iste natus error voluptatem accusantium doloremque laudantium totam rem aperiam eaque ipsa quae ab illo inventore veritatis quasi architecto beatae vitae dicta explicabo nemo ipsam quia voluptas aspernatur aut odit fugit consequuntur magni dolores eos ratione sequi nesciunt neque porro quisquam dolorem adipisci numquam eius modi tempora incidunt magnam aliquam quaerat'.split(' ');
+function randWord(){return WORDS[Math.floor(Math.random()*WORDS.length)];}
+function randSentence(){var len=8+Math.floor(Math.random()*12);var s=[];for(var i=0;i<len;i++)s.push(randWord());s[0]=s[0][0].toUpperCase()+s[0].slice(1);return s.join(' ')+'.';}
+function randParagraph(){var len=3+Math.floor(Math.random()*5);var p=[];for(var i=0;i<len;i++)p.push(randSentence());return p.join(' ');}
+function generate(){
+  var count=parseInt(document.getElementById('count').value)||1;
+  var unit=document.getElementById('unit').value;
+  var result=[];
+  if(unit==='paragraphs'){for(var i=0;i<count;i++)result.push(randParagraph());document.getElementById('output').value=result.join('\n\n');}
+  else if(unit==='sentences'){for(var i=0;i<count;i++)result.push(randSentence());document.getElementById('output').value=result.join(' ');}
+  else{var w=[];for(var i=0;i<count;i++)w.push(randWord());w[0]=w[0][0].toUpperCase()+w[0].slice(1);document.getElementById('output').value=w.join(' ')+'.';}
+}
+function copyText(){var o=document.getElementById('output');if(o.value)navigator.clipboard.writeText(o.value);}
+generate();
+</script>
