@@ -1,0 +1,173 @@
+---
+layout: tool
+title: LinkedIn Post Generator
+---
+
+<div class="tool-header">
+  <h1>LinkedIn Post Generator</h1>
+  <p>Generate engaging LinkedIn posts from a topic or brief context using AI.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="apiKey">Gemini API Key</label>
+    <div class="hint">Free from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--color-primary);">Google AI Studio</a>. Stored locally in your browser only.</div>
+    <input type="password" id="apiKey" placeholder="Paste your Gemini API key">
+  </div>
+  <div class="form-group">
+    <label for="topic">Topic or Context</label>
+    <div class="hint">Describe what you want to post about. The more context, the better the output.</div>
+    <textarea id="topic" rows="4" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;resize:vertical;" placeholder="e.g. I just shipped a side project that went from 0 to 1000 users in a week. It's a free tool for calculating EMIs. Key lessons: ship fast, solve real problems, don't overthink the tech stack."></textarea>
+  </div>
+  <div class="form-group">
+    <label for="tone">Tone</label>
+    <select id="tone">
+      <option value="professional">Professional</option>
+      <option value="conversational" selected>Conversational</option>
+      <option value="inspirational">Inspirational</option>
+      <option value="storytelling">Storytelling</option>
+      <option value="educational">Educational</option>
+      <option value="humorous">Humorous</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="length">Post Length</label>
+    <select id="length">
+      <option value="short">Short (under 100 words)</option>
+      <option value="medium" selected>Medium (100-200 words)</option>
+      <option value="long">Long (200-300 words)</option>
+    </select>
+  </div>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+    <button class="btn" id="generateBtn" onclick="generate()">Generate Post</button>
+    <button class="btn" onclick="copyPost()" style="background:var(--color-accent);">Copy to Clipboard</button>
+  </div>
+</div>
+
+<div id="loading" style="display:none;text-align:center;padding:2rem 0;">
+  <div style="font-size:1.1rem;color:var(--color-muted);">Generating your post...</div>
+</div>
+
+<div id="error" style="display:none;padding:1rem;background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);color:#dc2626;margin-bottom:1rem;"></div>
+
+<div class="form-group" id="outputGroup" style="display:none;margin-top:1.5rem;">
+  <label>Generated Post</label>
+  <textarea id="output" rows="14" style="width:100%;padding:0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;resize:vertical;line-height:1.7;background:var(--color-card-bg);"></textarea>
+</div>
+
+<div class="calc-form" style="margin-top:1.5rem;">
+  <h3 style="margin-bottom:0.75rem;">How to get a free API key</h3>
+  <ol style="padding-left:1.25rem;color:var(--color-muted);font-size:0.9rem;line-height:1.8;">
+    <li>Go to <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--color-primary);">Google AI Studio</a></li>
+    <li>Sign in with your Google account</li>
+    <li>Click "Create API Key"</li>
+    <li>Copy the key and paste it above</li>
+  </ol>
+  <p style="font-size:0.85rem;color:var(--color-muted);margin-top:0.75rem;">Your API key is stored only in your browser's local storage. It is never sent to any server other than Google's Gemini API.</p>
+</div>
+
+<script>
+// Persist API key in localStorage
+(function() {
+  var saved = localStorage.getItem('gemini_api_key');
+  if (saved) document.getElementById('apiKey').value = saved;
+})();
+
+document.getElementById('apiKey').addEventListener('change', function() {
+  localStorage.setItem('gemini_api_key', this.value.trim());
+});
+
+async function generate() {
+  var apiKey = document.getElementById('apiKey').value.trim();
+  var topic = document.getElementById('topic').value.trim();
+  var tone = document.getElementById('tone').value;
+  var length = document.getElementById('length').value;
+  var errorDiv = document.getElementById('error');
+  var loading = document.getElementById('loading');
+  var outputGroup = document.getElementById('outputGroup');
+  var output = document.getElementById('output');
+  var btn = document.getElementById('generateBtn');
+
+  errorDiv.style.display = 'none';
+
+  if (!apiKey) {
+    errorDiv.textContent = 'Please enter your Gemini API key.';
+    errorDiv.style.display = 'block';
+    return;
+  }
+  if (!topic) {
+    errorDiv.textContent = 'Please enter a topic or context for your post.';
+    errorDiv.style.display = 'block';
+    return;
+  }
+
+  localStorage.setItem('gemini_api_key', apiKey);
+
+  var lengthGuide = {short: 'under 100 words', medium: '100-200 words', long: '200-300 words'}[length];
+
+  var prompt = 'You are an expert LinkedIn content writer. Write a LinkedIn post based on the following input.\n\n' +
+    'Topic/Context: ' + topic + '\n\n' +
+    'Tone: ' + tone + '\n' +
+    'Length: ' + lengthGuide + '\n\n' +
+    'Guidelines:\n' +
+    '- Write in first person\n' +
+    '- Start with a strong hook in the first line that grabs attention\n' +
+    '- Use short paragraphs (1-2 sentences each) for readability\n' +
+    '- Add line breaks between paragraphs for LinkedIn formatting\n' +
+    '- Include a clear takeaway or call to action at the end\n' +
+    '- Use relevant hashtags at the end (3-5 max)\n' +
+    '- Do NOT use emojis excessively, 2-3 max if they fit naturally\n' +
+    '- Do NOT use generic motivational fluff\n' +
+    '- Sound human, not like AI\n' +
+    '- Do NOT use em dashes\n\n' +
+    'Output ONLY the post text, ready to copy and paste into LinkedIn. No explanations or preamble.';
+
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  loading.style.display = 'block';
+  outputGroup.style.display = 'none';
+
+  try {
+    var response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        contents: [{parts: [{text: prompt}]}],
+        generationConfig: {
+          temperature: 0.9,
+          maxOutputTokens: 1024
+        }
+      })
+    });
+
+    var data = await response.json();
+
+    if (!response.ok) {
+      var msg = (data.error && data.error.message) ? data.error.message : 'API request failed. Check your API key.';
+      throw new Error(msg);
+    }
+
+    var text = data.candidates[0].content.parts[0].text;
+    output.value = text.trim();
+    outputGroup.style.display = 'block';
+    loading.style.display = 'none';
+  } catch(e) {
+    errorDiv.textContent = e.message;
+    errorDiv.style.display = 'block';
+    loading.style.display = 'none';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Generate Post';
+  }
+}
+
+function copyPost() {
+  var output = document.getElementById('output');
+  if (!output.value) return;
+  navigator.clipboard.writeText(output.value);
+  var btn = event.target;
+  var orig = btn.textContent;
+  btn.textContent = 'Copied!';
+  setTimeout(function() { btn.textContent = orig; }, 1500);
+}
+</script>
