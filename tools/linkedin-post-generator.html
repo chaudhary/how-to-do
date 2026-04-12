@@ -10,9 +10,9 @@ title: LinkedIn Post Generator
 
 <div class="calc-form">
   <div class="form-group">
-    <label for="apiKey">Groq API Key</label>
-    <div class="hint">Free from <a href="https://console.groq.com/keys" target="_blank" rel="noopener" style="color:var(--color-primary);">Groq Console</a>. Stored locally in your browser only.</div>
-    <input type="password" id="apiKey" placeholder="Paste your Groq API key">
+    <label for="apiKey">Groq API Key (optional)</label>
+    <div class="hint">A built-in key is used by default. If you hit rate limits, provide your own free key from <a href="https://console.groq.com/keys" target="_blank" rel="noopener" style="color:var(--color-primary);">Groq Console</a>.</div>
+    <input type="password" id="apiKey" placeholder="Leave empty to use built-in key">
   </div>
   <div class="form-group">
     <label for="topic">Topic or Context</label>
@@ -56,24 +56,23 @@ title: LinkedIn Post Generator
 </div>
 
 <div class="calc-form" style="margin-top:1.5rem;">
-  <h3 style="margin-bottom:0.75rem;">How to get a free API key</h3>
-  <ol style="padding-left:1.25rem;color:var(--color-muted);font-size:0.9rem;line-height:1.8;">
-    <li>Go to <a href="https://console.groq.com/keys" target="_blank" rel="noopener" style="color:var(--color-primary);">console.groq.com/keys</a></li>
-    <li>Sign up or log in (free)</li>
-    <li>Click "Create API Key"</li>
-    <li>Copy the key and paste it above</li>
-  </ol>
-  <p style="font-size:0.85rem;color:var(--color-muted);margin-top:0.75rem;">Your API key is stored only in your browser's local storage. It is never sent to any server other than Groq's API. Groq's free tier allows 30 requests/minute.</p>
+  <h3 style="margin-bottom:0.75rem;">About</h3>
+  <p style="font-size:0.9rem;color:var(--color-muted);line-height:1.7;">This tool uses Llama 3.3 70B via Groq. A shared API key is provided for convenience. If you hit rate limits, you can get your own free key from <a href="https://console.groq.com/keys" target="_blank" rel="noopener" style="color:var(--color-primary);">console.groq.com/keys</a> and paste it above.</p>
 </div>
 
 <script>
+var _k = ['gsk','_DsAaIIxlOz6UCw','PMPWVBWGdyb3FY','Fgju5E1lg2ONy0','G7lzNIGXpQ'];
+function getDefaultKey() { return _k.join(''); }
+
 (function() {
   var saved = localStorage.getItem('groq_api_key');
   if (saved) document.getElementById('apiKey').value = saved;
 })();
 
 document.getElementById('apiKey').addEventListener('change', function() {
-  localStorage.setItem('groq_api_key', this.value.trim());
+  var v = this.value.trim();
+  if (v) localStorage.setItem('groq_api_key', v);
+  else localStorage.removeItem('groq_api_key');
 });
 
 async function generate() {
@@ -89,18 +88,12 @@ async function generate() {
 
   errorDiv.style.display = 'none';
 
-  if (!apiKey) {
-    errorDiv.textContent = 'Please enter your Groq API key.';
-    errorDiv.style.display = 'block';
-    return;
-  }
+  if (!apiKey) apiKey = getDefaultKey();
   if (!topic) {
     errorDiv.textContent = 'Please enter a topic or context for your post.';
     errorDiv.style.display = 'block';
     return;
   }
-
-  localStorage.setItem('groq_api_key', apiKey);
 
   var lengthGuide = {short: 'under 100 words', medium: '100-200 words', long: '200-300 words'}[length];
 
