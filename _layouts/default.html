@@ -5,12 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <link rel="icon" type="image/svg+xml" href="{{ '/assets/images/favicon.svg' | relative_url }}">
 </head>
 <body>
   <header class="site-header">
     <div class="container">
       <div style="display:flex;justify-content:space-between;align-items:center;">
-        <a href="{{ '/' | relative_url }}" class="site-title">{{ site.title }}</a>
+        <a href="{{ '/' | relative_url }}" class="site-title">
+          <img src="{{ '/assets/images/logo-icon.svg' | relative_url }}" alt="" class="site-logo">
+          {{ site.title }}
+        </a>
         <nav style="display:flex;gap:1.25rem;font-size:0.95rem;">
           <a href="{{ '/' | relative_url }}" style="color:var(--color-text);text-decoration:none;">Tools</a>
           <a href="{{ '/blog' | relative_url }}" style="color:var(--color-text);text-decoration:none;">Blog</a>
