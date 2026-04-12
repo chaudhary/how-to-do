@@ -1,0 +1,122 @@
+---
+layout: tool
+title: Time Zone Converter
+---
+
+<div class="tool-header">
+  <h1>Time Zone Converter</h1>
+  <p>Convert time between different time zones.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="datetime">Date & Time</label>
+    <input type="datetime-local" id="datetime">
+  </div>
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+    <div class="form-group" style="flex:1;min-width:200px;">
+      <label for="fromTz">From Time Zone</label>
+      <select id="fromTz"></select>
+    </div>
+    <div class="form-group" style="flex:1;min-width:200px;">
+      <label for="toTz">To Time Zone</label>
+      <select id="toTz"></select>
+    </div>
+  </div>
+  <button class="btn" onclick="convert()">Convert</button>
+</div>
+
+<div class="results" id="results">
+  <h2>Converted Time</h2>
+  <div class="result-row">
+    <span class="result-label" id="fromLabel">From</span>
+    <span class="result-value" id="fromTime"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label" id="toLabel">To</span>
+    <span class="result-value" id="toTime"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Time Difference</span>
+    <span class="result-value" id="diff"></span>
+  </div>
+</div>
+
+<div class="calc-form" style="margin-top:1.5rem;">
+  <h3>Current time across zones</h3>
+  <div id="worldClock" style="margin-top:1rem;"></div>
+</div>
+
+<script>
+var zones = [
+  'UTC',
+  'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles',
+  'America/Toronto', 'America/Sao_Paulo',
+  'Europe/London', 'Europe/Paris', 'Europe/Berlin', 'Europe/Moscow',
+  'Asia/Dubai', 'Asia/Kolkata', 'Asia/Shanghai', 'Asia/Tokyo',
+  'Asia/Singapore', 'Asia/Hong_Kong',
+  'Australia/Sydney', 'Pacific/Auckland'
+];
+
+var fromSel = document.getElementById('fromTz');
+var toSel = document.getElementById('toTz');
+zones.forEach(function(z) {
+  fromSel.innerHTML += '<option value="'+z+'"'+(z==='Asia/Kolkata'?' selected':'')+'>'+z.replace('_',' ')+'</option>';
+  toSel.innerHTML += '<option value="'+z+'"'+(z==='America/New_York'?' selected':'')+'>'+z.replace('_',' ')+'</option>';
+});
+
+var now = new Date();
+document.getElementById('datetime').value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'T'+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+
+function convert() {
+  var dt = document.getElementById('datetime').value;
+  var fromTz = document.getElementById('fromTz').value;
+  var toTz = document.getElementById('toTz').value;
+  if (!dt) { alert('Please select a date and time.'); return; }
+
+  var fromStr = new Date(dt).toLocaleString('en-US', {timeZone: fromTz, weekday:'short', year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true});
+
+  // Calculate offset difference to convert
+  var baseDate = new Date(dt);
+  var fromOffset = getOffset(baseDate, fromTz);
+  var toOffset = getOffset(baseDate, toTz);
+  var diffMs = (toOffset - fromOffset) * 60000;
+  var converted = new Date(baseDate.getTime() + diffMs);
+  var toStr = converted.toLocaleString('en-US', {timeZone: toTz, weekday:'short', year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true});
+
+  // Use simpler approach
+  var utcDate = new Date(baseDate.getTime() - fromOffset * 60000);
+  toStr = utcDate.toLocaleString('en-US', {timeZone: toTz, weekday:'short', year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true});
+
+  document.getElementById('fromLabel').textContent = fromTz.replace('_',' ');
+  document.getElementById('fromTime').textContent = fromStr;
+  document.getElementById('toLabel').textContent = toTz.replace('_',' ');
+  document.getElementById('toTime').textContent = toStr;
+
+  var diffHours = (toOffset - fromOffset) / 60;
+  document.getElementById('diff').textContent = (diffHours >= 0 ? '+' : '') + diffHours.toFixed(1) + ' hours';
+  document.getElementById('results').classList.add('visible');
+}
+
+function getOffset(date, tz) {
+  var str = date.toLocaleString('en-US', {timeZone: tz});
+  var tzDate = new Date(str);
+  var utcStr = date.toLocaleString('en-US', {timeZone: 'UTC'});
+  var utcDate = new Date(utcStr);
+  return (tzDate - utcDate) / 60000;
+}
+
+// World clock
+function updateWorldClock() {
+  var show = ['America/New_York','Europe/London','Asia/Kolkata','Asia/Tokyo','Australia/Sydney'];
+  var html = '';
+  var now = new Date();
+  show.forEach(function(tz) {
+    var t = now.toLocaleString('en-US', {timeZone:tz, hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true});
+    html += '<div class="result-row"><span class="result-label">'+tz.replace('_',' ')+'</span><span class="result-value">'+t+'</span></div>';
+  });
+  document.getElementById('worldClock').innerHTML = html;
+}
+updateWorldClock();
+setInterval(updateWorldClock, 1000);
+</script>

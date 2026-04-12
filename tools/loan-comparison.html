@@ -1,0 +1,82 @@
+---
+layout: tool
+title: Loan Comparison
+---
+
+<div class="tool-header">
+  <h1>Loan Comparison</h1>
+  <p>Compare two loans side by side to find the better deal.</p>
+</div>
+
+<div class="calc-form">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+    <div>
+      <h3 style="margin-bottom:1rem;">Loan A</h3>
+      <div class="form-group">
+        <label for="pa">Amount</label>
+        <input type="number" id="pa" placeholder="e.g. 1000000" min="1" step="any">
+      </div>
+      <div class="form-group">
+        <label for="ra">Rate (%/yr)</label>
+        <input type="number" id="ra" placeholder="e.g. 8.5" min="0.01" step="any">
+      </div>
+      <div class="form-group">
+        <label for="ta">Tenure (months)</label>
+        <input type="number" id="ta" placeholder="e.g. 240" min="1" step="1">
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:1rem;">Loan B</h3>
+      <div class="form-group">
+        <label for="pb">Amount</label>
+        <input type="number" id="pb" placeholder="e.g. 1000000" min="1" step="any">
+      </div>
+      <div class="form-group">
+        <label for="rb">Rate (%/yr)</label>
+        <input type="number" id="rb" placeholder="e.g. 9.0" min="0.01" step="any">
+      </div>
+      <div class="form-group">
+        <label for="tb">Tenure (months)</label>
+        <input type="number" id="tb" placeholder="e.g. 180" min="1" step="1">
+      </div>
+    </div>
+  </div>
+  <button class="btn" onclick="compare()" style="margin-top:1rem;">Compare</button>
+</div>
+
+<div class="results" id="results">
+  <h2>Comparison</h2>
+  <table class="amortization-table">
+    <thead><tr><th></th><th>Loan A</th><th>Loan B</th></tr></thead>
+    <tbody id="cmp-body"></tbody>
+  </table>
+</div>
+
+<script>
+function fmt(n) { return n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function emi(P,r,N) { return P*r*Math.pow(1+r,N)/(Math.pow(1+r,N)-1); }
+function compare() {
+  var pa=parseFloat(document.getElementById('pa').value), ra=parseFloat(document.getElementById('ra').value)/1200, ta=parseInt(document.getElementById('ta').value);
+  var pb=parseFloat(document.getElementById('pb').value), rb=parseFloat(document.getElementById('rb').value)/1200, tb=parseInt(document.getElementById('tb').value);
+  if (!pa||!ra||!ta||!pb||!rb||!tb) { alert('Fill in all fields.'); return; }
+  var ea=emi(pa,ra,ta), eb=emi(pb,rb,tb);
+  var tota=ea*ta, totb=eb*tb;
+  var rows = [
+    ['Monthly EMI', fmt(ea), fmt(eb)],
+    ['Total Interest', fmt(tota-pa), fmt(totb-pb)],
+    ['Total Payment', fmt(tota), fmt(totb)]
+  ];
+  var tbody=document.getElementById('cmp-body'); tbody.innerHTML='';
+  rows.forEach(function(r){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td style="text-align:left;font-weight:600">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td>';
+    tbody.appendChild(tr);
+  });
+  var winner = tota < totb ? 'Loan A' : tota > totb ? 'Loan B' : 'Both equal';
+  var savings = Math.abs(tota - totb);
+  var wtr = document.createElement('tr');
+  wtr.innerHTML='<td style="text-align:left;font-weight:700;color:var(--color-primary)">Better Deal</td><td colspan="2" style="font-weight:700;color:var(--color-primary)">'+winner+' saves '+fmt(savings)+'</td>';
+  tbody.appendChild(wtr);
+  document.getElementById('results').classList.add('visible');
+}
+</script>

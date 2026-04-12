@@ -1,0 +1,60 @@
+---
+layout: tool
+title: Word Counter
+---
+
+<div class="tool-header">
+  <h1>Word & Character Counter</h1>
+  <p>Count words, characters, sentences, and paragraphs in real time.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="text">Your Text</label>
+    <textarea id="text" rows="12" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;resize:vertical;" placeholder="Start typing or paste your text here..." oninput="count()"></textarea>
+  </div>
+</div>
+
+<div class="results visible">
+  <h2>Statistics</h2>
+  <div class="result-row">
+    <span class="result-label">Characters (with spaces)</span>
+    <span class="result-value" id="chars">0</span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Characters (no spaces)</span>
+    <span class="result-value" id="charsNoSpace">0</span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Words</span>
+    <span class="result-value" id="words">0</span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Sentences</span>
+    <span class="result-value" id="sentences">0</span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Paragraphs</span>
+    <span class="result-value" id="paragraphs">0</span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Reading Time</span>
+    <span class="result-value" id="reading">0 min</span>
+  </div>
+</div>
+
+<script>
+function count() {
+  var text = document.getElementById('text').value;
+  document.getElementById('chars').textContent = text.length;
+  document.getElementById('charsNoSpace').textContent = text.replace(/\s/g, '').length;
+  var words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  document.getElementById('words').textContent = words;
+  var sentences = text.trim() ? text.split(/[.!?]+/).filter(function(s){return s.trim()}).length : 0;
+  document.getElementById('sentences').textContent = sentences;
+  var paragraphs = text.trim() ? text.split(/\n\s*\n/).filter(function(s){return s.trim()}).length : 0;
+  document.getElementById('paragraphs').textContent = paragraphs;
+  var mins = Math.ceil(words / 200);
+  document.getElementById('reading').textContent = mins + ' min';
+}
+</script>

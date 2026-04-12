@@ -1,0 +1,57 @@
+---
+layout: tool
+title: SIP Calculator
+---
+
+<div class="tool-header">
+  <h1>SIP Calculator</h1>
+  <p>Calculate returns on your Systematic Investment Plan.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="monthly">Monthly Investment</label>
+    <input type="number" id="monthly" placeholder="e.g. 5000" min="1" step="any">
+  </div>
+  <div class="form-group">
+    <label for="rate">Expected Annual Return (%)</label>
+    <input type="number" id="rate" placeholder="e.g. 12" min="0.01" step="any">
+  </div>
+  <div class="form-group">
+    <label for="years">Investment Period (years)</label>
+    <input type="number" id="years" placeholder="e.g. 10" min="1" step="1">
+  </div>
+  <button class="btn" onclick="calculate()">Calculate</button>
+</div>
+
+<div class="results" id="results">
+  <h2>Results</h2>
+  <div class="result-row">
+    <span class="result-label">Total Invested</span>
+    <span class="result-value" id="invested"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Estimated Returns</span>
+    <span class="result-value" id="returns"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Total Value</span>
+    <span class="result-value" id="total"></span>
+  </div>
+</div>
+
+<script>
+function fmt(n) { return n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function calculate() {
+  var M = parseFloat(document.getElementById('monthly').value);
+  var r = parseFloat(document.getElementById('rate').value) / 12 / 100;
+  var n = parseInt(document.getElementById('years').value) * 12;
+  if (!M || !r || !n || M <= 0 || r <= 0 || n <= 0) { alert('Please enter valid positive numbers.'); return; }
+  var fv = M * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+  var invested = M * n;
+  document.getElementById('invested').textContent = fmt(invested);
+  document.getElementById('returns').textContent = fmt(fv - invested);
+  document.getElementById('total').textContent = fmt(fv);
+  document.getElementById('results').classList.add('visible');
+}
+</script>

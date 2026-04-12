@@ -1,0 +1,71 @@
+---
+layout: tool
+title: Age Calculator
+---
+
+<div class="tool-header">
+  <h1>Age Calculator</h1>
+  <p>Calculate exact age in years, months, and days between two dates.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="dob">Date of Birth</label>
+    <input type="date" id="dob">
+  </div>
+  <div class="form-group">
+    <label for="target">As of Date</label>
+    <input type="date" id="target">
+  </div>
+  <button class="btn" onclick="calculate()">Calculate</button>
+</div>
+
+<div class="results" id="results">
+  <h2>Your Age</h2>
+  <div class="result-row">
+    <span class="result-label">Age</span>
+    <span class="result-value" id="age"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Total Months</span>
+    <span class="result-value" id="months"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Total Weeks</span>
+    <span class="result-value" id="weeks"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Total Days</span>
+    <span class="result-value" id="days"></span>
+  </div>
+</div>
+
+<script>
+document.getElementById('target').valueAsDate = new Date();
+function calculate() {
+  var dob = new Date(document.getElementById('dob').value);
+  var target = new Date(document.getElementById('target').value);
+  if (isNaN(dob) || isNaN(target)) { alert('Please select both dates.'); return; }
+  if (dob > target) { alert('Date of birth must be before the target date.'); return; }
+
+  var years = target.getFullYear() - dob.getFullYear();
+  var months = target.getMonth() - dob.getMonth();
+  var days = target.getDate() - dob.getDate();
+  if (days < 0) {
+    months--;
+    var prev = new Date(target.getFullYear(), target.getMonth(), 0);
+    days += prev.getDate();
+  }
+  if (months < 0) { years--; months += 12; }
+
+  var totalDays = Math.floor((target - dob) / (1000*60*60*24));
+  var totalWeeks = Math.floor(totalDays / 7);
+  var totalMonths = years * 12 + months;
+
+  document.getElementById('age').textContent = years + ' years, ' + months + ' months, ' + days + ' days';
+  document.getElementById('months').textContent = totalMonths.toLocaleString();
+  document.getElementById('weeks').textContent = totalWeeks.toLocaleString();
+  document.getElementById('days').textContent = totalDays.toLocaleString();
+  document.getElementById('results').classList.add('visible');
+}
+</script>

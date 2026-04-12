@@ -1,0 +1,75 @@
+---
+layout: tool
+title: Date Difference Calculator
+---
+
+<div class="tool-header">
+  <h1>Date Difference Calculator</h1>
+  <p>Find the exact duration between two dates.</p>
+</div>
+
+<div class="calc-form">
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+    <div class="form-group" style="flex:1;min-width:200px;">
+      <label for="date1">Start Date</label>
+      <input type="date" id="date1">
+    </div>
+    <div class="form-group" style="flex:1;min-width:200px;">
+      <label for="date2">End Date</label>
+      <input type="date" id="date2">
+    </div>
+  </div>
+  <button class="btn" onclick="calculate()">Calculate</button>
+</div>
+
+<div class="results" id="results">
+  <h2>Duration</h2>
+  <div class="result-row">
+    <span class="result-label">Exact Duration</span>
+    <span class="result-value" id="exact"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Total Days</span>
+    <span class="result-value" id="days"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Total Weeks</span>
+    <span class="result-value" id="weeks"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Total Months</span>
+    <span class="result-value" id="months"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Total Hours</span>
+    <span class="result-value" id="hours"></span>
+  </div>
+</div>
+
+<script>
+(function() {
+  var today = new Date().toISOString().split('T')[0];
+  document.getElementById('date1').value = today;
+  document.getElementById('date2').value = today;
+})();
+function calculate() {
+  var d1 = new Date(document.getElementById('date1').value);
+  var d2 = new Date(document.getElementById('date2').value);
+  if (isNaN(d1) || isNaN(d2)) { alert('Select both dates.'); return; }
+  if (d1 > d2) { var tmp = d1; d1 = d2; d2 = tmp; }
+
+  var totalDays = Math.round((d2 - d1) / (1000*60*60*24));
+  var years = d2.getFullYear() - d1.getFullYear();
+  var months = d2.getMonth() - d1.getMonth();
+  var days = d2.getDate() - d1.getDate();
+  if (days < 0) { months--; days += new Date(d2.getFullYear(), d2.getMonth(), 0).getDate(); }
+  if (months < 0) { years--; months += 12; }
+
+  document.getElementById('exact').textContent = years + ' years, ' + months + ' months, ' + days + ' days';
+  document.getElementById('days').textContent = totalDays.toLocaleString() + ' days';
+  document.getElementById('weeks').textContent = (totalDays / 7).toFixed(1) + ' weeks';
+  document.getElementById('months').textContent = (years * 12 + months) + ' months';
+  document.getElementById('hours').textContent = (totalDays * 24).toLocaleString() + ' hours';
+  document.getElementById('results').classList.add('visible');
+}
+</script>

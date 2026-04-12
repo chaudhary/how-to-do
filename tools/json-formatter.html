@@ -1,0 +1,65 @@
+---
+layout: tool
+title: JSON Formatter
+---
+
+<div class="tool-header">
+  <h1>JSON Formatter & Validator</h1>
+  <p>Paste JSON to format, validate, and minify.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="jsonInput">Input JSON</label>
+    <textarea id="jsonInput" rows="10" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.9rem;resize:vertical;" placeholder='{"key": "value"}'></textarea>
+  </div>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+    <button class="btn" onclick="formatJSON()">Format</button>
+    <button class="btn" onclick="minifyJSON()" style="background:var(--color-muted);">Minify</button>
+    <button class="btn" onclick="copyOutput()" style="background:var(--color-accent);">Copy Output</button>
+  </div>
+  <div id="status" style="margin-top:0.75rem;font-weight:600;"></div>
+  <div class="form-group" style="margin-top:1rem;">
+    <label for="jsonOutput">Output</label>
+    <textarea id="jsonOutput" rows="12" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.9rem;resize:vertical;" readonly></textarea>
+  </div>
+</div>
+
+<script>
+function formatJSON() {
+  var input = document.getElementById('jsonInput').value.trim();
+  var status = document.getElementById('status');
+  if (!input) { status.textContent = 'Please paste some JSON.'; status.style.color = 'red'; return; }
+  try {
+    var obj = JSON.parse(input);
+    document.getElementById('jsonOutput').value = JSON.stringify(obj, null, 2);
+    status.textContent = 'Valid JSON. Formatted successfully.';
+    status.style.color = 'var(--color-accent)';
+  } catch(e) {
+    document.getElementById('jsonOutput').value = '';
+    status.textContent = 'Invalid JSON: ' + e.message;
+    status.style.color = 'red';
+  }
+}
+function minifyJSON() {
+  var input = document.getElementById('jsonInput').value.trim();
+  var status = document.getElementById('status');
+  if (!input) { status.textContent = 'Please paste some JSON.'; status.style.color = 'red'; return; }
+  try {
+    var obj = JSON.parse(input);
+    document.getElementById('jsonOutput').value = JSON.stringify(obj);
+    status.textContent = 'Minified successfully.';
+    status.style.color = 'var(--color-accent)';
+  } catch(e) {
+    status.textContent = 'Invalid JSON: ' + e.message;
+    status.style.color = 'red';
+  }
+}
+function copyOutput() {
+  var output = document.getElementById('jsonOutput');
+  if (!output.value) return;
+  navigator.clipboard.writeText(output.value);
+  document.getElementById('status').textContent = 'Copied to clipboard!';
+  document.getElementById('status').style.color = 'var(--color-primary)';
+}
+</script>

@@ -1,0 +1,81 @@
+---
+layout: tool
+title: Percentage Calculator
+---
+
+<div class="tool-header">
+  <h1>Percentage Calculator</h1>
+  <p>Solve any percentage problem quickly.</p>
+</div>
+
+<div class="calc-form">
+  <h3 style="margin-bottom:1rem;">What is X% of Y?</h3>
+  <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-bottom:1.5rem;">
+    <span>What is</span>
+    <input type="number" id="pct1" style="width:100px" step="any">
+    <span>% of</span>
+    <input type="number" id="val1" style="width:120px" step="any">
+    <span>?</span>
+    <button class="btn" onclick="calc1()">Go</button>
+    <strong id="res1" style="color:var(--color-primary);margin-left:0.5rem;"></strong>
+  </div>
+
+  <h3 style="margin-bottom:1rem;">X is what % of Y?</h3>
+  <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-bottom:1.5rem;">
+    <input type="number" id="val2a" style="width:120px" step="any">
+    <span>is what % of</span>
+    <input type="number" id="val2b" style="width:120px" step="any">
+    <span>?</span>
+    <button class="btn" onclick="calc2()">Go</button>
+    <strong id="res2" style="color:var(--color-primary);margin-left:0.5rem;"></strong>
+  </div>
+
+  <h3 style="margin-bottom:1rem;">Percentage Change</h3>
+  <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-bottom:1.5rem;">
+    <span>From</span>
+    <input type="number" id="val3a" style="width:120px" step="any">
+    <span>to</span>
+    <input type="number" id="val3b" style="width:120px" step="any">
+    <button class="btn" onclick="calc3()">Go</button>
+    <strong id="res3" style="color:var(--color-primary);margin-left:0.5rem;"></strong>
+  </div>
+
+  <h3 style="margin-bottom:1rem;">Increase/Decrease by %</h3>
+  <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+    <input type="number" id="val4a" style="width:120px" step="any">
+    <select id="val4op" style="width:auto;padding:0.6rem;">
+      <option value="inc">+ increase by</option>
+      <option value="dec">- decrease by</option>
+    </select>
+    <input type="number" id="val4b" style="width:100px" step="any">
+    <span>%</span>
+    <button class="btn" onclick="calc4()">Go</button>
+    <strong id="res4" style="color:var(--color-primary);margin-left:0.5rem;"></strong>
+  </div>
+</div>
+
+<script>
+function calc1() {
+  var p=parseFloat(document.getElementById('pct1').value), v=parseFloat(document.getElementById('val1').value);
+  if (isNaN(p)||isNaN(v)) return;
+  document.getElementById('res1').textContent = '= ' + (p/100*v).toLocaleString(undefined,{maximumFractionDigits:4});
+}
+function calc2() {
+  var a=parseFloat(document.getElementById('val2a').value), b=parseFloat(document.getElementById('val2b').value);
+  if (isNaN(a)||isNaN(b)||b===0) return;
+  document.getElementById('res2').textContent = '= ' + (a/b*100).toFixed(4) + '%';
+}
+function calc3() {
+  var a=parseFloat(document.getElementById('val3a').value), b=parseFloat(document.getElementById('val3b').value);
+  if (isNaN(a)||isNaN(b)||a===0) return;
+  var chg = ((b-a)/Math.abs(a))*100;
+  document.getElementById('res3').textContent = '= ' + chg.toFixed(4) + '% ' + (chg >= 0 ? 'increase' : 'decrease');
+}
+function calc4() {
+  var a=parseFloat(document.getElementById('val4a').value), b=parseFloat(document.getElementById('val4b').value);
+  var op=document.getElementById('val4op').value;
+  if (isNaN(a)||isNaN(b)) return;
+  var result = op === 'inc' ? a * (1 + b/100) : a * (1 - b/100);
+  document.getElementById('res4').textContent = '= ' + result.toLocaleString(undefined,{maximumFractionDigits:4});
+}
+</script>

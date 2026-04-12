@@ -1,0 +1,70 @@
+---
+layout: tool
+title: BMI Calculator
+---
+
+<div class="tool-header">
+  <h1>BMI Calculator</h1>
+  <p>Calculate your Body Mass Index and see where you stand.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="weight">Weight (kg)</label>
+    <input type="number" id="weight" placeholder="e.g. 70" min="1" step="any">
+  </div>
+  <div class="form-group">
+    <label for="height">Height (cm)</label>
+    <input type="number" id="height" placeholder="e.g. 170" min="1" step="any">
+  </div>
+  <button class="btn" onclick="calculate()">Calculate</button>
+</div>
+
+<div class="results" id="results">
+  <h2>Results</h2>
+  <div class="result-row">
+    <span class="result-label">Your BMI</span>
+    <span class="result-value" id="bmi"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Category</span>
+    <span class="result-value" id="category"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Healthy Weight Range</span>
+    <span class="result-value" id="range"></span>
+  </div>
+</div>
+
+<div class="calc-form" style="margin-top:1.5rem;">
+  <h3>BMI Categories</h3>
+  <table class="amortization-table" style="margin-top:1rem;">
+    <thead><tr><th style="text-align:left">Category</th><th>BMI Range</th></tr></thead>
+    <tbody>
+      <tr><td>Underweight</td><td>&lt; 18.5</td></tr>
+      <tr><td>Normal weight</td><td>18.5 - 24.9</td></tr>
+      <tr><td>Overweight</td><td>25.0 - 29.9</td></tr>
+      <tr><td>Obese</td><td>&ge; 30.0</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+function calculate() {
+  var w = parseFloat(document.getElementById('weight').value);
+  var h = parseFloat(document.getElementById('height').value) / 100;
+  if (!w || !h || w <= 0 || h <= 0) { alert('Please enter valid values.'); return; }
+  var bmi = w / (h * h);
+  var cat;
+  if (bmi < 18.5) cat = 'Underweight';
+  else if (bmi < 25) cat = 'Normal weight';
+  else if (bmi < 30) cat = 'Overweight';
+  else cat = 'Obese';
+  var low = (18.5 * h * h).toFixed(1);
+  var high = (24.9 * h * h).toFixed(1);
+  document.getElementById('bmi').textContent = bmi.toFixed(1);
+  document.getElementById('category').textContent = cat;
+  document.getElementById('range').textContent = low + ' - ' + high + ' kg';
+  document.getElementById('results').classList.add('visible');
+}
+</script>

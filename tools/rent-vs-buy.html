@@ -1,0 +1,131 @@
+---
+layout: tool
+title: Rent vs Buy Calculator
+---
+
+<div class="tool-header">
+  <h1>Rent vs Buy Calculator</h1>
+  <p>Should you rent or buy? Compare the financial outcomes.</p>
+</div>
+
+<div class="calc-form">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+    <div>
+      <h3 style="margin-bottom:1rem;">Buying</h3>
+      <div class="form-group">
+        <label for="price">Property Price</label>
+        <input type="number" id="price" placeholder="e.g. 5000000" min="1" step="any">
+      </div>
+      <div class="form-group">
+        <label for="down">Down Payment (%)</label>
+        <input type="number" id="down" placeholder="e.g. 20" min="0" max="100" step="any">
+      </div>
+      <div class="form-group">
+        <label for="loanrate">Loan Rate (%/yr)</label>
+        <input type="number" id="loanrate" placeholder="e.g. 8.5" min="0.01" step="any">
+      </div>
+      <div class="form-group">
+        <label for="loanterm">Loan Term (years)</label>
+        <input type="number" id="loanterm" placeholder="e.g. 20" min="1" step="1">
+      </div>
+      <div class="form-group">
+        <label for="appreciation">Property Appreciation (%/yr)</label>
+        <input type="number" id="appreciation" placeholder="e.g. 5" min="0" step="any">
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:1rem;">Renting</h3>
+      <div class="form-group">
+        <label for="rent">Monthly Rent</label>
+        <input type="number" id="rent" placeholder="e.g. 20000" min="1" step="any">
+      </div>
+      <div class="form-group">
+        <label for="rentinc">Annual Rent Increase (%)</label>
+        <input type="number" id="rentinc" placeholder="e.g. 5" min="0" step="any">
+      </div>
+      <div class="form-group">
+        <label for="investrate">Investment Return (%/yr)</label>
+        <div class="hint">Return on money you'd invest instead of buying</div>
+        <input type="number" id="investrate" placeholder="e.g. 10" min="0" step="any">
+      </div>
+      <div class="form-group">
+        <label for="horizon">Time Horizon (years)</label>
+        <input type="number" id="horizon" placeholder="e.g. 10" min="1" step="1">
+      </div>
+    </div>
+  </div>
+  <button class="btn" onclick="calculate()" style="margin-top:1rem;">Compare</button>
+</div>
+
+<div class="results" id="results">
+  <h2>Results after <span id="yrs"></span> years</h2>
+  <div class="result-row">
+    <span class="result-label">Buy: Net Worth Impact</span>
+    <span class="result-value" id="buy-net"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Rent: Net Worth Impact</span>
+    <span class="result-value" id="rent-net"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Verdict</span>
+    <span class="result-value" id="verdict"></span>
+  </div>
+</div>
+
+<script>
+function fmt(n) { return n.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0}); }
+function calculate() {
+  var price=parseFloat(document.getElementById('price').value);
+  var downPct=parseFloat(document.getElementById('down').value)/100;
+  var lr=parseFloat(document.getElementById('loanrate').value)/1200;
+  var lt=parseInt(document.getElementById('loanterm').value)*12;
+  var appr=parseFloat(document.getElementById('appreciation').value)/100;
+  var rent=parseFloat(document.getElementById('rent').value);
+  var ri=parseFloat(document.getElementById('rentinc').value)/100;
+  var ir=parseFloat(document.getElementById('investrate').value)/100;
+  var horizon=parseInt(document.getElementById('horizon').value);
+  if (!price||!lr||!lt||!rent||!horizon) { alert('Fill in all fields.'); return; }
+
+  var downAmt = price * downPct;
+  var loan = price - downAmt;
+  var emiAmt = loan * lr * Math.pow(1+lr,lt) / (Math.pow(1+lr,lt)-1);
+
+  // Buy scenario
+  var propValue = price * Math.pow(1 + appr, horizon);
+  var totalEmiPaid = 0;
+  var monthsPaid = Math.min(horizon * 12, lt);
+  var balance = loan;
+  for (var m = 0; m < monthsPaid; m++) {
+    var intPart = balance * lr;
+    balance -= (emiAmt - intPart);
+    totalEmiPaid += emiAmt;
+  }
+  if (balance < 0) balance = 0;
+  var buyNet = propValue - balance - downAmt - totalEmiPaid + downAmt;
+  buyNet = propValue - balance - totalEmiPaid;
+
+  // Rent scenario
+  var corpus = downAmt;
+  var monthlyIR = ir / 12;
+  var currentRent = rent;
+  var totalRent = 0;
+  for (var y = 0; y < horizon; y++) {
+    for (var mo = 0; mo < 12; mo++) {
+      var diff = emiAmt - currentRent;
+      if (diff > 0) corpus += diff;
+      corpus *= (1 + monthlyIR);
+      if (diff < 0) corpus += diff;
+      totalRent += currentRent;
+    }
+    currentRent *= (1 + ri);
+  }
+  var rentNet = corpus - downAmt;
+
+  document.getElementById('yrs').textContent = horizon;
+  document.getElementById('buy-net').textContent = fmt(buyNet);
+  document.getElementById('rent-net').textContent = fmt(rentNet);
+  document.getElementById('verdict').textContent = buyNet > rentNet ? 'Buying is better by ' + fmt(buyNet - rentNet) : 'Renting is better by ' + fmt(rentNet - buyNet);
+  document.getElementById('results').classList.add('visible');
+}
+</script>

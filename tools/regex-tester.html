@@ -1,0 +1,102 @@
+---
+layout: tool
+title: Regex Tester
+---
+
+<div class="tool-header">
+  <h1>Regex Tester</h1>
+  <p>Test regular expressions against text in real time.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="pattern">Pattern</label>
+    <div style="display:flex;gap:0.5rem;align-items:center;">
+      <span style="font-family:monospace;font-size:1.2rem;">/</span>
+      <input type="text" id="pattern" placeholder="[a-z]+" style="flex:1;font-family:monospace;" oninput="testRegex()">
+      <span style="font-family:monospace;font-size:1.2rem;">/</span>
+      <input type="text" id="flags" value="g" style="width:60px;font-family:monospace;" placeholder="flags" oninput="testRegex()">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="testStr">Test String</label>
+    <textarea id="testStr" rows="5" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.9rem;resize:vertical;" placeholder="Enter text to test against" oninput="testRegex()"></textarea>
+  </div>
+  <div id="status" style="font-weight:600;margin-bottom:1rem;"></div>
+  <div class="form-group">
+    <label>Highlighted Result</label>
+    <div id="highlighted" style="padding:0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.9rem;white-space:pre-wrap;word-break:break-all;min-height:3rem;background:var(--color-bg);"></div>
+  </div>
+  <div class="form-group">
+    <label>Matches</label>
+    <div id="matches" style="padding:0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.85rem;max-height:200px;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<script>
+function testRegex() {
+  var pattern = document.getElementById('pattern').value;
+  var flags = document.getElementById('flags').value;
+  var str = document.getElementById('testStr').value;
+  var status = document.getElementById('status');
+  var highlighted = document.getElementById('highlighted');
+  var matchesDiv = document.getElementById('matches');
+
+  if (!pattern || !str) {
+    status.textContent = '';
+    highlighted.innerHTML = escapeHtml(str);
+    matchesDiv.innerHTML = '';
+    return;
+  }
+
+  try {
+    var regex = new RegExp(pattern, flags);
+    var matches = [];
+    var match;
+
+    if (flags.indexOf('g') >= 0) {
+      while ((match = regex.exec(str)) !== null) {
+        matches.push({value: match[0], index: match.index, groups: match.slice(1)});
+        if (!match[0]) regex.lastIndex++;
+      }
+    } else {
+      match = regex.exec(str);
+      if (match) matches.push({value: match[0], index: match.index, groups: match.slice(1)});
+    }
+
+    status.textContent = matches.length + ' match' + (matches.length !== 1 ? 'es' : '') + ' found';
+    status.style.color = matches.length ? 'var(--color-accent)' : 'var(--color-muted)';
+
+    // Highlight
+    var html = '';
+    var lastIndex = 0;
+    var globalRegex = new RegExp(pattern, flags.indexOf('g') >= 0 ? flags : flags + 'g');
+    str.replace(globalRegex, function(m, offset) {
+      html += escapeHtml(str.slice(lastIndex, offset));
+      html += '<mark style="background:#fef08a;padding:1px 2px;border-radius:2px;">' + escapeHtml(m) + '</mark>';
+      lastIndex = offset + m.length;
+      return m;
+    });
+    html += escapeHtml(str.slice(lastIndex));
+    highlighted.innerHTML = html;
+
+    // Match list
+    matchesDiv.innerHTML = matches.map(function(m, i) {
+      var s = 'Match ' + (i+1) + ': "' + escapeHtml(m.value) + '" at index ' + m.index;
+      if (m.groups.length) s += ' | Groups: ' + m.groups.map(function(g,j){return (j+1)+': "'+escapeHtml(g||'')+'"'}).join(', ');
+      return s;
+    }).join('<br>') || 'No matches';
+
+  } catch(e) {
+    status.textContent = 'Invalid regex: ' + e.message;
+    status.style.color = 'red';
+    highlighted.innerHTML = escapeHtml(str);
+    matchesDiv.innerHTML = '';
+  }
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>

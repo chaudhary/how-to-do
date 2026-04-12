@@ -1,0 +1,55 @@
+---
+layout: tool
+title: CAGR Calculator
+---
+
+<div class="tool-header">
+  <h1>CAGR Calculator</h1>
+  <p>Calculate the Compound Annual Growth Rate of an investment.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="initial">Initial Value</label>
+    <input type="number" id="initial" placeholder="e.g. 100000" min="0.01" step="any">
+  </div>
+  <div class="form-group">
+    <label for="final">Final Value</label>
+    <input type="number" id="final" placeholder="e.g. 250000" min="0.01" step="any">
+  </div>
+  <div class="form-group">
+    <label for="years">Number of Years</label>
+    <input type="number" id="years" placeholder="e.g. 5" min="0.1" step="any">
+  </div>
+  <button class="btn" onclick="calculate()">Calculate</button>
+</div>
+
+<div class="results" id="results">
+  <h2>Results</h2>
+  <div class="result-row">
+    <span class="result-label">CAGR</span>
+    <span class="result-value" id="cagr"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Absolute Returns</span>
+    <span class="result-value" id="absolute"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Total Growth</span>
+    <span class="result-value" id="growth"></span>
+  </div>
+</div>
+
+<script>
+function calculate() {
+  var i = parseFloat(document.getElementById('initial').value);
+  var f = parseFloat(document.getElementById('final').value);
+  var y = parseFloat(document.getElementById('years').value);
+  if (!i || !f || !y || i <= 0 || f <= 0 || y <= 0) { alert('Please enter valid positive numbers.'); return; }
+  var cagr = (Math.pow(f / i, 1 / y) - 1) * 100;
+  document.getElementById('cagr').textContent = cagr.toFixed(2) + '%';
+  document.getElementById('absolute').textContent = (f - i).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('growth').textContent = (((f - i) / i) * 100).toFixed(2) + '%';
+  document.getElementById('results').classList.add('visible');
+}
+</script>

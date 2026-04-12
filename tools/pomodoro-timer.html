@@ -1,0 +1,95 @@
+---
+layout: tool
+title: Pomodoro Timer
+---
+
+<div class="tool-header">
+  <h1>Pomodoro Timer</h1>
+  <p>Stay focused with timed work and break intervals.</p>
+</div>
+
+<div class="calc-form" style="text-align:center;">
+  <div style="display:flex;gap:1rem;justify-content:center;margin-bottom:1.5rem;flex-wrap:wrap;">
+    <div class="form-group" style="margin-bottom:0;">
+      <label for="workMin">Work (min)</label>
+      <input type="number" id="workMin" value="25" min="1" max="120" style="width:80px;text-align:center;">
+    </div>
+    <div class="form-group" style="margin-bottom:0;">
+      <label for="breakMin">Break (min)</label>
+      <input type="number" id="breakMin" value="5" min="1" max="60" style="width:80px;text-align:center;">
+    </div>
+  </div>
+
+  <div id="phase" style="font-size:1.1rem;font-weight:600;color:var(--color-muted);margin-bottom:0.5rem;">WORK</div>
+  <div id="timer" style="font-size:4rem;font-weight:700;font-family:monospace;color:var(--color-text);margin-bottom:1.5rem;">25:00</div>
+
+  <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
+    <button class="btn" id="startBtn" onclick="startTimer()">Start</button>
+    <button class="btn" onclick="pauseTimer()" style="background:var(--color-muted);">Pause</button>
+    <button class="btn" onclick="resetTimer()" style="background:#ef4444;">Reset</button>
+  </div>
+
+  <div style="margin-top:1.5rem;color:var(--color-muted);">
+    Sessions completed: <strong id="sessions">0</strong>
+  </div>
+</div>
+
+<script>
+var interval = null;
+var remaining = 25 * 60;
+var isWork = true;
+var sessions = 0;
+
+function updateDisplay() {
+  var m = Math.floor(remaining / 60);
+  var s = remaining % 60;
+  document.getElementById('timer').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+function startTimer() {
+  if (interval) return;
+  remaining = remaining || getWorkSeconds();
+  interval = setInterval(function() {
+    remaining--;
+    updateDisplay();
+    if (remaining <= 0) {
+      clearInterval(interval);
+      interval = null;
+      if (isWork) {
+        sessions++;
+        document.getElementById('sessions').textContent = sessions;
+        isWork = false;
+        remaining = parseInt(document.getElementById('breakMin').value) * 60;
+        document.getElementById('phase').textContent = 'BREAK';
+        document.getElementById('phase').style.color = 'var(--color-accent)';
+      } else {
+        isWork = true;
+        remaining = getWorkSeconds();
+        document.getElementById('phase').textContent = 'WORK';
+        document.getElementById('phase').style.color = 'var(--color-muted)';
+      }
+      updateDisplay();
+      try { new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbsGczHjqR0teleS0jbKvS7rFyOiU+i8Db0JhYMjZ0o9Hfv31ILEOBt9XYoV44Nma12eS/dkMsR4u/3uCiXzU5a6PO5753RDNIicLo89rZmFY0P3ar2+eqUz4AAA==').play(); } catch(e) {}
+    }
+  }, 1000);
+}
+
+function getWorkSeconds() {
+  return parseInt(document.getElementById('workMin').value) * 60;
+}
+
+function pauseTimer() {
+  clearInterval(interval);
+  interval = null;
+}
+
+function resetTimer() {
+  clearInterval(interval);
+  interval = null;
+  isWork = true;
+  remaining = getWorkSeconds();
+  document.getElementById('phase').textContent = 'WORK';
+  document.getElementById('phase').style.color = 'var(--color-muted)';
+  updateDisplay();
+}
+</script>
