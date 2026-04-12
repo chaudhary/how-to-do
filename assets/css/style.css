@@ -467,10 +467,44 @@ body {
 /* Footer */
 .site-footer {
   border-top: 1px solid var(--color-border);
-  padding: 1.5rem 0;
+  padding: 2rem 0 1.5rem;
   margin-top: 3rem;
   color: var(--color-muted);
   font-size: 0.85rem;
+}
+
+.footer-tools {
+  margin-bottom: 1.5rem;
+}
+
+.footer-tools h3 {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text);
+  margin-bottom: 0.75rem;
+}
+
+.footer-tools-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+}
+
+.footer-tools-grid a {
+  color: var(--color-muted);
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: color 0.15s;
+}
+
+.footer-tools-grid a:hover {
+  color: var(--color-primary);
+}
+
+.footer-credit {
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
 }
 
 main {
