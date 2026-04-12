@@ -1,0 +1,115 @@
+---
+layout: tool
+title: EMI Calculator
+---
+
+<div class="tool-header">
+  <h1>EMI Calculator</h1>
+  <p>Calculate your Equated Monthly Installment for any loan.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="principal">Loan Amount</label>
+    <div class="hint">Total principal amount in your currency</div>
+    <input type="number" id="principal" placeholder="e.g. 1000000" min="1" step="any">
+  </div>
+
+  <div class="form-group">
+    <label for="rate">Annual Interest Rate (%)</label>
+    <div class="hint">Yearly interest rate</div>
+    <input type="number" id="rate" placeholder="e.g. 8.5" min="0.01" step="any">
+  </div>
+
+  <div class="form-group">
+    <label for="tenure">Loan Tenure (months)</label>
+    <div class="hint">Total repayment period in months</div>
+    <input type="number" id="tenure" placeholder="e.g. 240" min="1" step="1">
+  </div>
+
+  <button class="btn" onclick="calculateEMI()">Calculate</button>
+</div>
+
+<div class="results" id="results">
+  <h2>Results</h2>
+  <div class="result-row">
+    <span class="result-label">Monthly EMI</span>
+    <span class="result-value" id="emi-value"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Total Interest</span>
+    <span class="result-value" id="interest-value"></span>
+  </div>
+  <div class="result-row">
+    <span class="result-label">Total Payment</span>
+    <span class="result-value" id="total-value"></span>
+  </div>
+</div>
+
+<div class="amortization-section" id="amortization">
+  <h2>Amortization Schedule</h2>
+  <div class="table-wrap">
+    <table class="amortization-table">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>EMI</th>
+          <th>Principal</th>
+          <th>Interest</th>
+          <th>Balance</th>
+        </tr>
+      </thead>
+      <tbody id="amort-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function formatCurrency(n) {
+  return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function calculateEMI() {
+  var P = parseFloat(document.getElementById('principal').value);
+  var annualRate = parseFloat(document.getElementById('rate').value);
+  var N = parseInt(document.getElementById('tenure').value);
+
+  if (!P || !annualRate || !N || P <= 0 || annualRate <= 0 || N <= 0) {
+    alert('Please enter valid positive numbers for all fields.');
+    return;
+  }
+
+  var r = annualRate / 12 / 100;
+  var emi = P * r * Math.pow(1 + r, N) / (Math.pow(1 + r, N) - 1);
+  var totalPayment = emi * N;
+  var totalInterest = totalPayment - P;
+
+  document.getElementById('emi-value').textContent = formatCurrency(emi);
+  document.getElementById('interest-value').textContent = formatCurrency(totalInterest);
+  document.getElementById('total-value').textContent = formatCurrency(totalPayment);
+  document.getElementById('results').classList.add('visible');
+
+  // Build amortization schedule
+  var tbody = document.getElementById('amort-body');
+  tbody.innerHTML = '';
+  var balance = P;
+
+  for (var i = 1; i <= N; i++) {
+    var interestPart = balance * r;
+    var principalPart = emi - interestPart;
+    balance -= principalPart;
+    if (balance < 0) balance = 0;
+
+    var row = document.createElement('tr');
+    row.innerHTML =
+      '<td>' + i + '</td>' +
+      '<td>' + formatCurrency(emi) + '</td>' +
+      '<td>' + formatCurrency(principalPart) + '</td>' +
+      '<td>' + formatCurrency(interestPart) + '</td>' +
+      '<td>' + formatCurrency(balance) + '</td>';
+    tbody.appendChild(row);
+  }
+
+  document.getElementById('amortization').classList.add('visible');
+}
+</script>

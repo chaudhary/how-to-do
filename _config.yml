@@ -1,0 +1,15 @@
+title: How To Do
+description: A collection of useful everyday tools and calculators.
+baseurl: "/how-to-do"
+url: "https://chaudhary.github.io"
+
+markdown: kramdown
+theme: minima
+
+plugins:
+  - jekyll-seo-tag
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
