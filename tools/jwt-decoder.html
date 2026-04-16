@@ -1,0 +1,109 @@
+---
+layout: tool
+title: JWT Decoder
+description: "Decode and inspect JSON Web Tokens. View header, payload, and claim expiry in plain English. Runs client-side only — tokens never leave your browser."
+---
+
+<div class="tool-header">
+  <h1>JWT Decoder</h1>
+  <p>Paste a JSON Web Token to inspect its header and payload. Runs entirely in your browser — tokens never upload anywhere.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="jwtInput">JWT</label>
+    <textarea id="jwtInput" rows="5" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." oninput="decodeJwt()" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.9rem;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;resize:vertical;"></textarea>
+  </div>
+</div>
+
+<div id="jwtError" style="display:none;margin-top:1rem;padding:0.75rem 1rem;background:#fee2e2;border-left:3px solid #b91c1c;border-radius:var(--radius);color:#7f1d1d;"></div>
+
+<div id="jwtResult" style="display:none;margin-top:1.5rem;">
+  <div id="jwtMeta" style="margin-bottom:1rem;padding:0.75rem 1rem;background:var(--color-bg-alt, #f9f9f9);border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.9rem;"></div>
+
+  <h3 style="margin:1.25rem 0 0.5rem;">Header</h3>
+  <pre id="jwtHeader" style="margin:0;padding:1rem;background:#1e293b;color:#f1f5f9;border-radius:var(--radius);overflow-x:auto;font-size:0.85rem;"></pre>
+
+  <h3 style="margin:1.25rem 0 0.5rem;">Payload</h3>
+  <pre id="jwtPayload" style="margin:0;padding:1rem;background:#1e293b;color:#f1f5f9;border-radius:var(--radius);overflow-x:auto;font-size:0.85rem;"></pre>
+
+  <h3 style="margin:1.25rem 0 0.5rem;">Signature <small style="font-weight:normal;color:var(--color-muted);">(not verified — this tool only decodes)</small></h3>
+  <pre id="jwtSig" style="margin:0;padding:1rem;background:#1e293b;color:#f1f5f9;border-radius:var(--radius);overflow-x:auto;font-size:0.85rem;word-break:break-all;white-space:pre-wrap;"></pre>
+</div>
+
+<script>
+function base64UrlDecode(s){
+  var pad = '='.repeat((4 - s.length % 4) % 4);
+  var b64 = (s + pad).replace(/-/g,'+').replace(/_/g,'/');
+  var bin = atob(b64);
+  try{
+    return decodeURIComponent(Array.prototype.map.call(bin, function(c){
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+  }catch(e){
+    return bin;
+  }
+}
+
+function fmtDate(ts){
+  var d = new Date(ts * 1000);
+  return d.toLocaleString() + ' (' + d.toUTCString() + ')';
+}
+
+function relativeTime(ts){
+  var now = Math.floor(Date.now()/1000);
+  var diff = ts - now;
+  var abs = Math.abs(diff);
+  var unit, val;
+  if(abs < 60){unit='second'; val=abs;}
+  else if(abs < 3600){unit='minute'; val=Math.floor(abs/60);}
+  else if(abs < 86400){unit='hour'; val=Math.floor(abs/3600);}
+  else {unit='day'; val=Math.floor(abs/86400);}
+  return diff < 0 ? (val+' '+unit+(val!==1?'s':'')+' ago') : ('in '+val+' '+unit+(val!==1?'s':''));
+}
+
+function showError(msg){
+  document.getElementById('jwtError').style.display = 'block';
+  document.getElementById('jwtError').textContent = msg;
+  document.getElementById('jwtResult').style.display = 'none';
+}
+
+function hideError(){
+  document.getElementById('jwtError').style.display = 'none';
+}
+
+function decodeJwt(){
+  var raw = document.getElementById('jwtInput').value.trim();
+  if(!raw){hideError(); document.getElementById('jwtResult').style.display = 'none'; return;}
+  var parts = raw.split('.');
+  if(parts.length !== 3){showError('Not a valid JWT. Expected three dot-separated parts, got '+parts.length+'.'); return;}
+  var header, payload;
+  try{header = JSON.parse(base64UrlDecode(parts[0]));}
+  catch(e){showError('Could not decode header: '+e.message); return;}
+  try{payload = JSON.parse(base64UrlDecode(parts[1]));}
+  catch(e){showError('Could not decode payload: '+e.message); return;}
+
+  hideError();
+  document.getElementById('jwtHeader').textContent = JSON.stringify(header, null, 2);
+  document.getElementById('jwtPayload').textContent = JSON.stringify(payload, null, 2);
+  document.getElementById('jwtSig').textContent = parts[2] || '(empty)';
+
+  var metaLines = [];
+  metaLines.push('<strong>Algorithm:</strong> '+(header.alg || 'unspecified'));
+  if(header.typ) metaLines.push('<strong>Type:</strong> '+header.typ);
+  if(header.kid) metaLines.push('<strong>Key ID:</strong> '+header.kid);
+  if(payload.iss) metaLines.push('<strong>Issuer:</strong> '+payload.iss);
+  if(payload.sub) metaLines.push('<strong>Subject:</strong> '+payload.sub);
+  if(payload.aud) metaLines.push('<strong>Audience:</strong> '+(Array.isArray(payload.aud)?payload.aud.join(', '):payload.aud));
+  if(payload.iat) metaLines.push('<strong>Issued at:</strong> '+fmtDate(payload.iat)+' — '+relativeTime(payload.iat));
+  if(payload.nbf) metaLines.push('<strong>Not before:</strong> '+fmtDate(payload.nbf)+' — '+relativeTime(payload.nbf));
+  if(payload.exp){
+    var now = Math.floor(Date.now()/1000);
+    var expired = payload.exp < now;
+    var style = expired ? 'color:#b91c1c;font-weight:600;' : 'color:#15803d;font-weight:600;';
+    metaLines.push('<strong>Expires:</strong> '+fmtDate(payload.exp)+' — <span style="'+style+'">'+(expired?'EXPIRED':'valid')+' ('+relativeTime(payload.exp)+')</span>');
+  }
+  document.getElementById('jwtMeta').innerHTML = metaLines.join('<br>');
+  document.getElementById('jwtResult').style.display = 'block';
+}
+</script>

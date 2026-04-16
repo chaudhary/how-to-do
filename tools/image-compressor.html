@@ -1,0 +1,132 @@
+---
+layout: tool
+title: Image Compressor
+description: "Compress JPEG and PNG images in your browser. Adjust quality, resize, and download. Files never upload — 100% client-side."
+---
+
+<div class="tool-header">
+  <h1>Image Compressor</h1>
+  <p>Shrink image file size by adjusting quality and dimensions. Runs entirely in your browser.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="imgFile">Select image (JPEG, PNG, WebP)</label>
+    <input type="file" id="imgFile" accept="image/jpeg,image/png,image/webp" onchange="loadImage()">
+  </div>
+
+  <div id="imgControls" style="display:none;">
+    <div class="form-group">
+      <label for="quality">Quality: <span id="qualityVal">80</span>%</label>
+      <input type="range" id="quality" min="10" max="100" value="80" oninput="document.getElementById('qualityVal').textContent=this.value; compress();" style="width:100%;">
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+      <div class="form-group" style="flex:1;min-width:140px;">
+        <label for="maxWidth">Max width (px)</label>
+        <input type="number" id="maxWidth" placeholder="e.g. 1920" oninput="compress()" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);">
+      </div>
+      <div class="form-group" style="flex:1;min-width:140px;">
+        <label for="format">Output format</label>
+        <select id="format" onchange="compress()">
+          <option value="image/jpeg">JPEG</option>
+          <option value="image/webp">WebP</option>
+          <option value="image/png">PNG (lossless)</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="downloadCompressed()" style="background:var(--color-accent);">Download Compressed</button>
+  </div>
+</div>
+
+<div id="imgResult" style="display:none;margin-top:1.5rem;">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;">
+    <div>
+      <p style="margin:0 0 0.4rem;font-weight:600;">Original</p>
+      <div id="origStats" style="font-size:0.85rem;color:var(--color-muted);margin-bottom:0.5rem;"></div>
+      <img id="origPreview" style="max-width:100%;border:1px solid var(--color-border);border-radius:var(--radius);">
+    </div>
+    <div>
+      <p style="margin:0 0 0.4rem;font-weight:600;">Compressed</p>
+      <div id="newStats" style="font-size:0.85rem;color:var(--color-muted);margin-bottom:0.5rem;"></div>
+      <img id="newPreview" style="max-width:100%;border:1px solid var(--color-border);border-radius:var(--radius);">
+    </div>
+  </div>
+  <p id="savings" style="margin-top:1rem;font-size:1.05rem;"></p>
+</div>
+
+<script>
+var origFile = null, origImg = null, currentBlob = null;
+
+function fmt(bytes){
+  if(bytes < 1024) return bytes+' B';
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1)+' KB';
+  return (bytes/1024/1024).toFixed(2)+' MB';
+}
+
+function loadImage(){
+  var f = document.getElementById('imgFile').files[0];
+  if(!f) return;
+  origFile = f;
+  var url = URL.createObjectURL(f);
+  origImg = new Image();
+  origImg.onload = function(){
+    document.getElementById('origPreview').src = url;
+    document.getElementById('origStats').textContent = f.name+' — '+fmt(f.size)+' — '+origImg.width+'×'+origImg.height;
+    document.getElementById('imgControls').style.display = 'block';
+    document.getElementById('imgResult').style.display = 'block';
+    compress();
+  };
+  origImg.src = url;
+}
+
+function compress(){
+  if(!origImg) return;
+  var quality = parseInt(document.getElementById('quality').value,10)/100;
+  var maxW = parseInt(document.getElementById('maxWidth').value,10);
+  var format = document.getElementById('format').value;
+  var w = origImg.width, h = origImg.height;
+  if(maxW && maxW > 0 && w > maxW){
+    h = Math.round(h * (maxW / w));
+    w = maxW;
+  }
+  var canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  var ctx = canvas.getContext('2d');
+  if(format === 'image/jpeg'){
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0,0,w,h);
+  }
+  ctx.drawImage(origImg, 0, 0, w, h);
+  canvas.toBlob(function(blob){
+    if(!blob){document.getElementById('newStats').textContent='Compression failed.'; return;}
+    currentBlob = blob;
+    var url = URL.createObjectURL(blob);
+    document.getElementById('newPreview').src = url;
+    document.getElementById('newStats').textContent = fmt(blob.size)+' — '+w+'×'+h;
+    var saved = origFile.size - blob.size;
+    var pct = ((saved / origFile.size) * 100).toFixed(1);
+    var savingsEl = document.getElementById('savings');
+    if(saved > 0){
+      savingsEl.innerHTML = '<strong>Saved '+fmt(saved)+' ('+pct+'%)</strong>';
+      savingsEl.style.color = 'var(--color-accent)';
+    } else {
+      savingsEl.innerHTML = 'Output is <strong>'+fmt(-saved)+' larger</strong> than original. Try lower quality or a different format.';
+      savingsEl.style.color = '#b91c1c';
+    }
+  }, format, quality);
+}
+
+function downloadCompressed(){
+  if(!currentBlob) return;
+  var format = document.getElementById('format').value;
+  var ext = format.split('/')[1];
+  var baseName = origFile.name.replace(/\.(jpg|jpeg|png|webp)$/i,'');
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(currentBlob);
+  a.download = baseName+'-compressed.'+ext;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(a.href);}, 10000);
+}
+</script>

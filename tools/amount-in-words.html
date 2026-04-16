@@ -1,0 +1,106 @@
+---
+layout: tool
+title: Amount in Words (Indian Rupees)
+description: "Convert any rupee amount to words in Indian numbering format (lakh, crore). Useful for invoices, cheques, and legal documents."
+---
+
+<div class="tool-header">
+  <h1>Amount in Words (INR)</h1>
+  <p>Convert a rupee amount to words using the Indian numbering system (lakh, crore). Ideal for invoices and cheques.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="amount">Amount (₹)</label>
+    <input type="number" id="amount" placeholder="e.g. 123456.78" step="0.01" min="0" oninput="convert()" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+  </div>
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+    <label style="display:flex;align-items:center;gap:0.4rem;"><input type="checkbox" id="useRupees" checked onchange="convert()"> Include "Rupees" and "Paise" labels</label>
+    <label style="display:flex;align-items:center;gap:0.4rem;"><input type="checkbox" id="useOnly" checked onchange="convert()"> Append "Only"</label>
+  </div>
+</div>
+
+<div id="wordsResult" style="display:none;margin-top:1.5rem;padding:1.5rem;background:var(--color-bg-alt, #f9f9f9);border:1px solid var(--color-border);border-radius:var(--radius);">
+  <div id="formattedAmount" style="font-size:0.95rem;color:var(--color-muted);margin-bottom:0.75rem;"></div>
+  <div id="wordsText" style="font-size:1.1rem;line-height:1.6;font-weight:500;"></div>
+  <button class="btn" onclick="copyWords()" style="margin-top:1rem;">Copy</button>
+</div>
+
+<script>
+var ones = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+var tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+
+function twoDigits(n){
+  if(n < 20) return ones[n];
+  var t = Math.floor(n/10), o = n%10;
+  return tens[t] + (o ? ' '+ones[o] : '');
+}
+
+function threeDigits(n){
+  var h = Math.floor(n/100), rest = n%100;
+  var parts = [];
+  if(h) parts.push(ones[h]+' Hundred');
+  if(rest) parts.push(twoDigits(rest));
+  return parts.join(' ');
+}
+
+function toIndianWords(n){
+  if(n === 0) return 'Zero';
+  var parts = [];
+  var crore = Math.floor(n / 10000000); n %= 10000000;
+  var lakh = Math.floor(n / 100000); n %= 100000;
+  var thousand = Math.floor(n / 1000); n %= 1000;
+  var rest = n;
+  if(crore) parts.push(toIndianWords(crore) + ' Crore');
+  if(lakh) parts.push(twoDigits(lakh) + ' Lakh');
+  if(thousand) parts.push(twoDigits(thousand) + ' Thousand');
+  if(rest) parts.push(threeDigits(rest));
+  return parts.join(' ');
+}
+
+function formatIndianNumber(n){
+  var parts = n.toFixed(2).split('.');
+  var intPart = parts[0];
+  var lastThree = intPart.slice(-3);
+  var rest = intPart.slice(0, -3);
+  if(rest) lastThree = ',' + lastThree;
+  rest = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+  return '₹ ' + rest + lastThree + '.' + parts[1];
+}
+
+function convert(){
+  var raw = document.getElementById('amount').value;
+  var el = document.getElementById('wordsResult');
+  if(raw === '' || isNaN(parseFloat(raw))){el.style.display='none'; return;}
+  var amount = parseFloat(raw);
+  if(amount < 0){el.style.display='none'; return;}
+  var rupees = Math.floor(amount);
+  var paise = Math.round((amount - rupees) * 100);
+  if(paise === 100){rupees += 1; paise = 0;}
+  var useRupees = document.getElementById('useRupees').checked;
+  var useOnly = document.getElementById('useOnly').checked;
+  var words = toIndianWords(rupees);
+  var out;
+  if(useRupees){
+    out = words + ' Rupees';
+    if(paise) out += ' and ' + twoDigits(paise) + ' Paise';
+  } else {
+    out = words;
+    if(paise) out += ' Point ' + twoDigits(paise);
+  }
+  if(useOnly) out += ' Only';
+  document.getElementById('formattedAmount').textContent = formatIndianNumber(amount);
+  document.getElementById('wordsText').textContent = out;
+  el.style.display = 'block';
+}
+
+function copyWords(){
+  var text = document.getElementById('wordsText').textContent;
+  navigator.clipboard.writeText(text).then(function(){
+    var btn = event.target;
+    var orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(function(){btn.textContent = orig;}, 1500);
+  });
+}
+</script>
