@@ -1,0 +1,219 @@
+---
+layout: tool
+title: Income Tax Calculator (Old vs New Regime)
+description: "Compare tax liability under India's Old and New regimes. Covers FY 2025-26. See which regime saves you more, with a full breakdown."
+---
+
+<div class="tool-header">
+  <h1>Income Tax Calculator — Old vs New</h1>
+  <p>Compare your tax under the Old and New regimes for FY 2025-26 (AY 2026-27). Fill in deductions to see when the Old regime still wins.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="income">Annual gross income (₹)</label>
+    <input type="number" id="income" placeholder="e.g. 1200000" min="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    <small style="color:var(--color-muted);">Total salary before any deductions (CTC minus employer PF/gratuity).</small>
+  </div>
+
+  <div class="form-group">
+    <label for="age">Age</label>
+    <select id="age" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <option value="under60">Below 60</option>
+      <option value="senior">60 to 80 (Senior)</option>
+      <option value="super">80+ (Super Senior)</option>
+    </select>
+  </div>
+
+  <h3 style="margin:1.5rem 0 0.75rem;font-size:1.05rem;">Deductions (Old regime only)</h3>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="d80c">80C (PPF, ELSS, LIC…)</label>
+      <input type="number" id="d80c" placeholder="max 1,50,000" min="0" max="150000" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);">
+    </div>
+    <div class="form-group">
+      <label for="d80d">80D (Health insurance)</label>
+      <input type="number" id="d80d" placeholder="max 25-100k" min="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);">
+    </div>
+    <div class="form-group">
+      <label for="dhra">HRA exempt</label>
+      <input type="number" id="dhra" placeholder="exempt portion" min="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);">
+    </div>
+    <div class="form-group">
+      <label for="dhome">Home loan interest</label>
+      <input type="number" id="dhome" placeholder="max 2,00,000" min="0" max="200000" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);">
+    </div>
+    <div class="form-group">
+      <label for="dother">Other (80E, 80G, NPS…)</label>
+      <input type="number" id="dother" placeholder="remaining deductions" min="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);">
+    </div>
+  </div>
+
+  <div style="display:flex;gap:1rem;align-items:center;margin-top:0.5rem;">
+    <label style="display:flex;align-items:center;gap:0.4rem;"><input type="checkbox" id="salaried" checked> Salaried (standard deduction applies)</label>
+  </div>
+
+  <div style="margin-top:1rem;">
+    <button class="btn" onclick="calcTax()">Calculate</button>
+  </div>
+</div>
+
+<div id="taxResult" style="display:none;margin-top:1.5rem;">
+  <div id="winnerBox" style="padding:1rem 1.25rem;border-radius:var(--radius);margin-bottom:1rem;font-size:1.05rem;"></div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;">
+    <div style="padding:1rem;background:var(--color-bg-alt, #f9f9f9);border:1px solid var(--color-border);border-radius:var(--radius);">
+      <h3 style="margin:0 0 0.75rem;">Old Regime</h3>
+      <div id="oldBreakdown" style="font-size:0.9rem;line-height:1.7;"></div>
+    </div>
+    <div style="padding:1rem;background:var(--color-bg-alt, #f9f9f9);border:1px solid var(--color-border);border-radius:var(--radius);">
+      <h3 style="margin:0 0 0.75rem;">New Regime</h3>
+      <div id="newBreakdown" style="font-size:0.9rem;line-height:1.7;"></div>
+    </div>
+  </div>
+</div>
+
+<p style="margin-top:1.5rem;font-size:0.9rem;color:var(--color-muted);">Need a CTC-to-in-hand breakdown with PF, HRA, and monthly take-home? Use the <a href="{{ '/tools/salary-calculator' | relative_url }}">Salary Calculator</a>.</p>
+
+<div style="margin-top:1rem;padding:1rem;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:var(--radius);font-size:0.9rem;">
+  <strong>Note:</strong> Slabs are for FY 2025-26 (AY 2026-27) per Budget 2025. Verify against the latest Finance Act if filing for FY 2026-27. Surcharge on income above ₹50L is not included — for high earners, consult a CA.
+</div>
+
+<script>
+function fmtINR(n){
+  var s = Math.round(n).toString();
+  var last3 = s.slice(-3);
+  var rest = s.slice(0, -3);
+  if(rest) last3 = ',' + last3;
+  rest = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+  return '₹ ' + rest + last3;
+}
+
+function taxNewRegime(taxable){
+  var slabs = [
+    [400000, 0],
+    [800000, 0.05],
+    [1200000, 0.10],
+    [1600000, 0.15],
+    [2000000, 0.20],
+    [2400000, 0.25],
+    [Infinity, 0.30]
+  ];
+  return applySlabs(taxable, slabs);
+}
+
+function taxOldRegime(taxable, age){
+  var threshold = age==='super' ? 500000 : (age==='senior' ? 300000 : 250000);
+  var slabs = [
+    [threshold, 0],
+    [500000, 0.05],
+    [1000000, 0.20],
+    [Infinity, 0.30]
+  ];
+  return applySlabs(taxable, slabs);
+}
+
+function applySlabs(taxable, slabs){
+  var tax = 0, prev = 0, detail = [];
+  for(var i=0;i<slabs.length;i++){
+    var upper = slabs[i][0], rate = slabs[i][1];
+    if(taxable <= prev) break;
+    var slabAmount = Math.min(taxable, upper) - prev;
+    if(slabAmount > 0){
+      var slabTax = slabAmount * rate;
+      tax += slabTax;
+      if(rate > 0){
+        detail.push({from:prev, to:Math.min(taxable,upper), rate:rate, tax:slabTax});
+      }
+      prev = upper;
+    }
+  }
+  return {tax:tax, detail:detail};
+}
+
+function calcTax(){
+  var income = parseFloat(document.getElementById('income').value) || 0;
+  if(income <= 0){alert('Enter a positive income.'); return;}
+  var age = document.getElementById('age').value;
+  var salaried = document.getElementById('salaried').checked;
+  var d80c = Math.min(parseFloat(document.getElementById('d80c').value)||0, 150000);
+  var d80d = parseFloat(document.getElementById('d80d').value)||0;
+  var dhra = parseFloat(document.getElementById('dhra').value)||0;
+  var dhome = Math.min(parseFloat(document.getElementById('dhome').value)||0, 200000);
+  var dother = parseFloat(document.getElementById('dother').value)||0;
+
+  // New regime
+  var stdNew = salaried ? 75000 : 0;
+  var taxableNew = Math.max(0, income - stdNew);
+  var rNew = taxNewRegime(taxableNew);
+  // 87A rebate (new): income up to 12L → tax nil (excluding special rates income)
+  var rebateNew = 0;
+  if(taxableNew <= 1200000){rebateNew = rNew.tax; rNew.tax = 0;}
+  var cessNew = rNew.tax * 0.04;
+  var totalNew = rNew.tax + cessNew;
+
+  // Old regime
+  var stdOld = salaried ? 50000 : 0;
+  var deductionsOld = stdOld + d80c + d80d + dhra + dhome + dother;
+  var taxableOld = Math.max(0, income - deductionsOld);
+  var rOld = taxOldRegime(taxableOld, age);
+  // 87A rebate (old): income up to 5L → up to ₹12,500
+  var rebateOld = 0;
+  if(taxableOld <= 500000){rebateOld = Math.min(rOld.tax, 12500); rOld.tax -= rebateOld;}
+  var cessOld = rOld.tax * 0.04;
+  var totalOld = rOld.tax + cessOld;
+
+  // Render
+  document.getElementById('oldBreakdown').innerHTML = renderBreakdown({
+    income:income, deductions:deductionsOld, taxable:taxableOld,
+    detail:rOld.detail, baseTax:rOld.tax + rebateOld, rebate:rebateOld, cess:cessOld, total:totalOld,
+    stdDed:stdOld, extraDed:[['80C',d80c],['80D',d80d],['HRA',dhra],['Home loan',dhome],['Other',dother]]
+  });
+  document.getElementById('newBreakdown').innerHTML = renderBreakdown({
+    income:income, deductions:stdNew, taxable:taxableNew,
+    detail:rNew.detail, baseTax:rNew.tax + rebateNew, rebate:rebateNew, cess:cessNew, total:totalNew,
+    stdDed:stdNew, extraDed:[]
+  });
+
+  var winner = document.getElementById('winnerBox');
+  if(totalOld < totalNew){
+    winner.style.background = '#dcfce7';
+    winner.style.borderLeft = '3px solid #15803d';
+    winner.innerHTML = '<strong>Old regime saves '+fmtINR(totalNew - totalOld)+'</strong> — file under the Old regime.';
+  } else if(totalNew < totalOld){
+    winner.style.background = '#dcfce7';
+    winner.style.borderLeft = '3px solid #15803d';
+    winner.innerHTML = '<strong>New regime saves '+fmtINR(totalOld - totalNew)+'</strong> — the default New regime is better for you.';
+  } else {
+    winner.style.background = '#e0e7ff';
+    winner.style.borderLeft = '3px solid #4f46e5';
+    winner.innerHTML = 'Both regimes result in the same tax of '+fmtINR(totalNew)+'.';
+  }
+
+  document.getElementById('taxResult').style.display = 'block';
+}
+
+function renderBreakdown(r){
+  var html = '';
+  html += 'Gross income: <strong>'+fmtINR(r.income)+'</strong><br>';
+  if(r.stdDed) html += 'Standard deduction: −'+fmtINR(r.stdDed)+'<br>';
+  r.extraDed.forEach(function(d){
+    if(d[1] > 0) html += d[0]+': −'+fmtINR(d[1])+'<br>';
+  });
+  html += 'Taxable income: <strong>'+fmtINR(r.taxable)+'</strong><br>';
+  if(r.detail.length){
+    html += '<div style="margin:0.5rem 0;padding:0.5rem 0;border-top:1px dashed var(--color-border);border-bottom:1px dashed var(--color-border);font-size:0.85rem;">';
+    r.detail.forEach(function(s){
+      html += fmtINR(s.from)+'–'+fmtINR(s.to)+' @ '+(s.rate*100)+'% = '+fmtINR(s.tax)+'<br>';
+    });
+    html += '</div>';
+  }
+  html += 'Tax: '+fmtINR(r.baseTax)+'<br>';
+  if(r.rebate > 0) html += 'Less 87A rebate: −'+fmtINR(r.rebate)+'<br>';
+  html += 'Health & ed. cess (4%): '+fmtINR(r.cess)+'<br>';
+  html += '<hr style="margin:0.5rem 0;border:none;border-top:1px solid var(--color-border);">';
+  html += '<strong style="font-size:1.05rem;">Total tax: '+fmtINR(r.total)+'</strong>';
+  return html;
+}
+</script>

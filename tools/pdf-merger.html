@@ -1,0 +1,172 @@
+---
+layout: tool
+title: PDF Merger & Splitter
+description: "Merge multiple PDFs into one or split a PDF by page ranges. Runs 100% in your browser, files never leave your device."
+---
+
+<div class="tool-header">
+  <h1>PDF Merger & Splitter</h1>
+  <p>Combine PDFs or split one by page ranges. Everything runs in your browser, files never upload anywhere.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label>Mode</label>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+      <label style="display:flex;align-items:center;gap:0.4rem;"><input type="radio" name="mode" value="merge" checked onchange="switchMode()"> Merge multiple PDFs</label>
+      <label style="display:flex;align-items:center;gap:0.4rem;"><input type="radio" name="mode" value="split" onchange="switchMode()"> Split one PDF</label>
+    </div>
+  </div>
+
+  <div id="mergeBox">
+    <div class="form-group">
+      <label for="mergeFiles">Select PDFs (in order you want them merged)</label>
+      <input type="file" id="mergeFiles" accept="application/pdf" multiple onchange="renderFileList()">
+    </div>
+    <div id="fileList" style="margin-bottom:1rem;"></div>
+    <button class="btn" onclick="doMerge()" id="mergeBtn">Merge PDFs</button>
+  </div>
+
+  <div id="splitBox" style="display:none;">
+    <div class="form-group">
+      <label for="splitFile">Select PDF</label>
+      <input type="file" id="splitFile" accept="application/pdf" onchange="showPageCount()">
+    </div>
+    <div id="pageInfo" style="margin-bottom:0.75rem;color:var(--color-muted);font-size:0.9rem;"></div>
+    <div class="form-group">
+      <label for="ranges">Page ranges (comma-separated)</label>
+      <input type="text" id="ranges" placeholder="e.g. 1-3, 5, 7-9" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);">Each range becomes a separate PDF. Use <code>1-3</code> for a range, <code>5</code> for a single page.</small>
+    </div>
+    <button class="btn" onclick="doSplit()" id="splitBtn">Split PDF</button>
+  </div>
+</div>
+
+<div id="pdfStatus" style="margin-top:1rem;"></div>
+
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script>
+function switchMode(){
+  var mode = document.querySelector('input[name=mode]:checked').value;
+  document.getElementById('mergeBox').style.display = mode==='merge' ? '' : 'none';
+  document.getElementById('splitBox').style.display = mode==='split' ? '' : 'none';
+  setStatus('');
+}
+
+function setStatus(msg, isError){
+  var el = document.getElementById('pdfStatus');
+  if(!msg){el.innerHTML=''; return;}
+  var color = isError ? '#b91c1c' : 'var(--color-muted)';
+  el.innerHTML = '<p style="color:'+color+';margin:0;">'+msg+'</p>';
+}
+
+function renderFileList(){
+  var files = document.getElementById('mergeFiles').files;
+  var list = document.getElementById('fileList');
+  if(!files.length){list.innerHTML=''; return;}
+  var html = '<ol style="margin:0 0 0 1.25rem;padding:0;font-size:0.9rem;">';
+  for(var i=0;i<files.length;i++){
+    html += '<li>'+files[i].name+' <span style="color:var(--color-muted);">('+(files[i].size/1024).toFixed(0)+' KB)</span></li>';
+  }
+  html += '</ol>';
+  list.innerHTML = html;
+}
+
+async function showPageCount(){
+  var f = document.getElementById('splitFile').files[0];
+  if(!f){document.getElementById('pageInfo').textContent=''; return;}
+  try{
+    var bytes = await f.arrayBuffer();
+    var doc = await PDFLib.PDFDocument.load(bytes);
+    document.getElementById('pageInfo').textContent = f.name + ' — ' + doc.getPageCount() + ' pages';
+  }catch(e){
+    document.getElementById('pageInfo').textContent = 'Could not read PDF: ' + e.message;
+  }
+}
+
+async function doMerge(){
+  var files = document.getElementById('mergeFiles').files;
+  if(files.length < 2){setStatus('Select at least two PDFs.', true); return;}
+  var btn = document.getElementById('mergeBtn');
+  btn.disabled = true; btn.textContent = 'Merging...';
+  setStatus('Merging '+files.length+' PDFs...');
+  try{
+    var merged = await PDFLib.PDFDocument.create();
+    for(var i=0;i<files.length;i++){
+      var bytes = await files[i].arrayBuffer();
+      var doc = await PDFLib.PDFDocument.load(bytes);
+      var pages = await merged.copyPages(doc, doc.getPageIndices());
+      pages.forEach(function(p){merged.addPage(p);});
+    }
+    var out = await merged.save();
+    download(out, 'merged.pdf');
+    setStatus('Merged '+files.length+' files into merged.pdf');
+  }catch(e){
+    setStatus('Merge failed: '+e.message, true);
+  }finally{
+    btn.disabled = false; btn.textContent = 'Merge PDFs';
+  }
+}
+
+function parseRanges(input, total){
+  var parts = input.split(',').map(function(s){return s.trim();}).filter(Boolean);
+  var out = [];
+  for(var i=0;i<parts.length;i++){
+    var p = parts[i];
+    var m = p.match(/^(\d+)\s*-\s*(\d+)$/);
+    if(m){
+      var a = parseInt(m[1],10), b = parseInt(m[2],10);
+      if(a<1||b<1||a>total||b>total||a>b) throw new Error('Invalid range: '+p+' (PDF has '+total+' pages)');
+      out.push({label:a+'-'+b, indices:range(a-1,b-1)});
+    } else if(/^\d+$/.test(p)){
+      var n = parseInt(p,10);
+      if(n<1||n>total) throw new Error('Invalid page: '+p+' (PDF has '+total+' pages)');
+      out.push({label:''+n, indices:[n-1]});
+    } else {
+      throw new Error('Cannot parse "'+p+'"');
+    }
+  }
+  return out;
+}
+
+function range(a,b){var r=[]; for(var i=a;i<=b;i++) r.push(i); return r;}
+
+async function doSplit(){
+  var f = document.getElementById('splitFile').files[0];
+  var rangesStr = document.getElementById('ranges').value.trim();
+  if(!f){setStatus('Select a PDF.', true); return;}
+  if(!rangesStr){setStatus('Enter page ranges.', true); return;}
+  var btn = document.getElementById('splitBtn');
+  btn.disabled = true; btn.textContent = 'Splitting...';
+  setStatus('Splitting...');
+  try{
+    var bytes = await f.arrayBuffer();
+    var src = await PDFLib.PDFDocument.load(bytes);
+    var ranges = parseRanges(rangesStr, src.getPageCount());
+    var baseName = f.name.replace(/\.pdf$/i,'');
+    for(var i=0;i<ranges.length;i++){
+      var out = await PDFLib.PDFDocument.create();
+      var pages = await out.copyPages(src, ranges[i].indices);
+      pages.forEach(function(p){out.addPage(p);});
+      var bytes2 = await out.save();
+      download(bytes2, baseName+'_pages_'+ranges[i].label+'.pdf');
+    }
+    setStatus('Created '+ranges.length+' file(s).');
+  }catch(e){
+    setStatus('Split failed: '+e.message, true);
+  }finally{
+    btn.disabled = false; btn.textContent = 'Split PDF';
+  }
+}
+
+function download(bytes, name){
+  var blob = new Blob([bytes], {type:'application/pdf'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(a.href);}, 10000);
+}
+</script>
