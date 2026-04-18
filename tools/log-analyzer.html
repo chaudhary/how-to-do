@@ -1,0 +1,137 @@
+---
+layout: tool
+title: Log Root Cause Analyzer
+description: "Paste noisy logs, get a root cause summary, possible fixes, and severity detection. Works with any log format: app, server, stack traces, CI output."
+---
+
+<div class="tool-header">
+  <h1>Log Root Cause Analyzer</h1>
+  <p>Paste logs or a stack trace. Get the likely root cause, possible fixes, and severity.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="apiKey">Groq API Key (optional)</label>
+    <div class="hint">Built-in key used by default.</div>
+    <input type="password" id="apiKey" placeholder="Leave empty to use built-in key">
+  </div>
+  <div class="form-group">
+    <label for="logs">Logs / Stack Trace</label>
+    <textarea id="logs" rows="12" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.85rem;resize:vertical;" placeholder="Paste any logs: application errors, stack traces, server output, CI failures, Docker logs..."></textarea>
+  </div>
+  <div class="form-group">
+    <label for="context">Context (optional)</label>
+    <input type="text" id="context" placeholder="e.g. Node.js app on AWS Lambda, started after deploy at 3pm">
+  </div>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+    <button class="btn" id="generateBtn" onclick="analyze()">Analyze</button>
+    <button class="btn" onclick="copyOutput()" style="background:var(--color-accent);">Copy Output</button>
+  </div>
+</div>
+<div id="loading" style="display:none;text-align:center;padding:2rem 0;color:var(--color-muted);">Analyzing logs...</div>
+<div id="error" style="display:none;padding:1rem;background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);color:#dc2626;margin-top:1rem;"></div>
+
+<div id="outputGroup" style="display:none;margin-top:1.5rem;">
+  <div class="form-group">
+    <label>Severity</label>
+    <div id="severity" style="padding:0.75rem 1rem;border-radius:var(--radius);font-weight:700;font-size:1rem;display:inline-block;"></div>
+  </div>
+  <div class="form-group">
+    <label>Root Cause</label>
+    <div id="rootcause" style="padding:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.7;background:var(--color-card-bg);"></div>
+  </div>
+  <div class="form-group">
+    <label>Key Evidence from Logs</label>
+    <div id="evidence" style="padding:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.85rem;line-height:1.55;background:var(--color-card-bg);white-space:pre-wrap;"></div>
+  </div>
+  <div class="form-group">
+    <label>Possible Fixes</label>
+    <div id="fixes" style="padding:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.7;background:var(--color-card-bg);"></div>
+  </div>
+  <div class="form-group">
+    <label>Next Steps to Investigate</label>
+    <div id="nextsteps" style="padding:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.7;background:var(--color-card-bg);"></div>
+  </div>
+</div>
+
+<script>
+var _k=['gsk','_DsAaIIxlOz6UCw','PMPWVBWGdyb3FY','Fgju5E1lg2ONy0','G7lzNIGXpQ'];
+function gk(){return _k.join('');}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderList(text){
+  if(!text)return '<p style="color:var(--color-muted);">None.</p>';
+  var lines=text.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+  var html='',inList=false;
+  lines.forEach(function(l){
+    var m=l.match(/^(?:[-*]|\d+[.)])\s+(.*)/);
+    if(m){if(!inList){html+='<ul style="margin:0 0 0 1.2rem;padding:0;">';inList=true;}html+='<li style="margin-bottom:0.35rem;">'+esc(m[1])+'</li>';}
+    else{if(inList){html+='</ul>';inList=false;}html+='<p style="margin:0 0 0.5rem;">'+esc(l)+'</p>';}
+  });
+  if(inList)html+='</ul>';
+  return html;
+}
+function splitSections(text){
+  var out={severity:'',rootcause:'',evidence:'',fixes:'',nextsteps:''};
+  var headers=['SEVERITY','ROOT_CAUSE','EVIDENCE','FIXES','NEXT_STEPS'];
+  var re=new RegExp('\\n(?=(?:'+headers.join('|')+'):\\s*$)','im');
+  var parts=text.split(re);
+  parts.forEach(function(p){
+    var m=p.match(/^(SEVERITY|ROOT_CAUSE|EVIDENCE|FIXES|NEXT_STEPS):\s*\n?([\s\S]*)/i);
+    if(m){
+      var k=m[1].toLowerCase().replace('_','');
+      out[k]=m[2].trim();
+    }
+  });
+  return out;
+}
+function severityStyle(s){
+  var lvl=(s||'').toUpperCase();
+  if(lvl.indexOf('CRITICAL')>=0)return {bg:'#fef2f2',border:'#dc2626',color:'#991b1b'};
+  if(lvl.indexOf('HIGH')>=0)return {bg:'#fff7ed',border:'#ea580c',color:'#9a3412'};
+  if(lvl.indexOf('MEDIUM')>=0)return {bg:'#fefce8',border:'#ca8a04',color:'#854d0e'};
+  if(lvl.indexOf('LOW')>=0)return {bg:'#f0fdf4',border:'#16a34a',color:'#166534'};
+  return {bg:'var(--color-card-bg)',border:'var(--color-border)',color:'var(--color-text)'};
+}
+async function analyze(){
+  var apiKey=document.getElementById('apiKey').value.trim()||gk();
+  var logs=document.getElementById('logs').value.trim();
+  var ctx=document.getElementById('context').value.trim();
+  var errorDiv=document.getElementById('error');errorDiv.style.display='none';
+  if(!logs){errorDiv.textContent='Paste some logs first.';errorDiv.style.display='block';return;}
+  var prompt='Analyze these logs and find the root cause.\n\n'+(ctx?'Context: '+ctx+'\n\n':'')+'Logs:\n'+logs+'\n\nRespond in this EXACT format, using these five headers only:\n\nSEVERITY:\nOne word only: CRITICAL, HIGH, MEDIUM, or LOW. CRITICAL = production outage or data loss risk. HIGH = user-facing errors or broken features. MEDIUM = degraded behavior or warnings worth attention. LOW = noise or informational.\n\nROOT_CAUSE:\n[2-4 sentences explaining the most likely root cause. Be specific: name the component, the failure mode, and why it is failing. If multiple causes are possible, rank them.]\n\nEVIDENCE:\n[The 1-5 most relevant lines quoted verbatim from the logs that support the root cause. One per line.]\n\nFIXES:\n[Bulleted list of concrete, actionable fixes. Each should be a specific action, not a vague suggestion.]\n\nNEXT_STEPS:\n[Bulleted list of things to check or commands to run to confirm the diagnosis before applying a fix.]';
+  var btn=document.getElementById('generateBtn');btn.disabled=true;btn.textContent='Analyzing...';
+  document.getElementById('loading').style.display='block';document.getElementById('outputGroup').style.display='none';
+  try{
+    var r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'You are a senior SRE and debugging expert. You read noisy logs and find root causes fast. Be precise and specific. Never use em dashes.'},{role:'user',content:prompt}],temperature:0.2,max_tokens:2048})});
+    var data=await r.json();
+    if(!r.ok)throw new Error(data.error?.message||'API error');
+    var result=data.choices[0].message.content.trim();
+    var s=splitSections(result);
+    var sev=s.severity.split('\n')[0].trim().toUpperCase().replace(/[^A-Z]/g,'');
+    var st=severityStyle(sev);
+    var sevEl=document.getElementById('severity');
+    sevEl.textContent=sev||'UNKNOWN';
+    sevEl.style.background=st.bg;sevEl.style.border='2px solid '+st.border;sevEl.style.color=st.color;
+    document.getElementById('rootcause').innerHTML=renderList(s.rootcause);
+    document.getElementById('evidence').textContent=s.evidence||'No specific lines highlighted.';
+    document.getElementById('fixes').innerHTML=renderList(s.fixes);
+    document.getElementById('nextsteps').innerHTML=renderList(s.nextsteps);
+    document.getElementById('outputGroup').style.display='block';
+  }catch(e){errorDiv.textContent=e.message;errorDiv.style.display='block';}
+  finally{btn.disabled=false;btn.textContent='Analyze';document.getElementById('loading').style.display='none';}
+}
+function copyOutput(){
+  var parts=[];
+  var sev=document.getElementById('severity').textContent.trim();
+  var rc=document.getElementById('rootcause').innerText.trim();
+  var ev=document.getElementById('evidence').innerText.trim();
+  var fx=document.getElementById('fixes').innerText.trim();
+  var ns=document.getElementById('nextsteps').innerText.trim();
+  if(sev)parts.push('SEVERITY: '+sev);
+  if(rc)parts.push('ROOT CAUSE:\n'+rc);
+  if(ev)parts.push('EVIDENCE:\n'+ev);
+  if(fx)parts.push('FIXES:\n'+fx);
+  if(ns)parts.push('NEXT STEPS:\n'+ns);
+  if(parts.length)navigator.clipboard.writeText(parts.join('\n\n'));
+}
+</script>

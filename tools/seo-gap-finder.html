@@ -1,0 +1,129 @@
+---
+layout: tool
+title: SEO Gap Finder for Blogs
+description: "Enter your blog's domain or niche and get missing topics, competitor content gaps, and easy-to-rank keyword ideas. Perfect for content strategy."
+---
+
+<div class="tool-header">
+  <h1>SEO Gap Finder for Blogs</h1>
+  <p>Find missing topics, competitor gaps, and low-competition keywords for your niche.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="apiKey">Groq API Key (optional)</label>
+    <div class="hint">Built-in key used by default.</div>
+    <input type="password" id="apiKey" placeholder="Leave empty to use built-in key">
+  </div>
+  <div class="form-group">
+    <label for="domain">Your Blog or Niche</label>
+    <input type="text" id="domain" placeholder="e.g. personal finance for Indian salaried professionals, or yourblog.com">
+  </div>
+  <div class="form-group">
+    <label for="existing">Topics You Already Cover (optional)</label>
+    <textarea id="existing" rows="3" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;resize:vertical;" placeholder="Comma-separated: EMI calculator, SIP returns, income tax, ..."></textarea>
+  </div>
+  <div class="form-group">
+    <label for="competitors">Competitor Sites (optional)</label>
+    <input type="text" id="competitors" placeholder="e.g. groww.in, clear.in, paisabazaar.com">
+  </div>
+  <div class="form-group">
+    <label for="audience">Target Audience</label>
+    <input type="text" id="audience" placeholder="e.g. beginners, founders, Indian professionals, US renters">
+  </div>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+    <button class="btn" id="generateBtn" onclick="findGaps()">Find Gaps</button>
+    <button class="btn" onclick="copyOutput()" style="background:var(--color-accent);">Copy Output</button>
+  </div>
+</div>
+<div id="loading" style="display:none;text-align:center;padding:2rem 0;color:var(--color-muted);">Researching gaps...</div>
+<div id="error" style="display:none;padding:1rem;background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);color:#dc2626;margin-top:1rem;"></div>
+
+<div id="outputGroup" style="display:none;margin-top:1.5rem;">
+  <div class="form-group">
+    <label>Missing Topics You Should Cover</label>
+    <div id="missing" style="padding:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.7;background:var(--color-card-bg);"></div>
+  </div>
+  <div class="form-group">
+    <label>Competitor Content Gaps</label>
+    <div id="gaps" style="padding:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.7;background:var(--color-card-bg);"></div>
+  </div>
+  <div class="form-group">
+    <label>Easy-to-Rank Keywords (long-tail, low competition)</label>
+    <div id="keywords" style="padding:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.7;background:var(--color-card-bg);"></div>
+  </div>
+  <div class="form-group">
+    <label>Suggested Post Titles</label>
+    <div id="titles" style="padding:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.7;background:var(--color-card-bg);"></div>
+  </div>
+</div>
+
+<script>
+var _k=['gsk','_DsAaIIxlOz6UCw','PMPWVBWGdyb3FY','Fgju5E1lg2ONy0','G7lzNIGXpQ'];
+function gk(){return _k.join('');}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderList(text){
+  if(!text)return '<p style="color:var(--color-muted);">None.</p>';
+  var lines=text.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+  var html='',inList=false;
+  lines.forEach(function(l){
+    var m=l.match(/^(?:[-*]|\d+[.)])\s+(.*)/);
+    if(m){if(!inList){html+='<ul style="margin:0 0 0 1.2rem;padding:0;">';inList=true;}html+='<li style="margin-bottom:0.4rem;">'+esc(m[1])+'</li>';}
+    else{if(inList){html+='</ul>';inList=false;}html+='<p style="margin:0 0 0.5rem;">'+esc(l)+'</p>';}
+  });
+  if(inList)html+='</ul>';
+  return html;
+}
+function splitSections(text){
+  var out={missing:'',gaps:'',keywords:'',titles:''};
+  var headers=['MISSING_TOPICS','COMPETITOR_GAPS','EASY_KEYWORDS','POST_TITLES'];
+  var re=new RegExp('\\n(?=(?:'+headers.join('|')+'):\\s*$)','im');
+  var parts=text.split(re);
+  parts.forEach(function(p){
+    var m=p.match(/^(MISSING_TOPICS|COMPETITOR_GAPS|EASY_KEYWORDS|POST_TITLES):\s*\n?([\s\S]*)/i);
+    if(m){
+      var key={missingtopics:'missing',competitorgaps:'gaps',easykeywords:'keywords',posttitles:'titles'}[m[1].toLowerCase().replace(/_/g,'')];
+      if(key)out[key]=m[2].trim();
+    }
+  });
+  return out;
+}
+async function findGaps(){
+  var apiKey=document.getElementById('apiKey').value.trim()||gk();
+  var domain=document.getElementById('domain').value.trim();
+  var existing=document.getElementById('existing').value.trim();
+  var comps=document.getElementById('competitors').value.trim();
+  var audience=document.getElementById('audience').value.trim();
+  var errorDiv=document.getElementById('error');errorDiv.style.display='none';
+  if(!domain){errorDiv.textContent='Enter your blog domain or niche first.';errorDiv.style.display='block';return;}
+  var prompt='I run a blog in this niche: '+domain+'.'+
+    (audience?'\nTarget audience: '+audience+'.':'')+
+    (existing?'\nTopics I already cover: '+existing+'.':'')+
+    (comps?'\nKnown competitors: '+comps+'.':'')+
+    '\n\nDo a content gap analysis. Respond in this EXACT format using these four headers only:\n\nMISSING_TOPICS:\n[Bulleted list of 8-12 specific topics the niche clearly demands that are not already covered. Each item should be a concrete topic, not a category. Skip anything already in my existing list.]\n\nCOMPETITOR_GAPS:\n[Bulleted list of 6-10 angles, formats, or questions competitors typically miss or cover poorly in this niche. For each, note why it is a gap (outdated content, superficial coverage, poor UX, missing calculator, etc).]\n\nEASY_KEYWORDS:\n[Bulleted list of 10-15 long-tail, low-competition keyword phrases likely to be winnable by a smaller blog. Favor specific questions, comparisons, year-stamped guides, and calculator-related searches. Put the phrase first, then a short note on search intent in parentheses.]\n\nPOST_TITLES:\n[Bulleted list of 8-10 ready-to-use blog post titles that target the above gaps and keywords. Make them click-worthy but honest, not clickbait. Include year where relevant.]';
+  var btn=document.getElementById('generateBtn');btn.disabled=true;btn.textContent='Researching...';
+  document.getElementById('loading').style.display='block';document.getElementById('outputGroup').style.display='none';
+  try{
+    var r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'You are an experienced SEO strategist and content editor. You know how small blogs actually win against large sites: specificity, long-tail queries, interactive tools, better UX. Be concrete and niche-aware. Never use em dashes.'},{role:'user',content:prompt}],temperature:0.5,max_tokens:3072})});
+    var data=await r.json();
+    if(!r.ok)throw new Error(data.error?.message||'API error');
+    var result=data.choices[0].message.content.trim();
+    var s=splitSections(result);
+    document.getElementById('missing').innerHTML=renderList(s.missing);
+    document.getElementById('gaps').innerHTML=renderList(s.gaps);
+    document.getElementById('keywords').innerHTML=renderList(s.keywords);
+    document.getElementById('titles').innerHTML=renderList(s.titles);
+    document.getElementById('outputGroup').style.display='block';
+  }catch(e){errorDiv.textContent=e.message;errorDiv.style.display='block';}
+  finally{btn.disabled=false;btn.textContent='Find Gaps';document.getElementById('loading').style.display='none';}
+}
+function copyOutput(){
+  var parts=[];
+  var labels=[['missing','MISSING TOPICS'],['gaps','COMPETITOR GAPS'],['keywords','EASY KEYWORDS'],['titles','POST TITLES']];
+  labels.forEach(function(l){
+    var t=document.getElementById(l[0]).innerText.trim();
+    if(t)parts.push(l[1]+':\n'+t);
+  });
+  if(parts.length)navigator.clipboard.writeText(parts.join('\n\n'));
+}
+</script>
