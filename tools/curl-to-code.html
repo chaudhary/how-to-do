@@ -1,0 +1,132 @@
+---
+layout: tool
+title: cURL to Production Code
+exclude_from_search: false
+description: "Convert a curl command into production-ready code with retries, timeouts, and error handling. Supports Node.js, Python, Ruby/Rails, Go, and PHP."
+---
+
+<div class="tool-header">
+  <h1>cURL to Production-ready Code</h1>
+  <p>Paste a curl command, get clean code with retries, timeouts, and error handling. Not just syntax conversion.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="apiKey">Groq API Key (optional)</label>
+    <div class="hint">Built-in key used by default.</div>
+    <input type="password" id="apiKey" placeholder="Leave empty to use built-in key">
+  </div>
+  <div class="form-group">
+    <label for="curlInput">cURL Command</label>
+    <textarea id="curlInput" rows="8" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.9rem;resize:vertical;" placeholder="curl -X POST https://api.example.com/users \&#10;  -H 'Authorization: Bearer TOKEN' \&#10;  -H 'Content-Type: application/json' \&#10;  -d '{&quot;name&quot;:&quot;Alice&quot;,&quot;email&quot;:&quot;a@example.com&quot;}'"></textarea>
+  </div>
+  <div class="form-group">
+    <label for="language">Target Language</label>
+    <select id="language">
+      <option value="node" selected>Node.js (fetch + retry)</option>
+      <option value="node-axios">Node.js (axios)</option>
+      <option value="python">Python (requests)</option>
+      <option value="python-httpx">Python (httpx, async)</option>
+      <option value="ruby">Ruby (Net::HTTP)</option>
+      <option value="rails">Ruby on Rails (Faraday)</option>
+      <option value="go">Go (net/http)</option>
+      <option value="php">PHP (Guzzle)</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label style="display:flex;align-items:center;gap:0.5rem;font-weight:normal;">
+      <input type="checkbox" id="includeTests" style="width:auto;">
+      Include a basic usage example
+    </label>
+  </div>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+    <button class="btn" id="generateBtn" onclick="generate()">Convert</button>
+    <button class="btn" onclick="copyCode()" style="background:var(--color-accent);">Copy Code</button>
+  </div>
+</div>
+<div id="loading" style="display:none;text-align:center;padding:2rem 0;color:var(--color-muted);">Generating...</div>
+<div id="error" style="display:none;padding:1rem;background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);color:#dc2626;margin-top:1rem;"></div>
+
+<div id="outputGroup" style="display:none;margin-top:1.5rem;">
+  <div class="form-group">
+    <label>Production Code</label>
+    <pre id="code" style="padding:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.85rem;line-height:1.55;background:var(--color-card-bg);overflow-x:auto;white-space:pre;margin:0;"></pre>
+  </div>
+  <div class="form-group">
+    <label>What's included</label>
+    <div id="notes" style="padding:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.7;background:var(--color-card-bg);"></div>
+  </div>
+</div>
+
+<script>
+var _k=['gsk','_DsAaIIxlOz6UCw','PMPWVBWGdyb3FY','Fgju5E1lg2ONy0','G7lzNIGXpQ'];
+function gk(){return _k.join('');}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderList(text){
+  var lines=text.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+  var html='',inList=false;
+  lines.forEach(function(l){
+    var m=l.match(/^(?:[-*]|\d+[.)])\s+(.*)/);
+    if(m){if(!inList){html+='<ul style="margin:0 0 0 1.2rem;padding:0;">';inList=true;}html+='<li style="margin-bottom:0.35rem;">'+esc(m[1])+'</li>';}
+    else{if(inList){html+='</ul>';inList=false;}html+='<p style="margin:0 0 0.5rem;">'+esc(l)+'</p>';}
+  });
+  if(inList)html+='</ul>';
+  return html||'<p style="color:var(--color-muted);">None.</p>';
+}
+function stripFences(s){
+  var m=s.match(/^```[a-zA-Z0-9_+\-]*\n([\s\S]*?)\n```$/);
+  return m?m[1]:s;
+}
+function splitSections(text){
+  var out={code:'',notes:''};
+  var re=/\n(?=(?:CODE|NOTES):\s*$)/im;
+  var parts=text.split(re);
+  parts.forEach(function(p){
+    var m=p.match(/^(CODE|NOTES):\s*\n?([\s\S]*)/i);
+    if(m){out[m[1].toLowerCase()]=m[2].trim();}
+  });
+  if(!out.code){out.code=stripFences(text.trim());}
+  else{out.code=stripFences(out.code);}
+  return out;
+}
+async function generate(){
+  var apiKey=document.getElementById('apiKey').value.trim()||gk();
+  var curl=document.getElementById('curlInput').value.trim();
+  var lang=document.getElementById('language').value;
+  var withExample=document.getElementById('includeTests').checked;
+  var errorDiv=document.getElementById('error');errorDiv.style.display='none';
+  if(!curl){errorDiv.textContent='Paste a curl command first.';errorDiv.style.display='block';return;}
+  var langMap={
+    'node':'Node.js using the built-in fetch API (Node 18+). No external dependencies.',
+    'node-axios':'Node.js using the axios library.',
+    'python':'Python 3 using the requests library.',
+    'python-httpx':'Python 3 using the httpx library with async/await.',
+    'ruby':'Ruby using the standard library Net::HTTP.',
+    'rails':'Ruby on Rails using the Faraday gem, structured as a service object class.',
+    'go':'Go using the standard net/http package.',
+    'php':'PHP using the Guzzle HTTP client.'
+  };
+  var target=langMap[lang];
+  var requirements='Requirements:\n- Parse the curl command accurately: method, URL, headers, body, query params, auth.\n- Extract any hard-coded secrets into named constants or environment variables at the top. Never leave a real token inline.\n- Include a request timeout (default 10 seconds, configurable).\n- Include retry logic with exponential backoff (default 3 retries) for transient failures (5xx, 429, network errors). Do not retry 4xx.\n- Handle errors gracefully: non-2xx status codes should raise/return a descriptive error with the status code and body.\n- Parse the JSON response if Content-Type is JSON, otherwise return raw text.\n- Use idiomatic naming and structure for the target language. Keep it readable.\n- No placeholder comments like "// do something here". The code must be ready to paste into a project.';
+  if(withExample){requirements+='\n- At the bottom, add a short usage example showing how to call the function.';}
+  else{requirements+='\n- Do not include a usage example.';}
+  var prompt='Convert this curl command to '+target+'\n\ncurl command:\n'+curl+'\n\n'+requirements+'\n\nRespond in this EXACT format:\n\nCODE:\n[the full code, no markdown fences, no surrounding prose]\n\nNOTES:\n[bulleted list of what the code does well: timeout value, retry strategy, error handling approach, secret extraction, anything else noteworthy]';
+  var btn=document.getElementById('generateBtn');btn.disabled=true;btn.textContent='Generating...';
+  document.getElementById('loading').style.display='block';document.getElementById('outputGroup').style.display='none';
+  try{
+    var r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'You are a senior backend engineer who writes production-grade HTTP client code. Code must be idiomatic, safe, and ready to ship. Never use em dashes.'},{role:'user',content:prompt}],temperature:0.2,max_tokens:3072})});
+    var data=await r.json();
+    if(!r.ok)throw new Error(data.error?.message||'API error');
+    var result=data.choices[0].message.content.trim();
+    var s=splitSections(result);
+    document.getElementById('code').textContent=s.code;
+    document.getElementById('notes').innerHTML=renderList(s.notes);
+    document.getElementById('outputGroup').style.display='block';
+  }catch(e){errorDiv.textContent=e.message;errorDiv.style.display='block';}
+  finally{btn.disabled=false;btn.textContent='Convert';document.getElementById('loading').style.display='none';}
+}
+function copyCode(){
+  var c=document.getElementById('code').textContent;
+  if(c)navigator.clipboard.writeText(c);
+}
+</script>

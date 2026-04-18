@@ -1,0 +1,116 @@
+---
+layout: tool
+title: SQL Query Explainer
+description: "Paste any SQL query and get a plain-English step-by-step explanation, optimization suggestions, and index recommendations using AI."
+---
+
+<div class="tool-header">
+  <h1>SQL Query Explainer</h1>
+  <p>Understand complex SQL in plain English. Get step-by-step breakdowns, optimization tips, and index recommendations.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="apiKey">Groq API Key (optional)</label>
+    <div class="hint">Built-in key used by default.</div>
+    <input type="password" id="apiKey" placeholder="Leave empty to use built-in key">
+  </div>
+  <div class="form-group">
+    <label for="sql">SQL Query</label>
+    <textarea id="sql" rows="10" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.9rem;resize:vertical;" placeholder="SELECT u.name, COUNT(o.id) AS order_count&#10;FROM users u&#10;LEFT JOIN orders o ON o.user_id = u.id&#10;WHERE u.created_at > '2024-01-01'&#10;GROUP BY u.name&#10;HAVING COUNT(o.id) > 5&#10;ORDER BY order_count DESC;"></textarea>
+  </div>
+  <div class="form-group">
+    <label for="dialect">Dialect</label>
+    <select id="dialect">
+      <option value="Generic SQL" selected>Generic SQL</option>
+      <option value="PostgreSQL">PostgreSQL</option>
+      <option value="MySQL">MySQL</option>
+      <option value="SQLite">SQLite</option>
+      <option value="SQL Server">SQL Server</option>
+      <option value="Oracle">Oracle</option>
+      <option value="BigQuery">BigQuery</option>
+      <option value="Snowflake">Snowflake</option>
+    </select>
+  </div>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+    <button class="btn" id="generateBtn" onclick="explain()">Explain Query</button>
+    <button class="btn" onclick="copyOutput()" style="background:var(--color-accent);">Copy Output</button>
+  </div>
+</div>
+<div id="loading" style="display:none;text-align:center;padding:2rem 0;color:var(--color-muted);">Analyzing query...</div>
+<div id="error" style="display:none;padding:1rem;background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);color:#dc2626;margin-top:1rem;"></div>
+
+<div id="outputGroup" style="display:none;margin-top:1.5rem;">
+  <div class="form-group">
+    <label>Step-by-step Explanation</label>
+    <div id="explanation" style="padding:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.7;background:var(--color-card-bg);"></div>
+  </div>
+  <div class="form-group">
+    <label>Optimization Suggestions</label>
+    <div id="optimizations" style="padding:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.7;background:var(--color-card-bg);"></div>
+  </div>
+  <div class="form-group">
+    <label>Index Recommendations</label>
+    <div id="indexes" style="padding:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);font-family:monospace;font-size:0.9rem;line-height:1.7;background:var(--color-card-bg);white-space:pre-wrap;"></div>
+  </div>
+</div>
+
+<script>
+var _k=['gsk','_DsAaIIxlOz6UCw','PMPWVBWGdyb3FY','Fgju5E1lg2ONy0','G7lzNIGXpQ'];
+function gk(){return _k.join('');}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderList(text){
+  var lines=text.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+  var html='',inList=false;
+  lines.forEach(function(l){
+    var m=l.match(/^(?:[-*]|\d+[.)])\s+(.*)/);
+    if(m){if(!inList){html+='<ul style="margin:0 0 0 1.2rem;padding:0;">';inList=true;}html+='<li style="margin-bottom:0.35rem;">'+esc(m[1])+'</li>';}
+    else{if(inList){html+='</ul>';inList=false;}html+='<p style="margin:0 0 0.5rem;">'+esc(l)+'</p>';}
+  });
+  if(inList)html+='</ul>';
+  return html||'<p style="color:var(--color-muted);">None.</p>';
+}
+function splitSections(text){
+  var sections={explanation:'',optimizations:'',indexes:''};
+  var re=/^(EXPLANATION|OPTIMIZATIONS|INDEXES):\s*$/im;
+  var parts=text.split(/\n(?=(?:EXPLANATION|OPTIMIZATIONS|INDEXES):\s*$)/im);
+  parts.forEach(function(p){
+    var m=p.match(/^(EXPLANATION|OPTIMIZATIONS|INDEXES):\s*\n?([\s\S]*)/i);
+    if(m){sections[m[1].toLowerCase()]=m[2].trim();}
+  });
+  if(!sections.explanation&&!sections.optimizations&&!sections.indexes){sections.explanation=text.trim();}
+  return sections;
+}
+async function explain(){
+  var apiKey=document.getElementById('apiKey').value.trim()||gk();
+  var sql=document.getElementById('sql').value.trim();
+  var dialect=document.getElementById('dialect').value;
+  var errorDiv=document.getElementById('error');errorDiv.style.display='none';
+  if(!sql){errorDiv.textContent='Paste a SQL query first.';errorDiv.style.display='block';return;}
+  var prompt='Analyze this '+dialect+' query:\n\n'+sql+'\n\nRespond in this EXACT format, using these three headers only:\n\nEXPLANATION:\n[Numbered, step-by-step plain-English walkthrough of what the query does. Cover tables, joins, filters, grouping, ordering, and the final result.]\n\nOPTIMIZATIONS:\n[Bulleted list of specific, actionable optimization suggestions for this query. If the query is already optimal, say so.]\n\nINDEXES:\n[Bulleted list of recommended CREATE INDEX statements, each on its own line as valid SQL. If no indexes are needed, say "No additional indexes recommended."]';
+  var btn=document.getElementById('generateBtn');btn.disabled=true;btn.textContent='Analyzing...';
+  document.getElementById('loading').style.display='block';document.getElementById('outputGroup').style.display='none';
+  try{
+    var r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'You are a senior database engineer. Be precise, practical, and concise. Never use em dashes.'},{role:'user',content:prompt}],temperature:0.2,max_tokens:2048})});
+    var data=await r.json();
+    if(!r.ok)throw new Error(data.error?.message||'API error');
+    var result=data.choices[0].message.content.trim();
+    var s=splitSections(result);
+    document.getElementById('explanation').innerHTML=renderList(s.explanation);
+    document.getElementById('optimizations').innerHTML=renderList(s.optimizations);
+    document.getElementById('indexes').textContent=s.indexes||'No additional indexes recommended.';
+    document.getElementById('outputGroup').style.display='block';
+  }catch(e){errorDiv.textContent=e.message;errorDiv.style.display='block';}
+  finally{btn.disabled=false;btn.textContent='Explain Query';document.getElementById('loading').style.display='none';}
+}
+function copyOutput(){
+  var parts=[];
+  var e=document.getElementById('explanation').innerText.trim();
+  var o=document.getElementById('optimizations').innerText.trim();
+  var i=document.getElementById('indexes').innerText.trim();
+  if(e)parts.push('EXPLANATION:\n'+e);
+  if(o)parts.push('OPTIMIZATIONS:\n'+o);
+  if(i)parts.push('INDEXES:\n'+i);
+  if(parts.length)navigator.clipboard.writeText(parts.join('\n\n'));
+}
+</script>
