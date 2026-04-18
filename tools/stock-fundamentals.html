@@ -1,0 +1,299 @@
+---
+layout: tool
+title: Indian Stock Fundamentals Cheatsheet
+description: "Look up live key ratios for any Indian listed company. Powered by real-time web search with cited sources. Plain-English benchmarks and an AI summary. Educational only, not investment advice."
+---
+
+<div class="tool-header">
+  <h1>Indian Stock Fundamentals Cheatsheet</h1>
+  <p>Enter a BSE or NSE ticker. See live ratios pulled from the web with cited sources, benchmarks, and an AI summary of what the numbers suggest.</p>
+</div>
+
+<div style="padding:1rem;background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);color:#991b1b;margin-bottom:1.25rem;font-size:0.9rem;line-height:1.6;">
+  <strong>Educational use only.</strong> This tool is not investment advice and does not constitute a buy or sell recommendation. The author is not a SEBI-registered research analyst. Data is fetched from public web sources and may be delayed, incomplete, or incorrect. Do your own research and consult a SEBI-registered investment adviser before making any investment decision.
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="geminiKey">Gemini API Key (optional)</label>
+    <div class="hint">Built-in key used by default. For heavy use, get your own free key at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com</a>.</div>
+    <input type="password" id="geminiKey" placeholder="Leave empty to use built-in key">
+  </div>
+  <div class="form-group">
+    <label for="ticker">Ticker or Company Name</label>
+    <div class="hint">Examples: RELIANCE, TCS, INFY, HDFCBANK, ITC, ZOMATO, POLYCAB. Both large caps and small caps work.</div>
+    <input type="text" id="ticker" placeholder="RELIANCE">
+  </div>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+    <button class="btn" id="generateBtn" onclick="lookup()">Analyze</button>
+    <button class="btn" onclick="copyOutput()" style="background:var(--color-accent);">Copy Summary</button>
+  </div>
+</div>
+<div id="loading" style="display:none;text-align:center;padding:2rem 0;color:var(--color-muted);">Searching the web and analyzing... this takes 10-20 seconds.</div>
+<div id="error" style="display:none;padding:1rem;background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);color:#dc2626;margin-top:1rem;"></div>
+
+<div id="outputGroup" style="display:none;margin-top:1.5rem;">
+  <div id="companyHeader" style="padding:1rem 1.1rem;border:1px solid var(--color-border);border-radius:var(--radius);background:var(--color-card-bg);margin-bottom:1rem;"></div>
+
+  <h3 style="margin:1.25rem 0 0.5rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-muted);">Valuation</h3>
+  <div id="valuationGrid" class="metric-grid"></div>
+
+  <h3 style="margin:1.25rem 0 0.5rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-muted);">Profitability & Quality</h3>
+  <div id="qualityGrid" class="metric-grid"></div>
+
+  <h3 style="margin:1.25rem 0 0.5rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-muted);">Growth, Income & Risk</h3>
+  <div id="growthGrid" class="metric-grid"></div>
+
+  <div class="form-group" style="margin-top:1.5rem;">
+    <label>AI Summary (grounded on the numbers above)</label>
+    <div id="summary" style="padding:1rem 1.1rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.75;background:var(--color-card-bg);"></div>
+  </div>
+
+  <div class="form-group">
+    <label>Sources</label>
+    <div id="sources" style="padding:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);background:var(--color-card-bg);display:flex;flex-wrap:wrap;gap:0.4rem;"></div>
+  </div>
+
+  <div style="padding:0.9rem;background:#fefce8;border:1px solid #fde68a;border-radius:var(--radius);color:#713f12;font-size:0.85rem;line-height:1.6;margin-top:1rem;">
+    Benchmarks are generic thresholds. Fair valuation varies widely by sector and cycle. Banks, NBFCs, utilities, and consumer staples all have different "normal" ranges. Web data can be a day or more stale. Use as a starting point for research, not a verdict.
+  </div>
+</div>
+
+<style>
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.6rem;}
+.metric-card{padding:0.7rem 0.85rem;border:1px solid var(--color-border);border-radius:var(--radius);background:var(--color-card-bg);}
+.metric-card .label{font-size:0.78rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem;}
+.metric-card .value{font-size:1.15rem;font-weight:700;margin-bottom:0.25rem;}
+.metric-card .zone{display:inline-block;padding:0.12rem 0.5rem;border-radius:999px;font-size:0.72rem;font-weight:600;}
+.metric-card .note{font-size:0.78rem;color:var(--color-muted);margin-top:0.3rem;line-height:1.4;}
+.z-green{background:#dcfce7;color:#166534;}
+.z-blue{background:#dbeafe;color:#1e40af;}
+.z-orange{background:#ffedd5;color:#9a3412;}
+.z-red{background:#fee2e2;color:#991b1b;}
+.z-gray{background:#f1f5f9;color:#475569;}
+.source-chip{display:inline-block;padding:0.3rem 0.7rem;background:#fff;border:1px solid var(--color-border);border-radius:999px;font-size:0.82rem;color:var(--color-text);text-decoration:none;}
+.source-chip:hover{background:#f8fafc;border-color:var(--color-primary);}
+</style>
+
+<script>
+var _gk=['AIza','SyDI','XcwI','SlF1','GL5f','vfjv','PZ7q','McZt','oMs0','f04'];
+function geminik(){return _gk.join('');}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function n(v){if(v==null||v===''||/^n\/?a$/i.test(String(v).trim()))return null;var x=parseFloat(String(v).replace(/[,%\s\u20B9]/g,''));return isNaN(x)?null:x;}
+function fmt(v,opts){
+  if(v==null)return 'N/A';
+  opts=opts||{};
+  if(opts.pct)return v.toFixed(opts.d!=null?opts.d:2)+'%';
+  if(opts.money){
+    var abs=Math.abs(v);
+    if(abs>=1e5)return '\u20B9'+(v/1e5).toFixed(2)+' L Cr';
+    if(abs>=1e3)return '\u20B9'+v.toFixed(0)+' Cr';
+    return '\u20B9'+v.toFixed(2)+' Cr';
+  }
+  if(opts.inr)return '\u20B9'+v.toFixed(opts.d!=null?opts.d:2);
+  return v.toFixed(opts.d!=null?opts.d:2);
+}
+
+function zone(metric,v){
+  if(v==null)return {z:'z-gray',label:'N/A'};
+  var m={
+    pe:{bands:[[0,'z-red','Loss-making'],[15,'z-green','Cheap vs market'],[25,'z-blue','Fair valuation'],[40,'z-orange','Premium pricing'],[Infinity,'z-red','Expensive']]},
+    fpe:{bands:[[0,'z-red','Expected loss'],[15,'z-green','Attractive forward P/E'],[25,'z-blue','Fair forward P/E'],[40,'z-orange','Rich forward P/E'],[Infinity,'z-red','Expensive on forward basis']]},
+    peg:{bands:[[1,'z-green','Growth priced attractively'],[1.5,'z-blue','Reasonable growth premium'],[2,'z-orange','Growth looks stretched'],[Infinity,'z-red','Growth looks overpriced']]},
+    pb:{bands:[[1,'z-green','Below book value'],[3,'z-blue','Typical range'],[6,'z-orange','Premium to book'],[Infinity,'z-red','Expensive vs book']]},
+    ps:{bands:[[1,'z-green','Cheap vs revenue'],[4,'z-blue','Typical range'],[10,'z-orange','Premium to sales'],[Infinity,'z-red','Expensive vs sales']]},
+    evebitda:{bands:[[10,'z-green','Cheap on EV/EBITDA'],[15,'z-blue','Fair on EV/EBITDA'],[20,'z-orange','Rich on EV/EBITDA'],[Infinity,'z-red','Expensive on EV/EBITDA']]},
+    roe:{bands:[[10,'z-red','Weak return on equity'],[15,'z-orange','Decent ROE'],[25,'z-blue','Strong ROE'],[Infinity,'z-green','Exceptional ROE']]},
+    roa:{bands:[[5,'z-red','Weak return on assets'],[10,'z-orange','Decent ROA'],[15,'z-blue','Strong ROA'],[Infinity,'z-green','Exceptional ROA']]},
+    opmargin:{bands:[[5,'z-red','Thin operating margin'],[15,'z-orange','Decent margin'],[25,'z-blue','Strong margin'],[Infinity,'z-green','Excellent margin']]},
+    netmargin:{bands:[[5,'z-red','Thin net margin'],[15,'z-orange','Healthy margin'],[25,'z-blue','Strong margin'],[Infinity,'z-green','Excellent margin']]},
+    divyield:{bands:[[1,'z-gray','Low yield'],[3,'z-blue','Modest yield'],[5,'z-green','High yield'],[Infinity,'z-orange','Very high, check sustainability']]},
+    revgrowth:{bands:[[0,'z-red','Revenue declining'],[10,'z-orange','Slow growth'],[20,'z-blue','Healthy growth'],[Infinity,'z-green','Strong growth']]},
+    epsgrowth:{bands:[[0,'z-red','Earnings declining'],[10,'z-orange','Slow earnings growth'],[20,'z-blue','Healthy earnings growth'],[Infinity,'z-green','Strong earnings growth']]},
+    beta:{bands:[[0.8,'z-green','Defensive, low volatility'],[1.2,'z-blue','Moves with market'],[1.5,'z-orange','More volatile than market'],[Infinity,'z-red','Highly volatile']]},
+    de:{bands:[[0.5,'z-green','Conservative balance sheet'],[1,'z-blue','Moderate leverage'],[2,'z-orange','High leverage'],[Infinity,'z-red','Very high leverage']]}
+  }[metric];
+  if(!m)return {z:'z-gray',label:''};
+  for(var i=0;i<m.bands.length;i++){
+    if(v<m.bands[i][0])return {z:m.bands[i][1],label:m.bands[i][2]};
+  }
+  var last=m.bands[m.bands.length-1];
+  return {z:last[1],label:last[2]};
+}
+
+function card(label,valueText,metric,rawForZone,extraNote){
+  var z=zone(metric,rawForZone);
+  return '<div class="metric-card"><div class="label">'+esc(label)+'</div>'+
+    '<div class="value">'+esc(valueText)+'</div>'+
+    (z.label?'<span class="zone '+z.z+'">'+esc(z.label)+'</span>':'')+
+    (extraNote?'<div class="note">'+esc(extraNote)+'</div>':'')+
+    '</div>';
+}
+function plainCard(label,valueText,note){
+  return '<div class="metric-card"><div class="label">'+esc(label)+'</div>'+
+    '<div class="value">'+esc(valueText)+'</div>'+
+    (note?'<div class="note">'+esc(note)+'</div>':'')+
+    '</div>';
+}
+
+function parseFields(text){
+  var out={};
+  var fields=['COMPANY_NAME','SECTOR','INDUSTRY','DESCRIPTION','CURRENT_PRICE','52_WEEK_LOW','52_WEEK_HIGH','MARKET_CAP_CRORE','PE_TTM','PE_FORWARD','PEG','PB','PS','EV_EBITDA','ROE','ROA','OPERATING_MARGIN','NET_MARGIN','REVENUE_GROWTH_YOY','EPS_GROWTH_YOY','DIVIDEND_YIELD','BETA','DEBT_TO_EQUITY','EPS','BOOK_VALUE'];
+  fields.forEach(function(f){
+    var re=new RegExp('^\\s*'+f.replace(/_/g,'[_\\s]')+'\\s*:\\s*(.+?)\\s*$','im');
+    var m=text.match(re);
+    if(m)out[f]=m[1].trim().replace(/^\*+|\*+$/g,'').trim();
+  });
+  var summaryMatch=text.match(/SUMMARY:\s*\n?([\s\S]+?)(?:\n\s*(?:SOURCES?:|$))/i);
+  out.SUMMARY=summaryMatch?summaryMatch[1].trim():'';
+  return out;
+}
+
+async function lookup(){
+  var apiKey=document.getElementById('geminiKey').value.trim()||geminik();
+  var ticker=document.getElementById('ticker').value.trim();
+  var errorDiv=document.getElementById('error');errorDiv.style.display='none';
+  if(!ticker){errorDiv.textContent='Enter a ticker or company name.';errorDiv.style.display='block';return;}
+  var btn=document.getElementById('generateBtn');btn.disabled=true;btn.textContent='Analyzing...';
+  document.getElementById('loading').style.display='block';document.getElementById('outputGroup').style.display='none';
+
+  var today=new Date().toISOString().split('T')[0];
+  var prompt='Research this Indian listed company: '+ticker+'. Fetch the latest publicly available financial data from sources like Screener.in, Moneycontrol, Groww, BSE, NSE, or the company\'s investor-relations pages. Today is '+today+'.\n\n'+
+    'Respond in this EXACT format. If a value is genuinely unavailable, write N/A. Use plain numbers only: no currency symbols, no commas, no % signs in the values. Percentages as plain numbers (e.g. 15.5 means 15.5%). Market cap in crores (e.g. 934009). Prices in INR.\n\n'+
+    'COMPANY_NAME: [full registered company name]\n'+
+    'SECTOR: [broad sector]\n'+
+    'INDUSTRY: [specific industry or sub-sector]\n'+
+    'DESCRIPTION: [2-3 sentence business description]\n'+
+    'CURRENT_PRICE: [latest share price]\n'+
+    '52_WEEK_LOW: [52 week low price]\n'+
+    '52_WEEK_HIGH: [52 week high price]\n'+
+    'MARKET_CAP_CRORE: [market cap in crores]\n'+
+    'PE_TTM: [trailing P/E]\n'+
+    'PE_FORWARD: [forward P/E if available]\n'+
+    'PEG: [PEG ratio]\n'+
+    'PB: [price to book]\n'+
+    'PS: [price to sales TTM]\n'+
+    'EV_EBITDA: [EV to EBITDA]\n'+
+    'ROE: [return on equity percent]\n'+
+    'ROA: [return on assets percent]\n'+
+    'OPERATING_MARGIN: [operating margin percent]\n'+
+    'NET_MARGIN: [net profit margin percent]\n'+
+    'REVENUE_GROWTH_YOY: [latest quarter revenue growth YoY percent]\n'+
+    'EPS_GROWTH_YOY: [latest quarter EPS growth YoY percent]\n'+
+    'DIVIDEND_YIELD: [dividend yield percent]\n'+
+    'BETA: [beta vs market]\n'+
+    'DEBT_TO_EQUITY: [debt to equity ratio]\n'+
+    'EPS: [trailing EPS in INR]\n'+
+    'BOOK_VALUE: [book value per share in INR]\n'+
+    '\n'+
+    'SUMMARY:\n'+
+    '[Write an 8 to 10 line plain-English summary of what these numbers collectively suggest. Cover valuation relative to profitability and growth, balance sheet health, dividend profile, notable strengths, and any red flags. Reference actual numbers. Do NOT recommend buying or selling. Do NOT use em dashes. End with one sentence noting that sector context and qualitative factors matter and this is educational only.]';
+
+  try{
+    var r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+encodeURIComponent(apiKey),{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        contents:[{parts:[{text:prompt}]}],
+        tools:[{google_search:{}}],
+        generationConfig:{temperature:0.2,maxOutputTokens:4096}
+      })
+    });
+    var data=await r.json();
+    if(!r.ok){throw new Error(data.error?.message||'Gemini API error');}
+    var cand=data.candidates&&data.candidates[0];
+    if(!cand)throw new Error('Empty response from Gemini.');
+    var text=(cand.content&&cand.content.parts||[]).map(function(p){return p.text||'';}).join('\n').trim();
+    if(!text)throw new Error('No text in Gemini response. The ticker may be unrecognized.');
+    var fields=parseFields(text);
+    if(!fields.COMPANY_NAME&&!fields.CURRENT_PRICE){
+      throw new Error('Could not parse fundamentals for "'+ticker+'". Try the exact NSE/BSE ticker or the full company name.');
+    }
+    renderCompany(fields);
+    renderMetrics(fields);
+    renderSummary(fields.SUMMARY);
+    renderSources(cand.groundingMetadata);
+    document.getElementById('outputGroup').style.display='block';
+  }catch(e){errorDiv.textContent=e.message;errorDiv.style.display='block';}
+  finally{btn.disabled=false;btn.textContent='Analyze';document.getElementById('loading').style.display='none';}
+}
+
+function renderCompany(f){
+  var price=n(f.CURRENT_PRICE);
+  var lo=n(f['52_WEEK_LOW']);
+  var hi=n(f['52_WEEK_HIGH']);
+  var priceLine='';
+  if(price!=null){
+    priceLine='<div style="font-size:1.5rem;font-weight:700;margin-top:0.6rem;">\u20B9'+price.toFixed(2)+'</div>';
+    if(lo!=null&&hi!=null){
+      var pct=((price-lo)/(hi-lo)*100);
+      priceLine+='<div style="font-size:0.85rem;color:var(--color-muted);margin-top:0.15rem;">52-week: \u20B9'+lo.toFixed(2)+' to \u20B9'+hi.toFixed(2)+' \u00B7 '+pct.toFixed(0)+'% of range</div>';
+    }
+  }
+  document.getElementById('companyHeader').innerHTML=
+    '<div style="font-size:1.25rem;font-weight:700;">'+esc(f.COMPANY_NAME||'Unknown')+'</div>'+
+    '<div style="color:var(--color-muted);font-size:0.9rem;margin-top:0.25rem;">'+
+    esc([f.SECTOR,f.INDUSTRY].filter(function(x){return x&&x.toLowerCase()!=='n/a';}).join(' \u00B7 '))+'</div>'+
+    (f.DESCRIPTION&&f.DESCRIPTION.toLowerCase()!=='n/a'?'<div style="margin-top:0.6rem;font-size:0.88rem;line-height:1.55;">'+esc(f.DESCRIPTION)+'</div>':'')+
+    priceLine;
+}
+
+function renderMetrics(f){
+  var mcap=n(f.MARKET_CAP_CRORE);
+  var pe=n(f.PE_TTM),fpe=n(f.PE_FORWARD),peg=n(f.PEG),pb=n(f.PB),ps=n(f.PS),eveb=n(f.EV_EBITDA);
+  var roe=n(f.ROE),roa=n(f.ROA),op=n(f.OPERATING_MARGIN),np=n(f.NET_MARGIN);
+  var rg=n(f.REVENUE_GROWTH_YOY),eg=n(f.EPS_GROWTH_YOY),dy=n(f.DIVIDEND_YIELD);
+  var beta=n(f.BETA),de=n(f.DEBT_TO_EQUITY),eps=n(f.EPS),bv=n(f.BOOK_VALUE);
+
+  var v='';
+  v+=plainCard('Market Cap',fmt(mcap,{money:true}),'Total equity value');
+  v+=card('Trailing P/E',fmt(pe),'pe',pe);
+  v+=card('Forward P/E',fmt(fpe),'fpe',fpe);
+  v+=card('PEG Ratio',fmt(peg),'peg',peg,'P/E adjusted for growth');
+  v+=card('P/B Ratio',fmt(pb),'pb',pb);
+  v+=card('P/S (TTM)',fmt(ps),'ps',ps);
+  v+=card('EV/EBITDA',fmt(eveb),'evebitda',eveb);
+  document.getElementById('valuationGrid').innerHTML=v;
+
+  var q='';
+  q+=card('ROE',roe!=null?fmt(roe,{pct:true}):'N/A','roe',roe);
+  q+=card('ROA',roa!=null?fmt(roa,{pct:true}):'N/A','roa',roa);
+  q+=card('Operating Margin',op!=null?fmt(op,{pct:true}):'N/A','opmargin',op);
+  q+=card('Net Margin',np!=null?fmt(np,{pct:true}):'N/A','netmargin',np);
+  q+=plainCard('EPS (TTM)',eps!=null?fmt(eps,{inr:true}):'N/A','Earnings per share');
+  q+=plainCard('Book Value',bv!=null?fmt(bv,{inr:true}):'N/A','Equity per share');
+  document.getElementById('qualityGrid').innerHTML=q;
+
+  var g='';
+  g+=card('Revenue Growth YoY',rg!=null?fmt(rg,{pct:true}):'N/A','revgrowth',rg,'Latest quarter vs year ago');
+  g+=card('EPS Growth YoY',eg!=null?fmt(eg,{pct:true}):'N/A','epsgrowth',eg,'Latest quarter vs year ago');
+  g+=card('Dividend Yield',dy!=null?fmt(dy,{pct:true}):'N/A','divyield',dy);
+  g+=card('Beta',fmt(beta),'beta',beta,'Volatility vs market');
+  g+=card('Debt / Equity',fmt(de),'de',de,'Leverage ratio');
+  document.getElementById('growthGrid').innerHTML=g;
+}
+
+function renderSummary(s){
+  if(!s){document.getElementById('summary').innerHTML='<span style="color:var(--color-muted);">No summary available.</span>';return;}
+  document.getElementById('summary').innerHTML=s.split(/\n+/).filter(Boolean).map(function(p){return '<p style="margin:0 0 0.6rem;">'+esc(p)+'</p>';}).join('');
+}
+
+function renderSources(gm){
+  var box=document.getElementById('sources');
+  if(!gm||!gm.groundingChunks||!gm.groundingChunks.length){box.innerHTML='<span style="color:var(--color-muted);font-size:0.85rem;">No source citations returned.</span>';return;}
+  var seen={};
+  var html=gm.groundingChunks.map(function(c){
+    var w=c.web;if(!w||!w.uri)return '';
+    var title=w.title||w.uri;
+    if(seen[title])return '';seen[title]=1;
+    return '<a class="source-chip" href="'+esc(w.uri)+'" target="_blank" rel="noopener">'+esc(title)+'</a>';
+  }).join('');
+  box.innerHTML=html||'<span style="color:var(--color-muted);font-size:0.85rem;">No source citations returned.</span>';
+}
+
+function copyOutput(){
+  var h=document.getElementById('companyHeader').innerText.trim();
+  var s=document.getElementById('summary').innerText.trim();
+  if(h||s)navigator.clipboard.writeText((h?h+'\n\n':'')+s);
+}
+</script>
