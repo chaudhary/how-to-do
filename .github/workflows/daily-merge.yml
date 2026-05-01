@@ -1,0 +1,42 @@
+name: Daily PR auto-merge
+
+on:
+  schedule:
+    # 03:30 UTC = 09:00 IST, every day
+    - cron: '30 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  merge-oldest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pick and merge the oldest mergeable PR with auto-merge label
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          target=$(gh pr list \
+            --repo "$REPO" \
+            --state open \
+            --label auto-merge \
+            --json number,title,createdAt,mergeable \
+            --jq 'sort_by(.createdAt) | map(select(.mergeable == "MERGEABLE")) | .[0].number')
+
+          if [ -z "$target" ] || [ "$target" = "null" ]; then
+            echo "No mergeable PRs with auto-merge label. Nothing to do."
+            exit 0
+          fi
+
+          title=$(gh pr view "$target" --repo "$REPO" --json title --jq '.title')
+          echo "Merging PR #$target — $title"
+
+          gh pr merge "$target" \
+            --repo "$REPO" \
+            --squash \
+            --delete-branch
