@@ -120,6 +120,41 @@ Each is a calculator + comparison table + verdict. Convert decisions into pages:
 
 ---
 
+## AI tools blog posts
+
+The "AI tools" niche is saturated by generic listicles. The angle for ranking: specific problem → specific tool, India-context, opinionated first-person reviews, and companion posts for our existing AI-powered tools.
+
+### Tier A — high intent, low competition, India angle
+
+- [ ] **How to draft an Indian rent agreement using ChatGPT (with the actual prompt)** — pair with Rent Receipt Generator
+- [ ] **Reading your Form 16 with Claude in 2 minutes** — pair with Form 16 → ITR-1 Helper
+- [ ] **AI prompts to negotiate your salary in India (with CTC math)** — pair with Salary Calculator
+- [ ] **Compare term insurance with ChatGPT (without the salesman)** — high-CPM finance, India
+
+### Tier B — companion blogs for existing AI tools
+
+- [ ] **How our LinkedIn post generator picks engagement-friendly hooks** — prompt logic + before/after
+- [ ] **What our SQL Query Explainer is checking under the hood** — explainer + documentation
+- [ ] **Debugging a stack trace with AI: the workflow our Log Analyzer uses**
+
+### Tier C — opinionated comparisons
+
+- [ ] **Why I stopped using ChatGPT for emails and switched to Claude** — first-person, workflow
+- [ ] **Claude Code vs Cursor for a non-engineer: which one to start with**
+
+### Tier D — prompt library (long evergreen)
+
+- [ ] **The 12 ChatGPT prompts every freelancer in India needs** — pair with Resignation Letter + Invoice Generator
+
+### Skip outright in this category
+
+- "Top 10 AI tools 2026" listicles — saturated to the point of unrankable
+- Generic "ChatGPT vs Claude vs Gemini" comparisons
+- "Best AI prompts" listicles without specific India use cases
+- "Will AI replace [job]?" hot-takes
+
+---
+
 ## Skip / monitor (don't build)
 
 - AI coding tool comparison (Claude Code vs Copilot vs Cursor) — saturated, only worth a long-form post, not a tool
@@ -141,4 +176,4 @@ Each is a calculator + comparison table + verdict. Convert decisions into pages:
 
 ---
 
-_Last updated: 2026-05-01_
+_Last updated: 2026-05-01_ (AI blog section added)
