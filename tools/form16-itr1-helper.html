@@ -1,0 +1,297 @@
+---
+layout: tool
+title: Form 16 to ITR-1 Helper (FY 2025-26)
+description: "Enter your Form 16 fields and we'll show exactly which ITR-1 box each one goes into, with explanations. Computes your final tax liability and refund/payable."
+category: "Financial (More)"
+tagline: "Map your Form 16 fields to ITR-1 boxes with explanations. Computes refund or balance due in seconds."
+search: "form 16 itr-1 helper part a part b tds salary deductions chapter vi-a 80c 80d india fy 2025-26 ay 2026-27 tax filing pre-fill"
+card_title: "Form 16 → ITR-1 Helper"
+---
+
+<div class="tool-header">
+  <h1>Form 16 → ITR-1 Helper</h1>
+  <p>Enter the values from your Form 16 (Part A + Part B) and see field-by-field which ITR-1 boxes they map to. Calculates your final tax under the New regime (default) and shows whether you have a refund or balance to pay.</p>
+</div>
+
+<div class="calc-form">
+  <h3 style="margin-bottom:0.5rem;font-size:1.05rem;">Part A — Identity & TDS</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="f_pan">PAN of employee</label>
+      <input type="text" id="f_pan" placeholder="ABCDE1234F" maxlength="10" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;text-transform:uppercase;">
+    </div>
+    <div class="form-group">
+      <label for="f_tan">TAN of employer</label>
+      <input type="text" id="f_tan" placeholder="MUMA12345B" maxlength="10" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;text-transform:uppercase;">
+    </div>
+    <div class="form-group">
+      <label for="f_tds">Total TDS deducted (₹)</label>
+      <input type="number" id="f_tds" placeholder="from Part A summary" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);">Sum of all quarter TDS entries.</small>
+    </div>
+  </div>
+
+  <h3 style="margin:1.25rem 0 0.5rem;font-size:1.05rem;">Part B — Salary breakdown</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="f_gross">1. Gross salary (₹)</label>
+      <input type="number" id="f_gross" placeholder="Sec 17(1) total" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="f_perq">2. Perquisites (₹)</label>
+      <input type="number" id="f_perq" placeholder="Sec 17(2)" min="0" step="any" value="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="f_profit">3. Profit in lieu of salary (₹)</label>
+      <input type="number" id="f_profit" placeholder="Sec 17(3)" min="0" step="any" value="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="f_hra">4. HRA exemption (₹) <span style="font-weight:normal;color:var(--color-muted);font-size:0.85rem;">old regime only</span></label>
+      <input type="number" id="f_hra" placeholder="Sec 10(13A)" min="0" step="any" value="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);">Compute via <a href="{{ '/tools/hra-calculator' | relative_url }}">HRA Calculator</a>.</small>
+    </div>
+    <div class="form-group">
+      <label for="f_lta">5. LTA exemption (₹) <span style="font-weight:normal;color:var(--color-muted);font-size:0.85rem;">old regime only</span></label>
+      <input type="number" id="f_lta" placeholder="Sec 10(5)" min="0" step="any" value="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="f_otherExempt">6. Other 10(*) exemptions (₹)</label>
+      <input type="number" id="f_otherExempt" placeholder="conveyance, gratuity, etc" min="0" step="any" value="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="f_profTax">7. Professional tax (₹)</label>
+      <input type="number" id="f_profTax" placeholder="Sec 16(iii)" min="0" step="any" value="2400" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="f_otherIncome">8. Income from other sources (₹) <span style="color:var(--color-muted);font-weight:normal;font-size:0.85rem;">interest, dividend</span></label>
+      <input type="number" id="f_otherIncome" placeholder="bank interest, etc" min="0" step="any" value="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+  </div>
+
+  <h3 style="margin:1.25rem 0 0.5rem;font-size:1.05rem;">Chapter VI-A deductions <span style="color:var(--color-muted);font-weight:normal;font-size:0.85rem;">old regime only</span></h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="f_80c">9. 80C (max ₹1,50,000)</label>
+      <input type="number" id="f_80c" placeholder="EPF, ELSS, LIC…" min="0" max="150000" step="any" value="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="f_80d">10. 80D health insurance</label>
+      <input type="number" id="f_80d" placeholder="self + parents" min="0" step="any" value="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="f_80ccd">11. 80CCD(1B) NPS (max ₹50,000)</label>
+      <input type="number" id="f_80ccd" placeholder="self NPS contribution" min="0" max="50000" step="any" value="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="f_80other">12. Other 80(*) deductions</label>
+      <input type="number" id="f_80other" placeholder="80E, 80G, 80TTA…" min="0" step="any" value="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+  </div>
+
+  <div style="margin-top:1.25rem;display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+    <label><input type="radio" name="regime" value="new" checked> New regime (default)</label>
+    <label><input type="radio" name="regime" value="old"> Old regime (with deductions)</label>
+  </div>
+
+  <div style="margin-top:1rem;">
+    <button class="btn" onclick="mapForm16()">Map to ITR-1</button>
+  </div>
+</div>
+
+<div id="form16Result" style="display:none;margin-top:1.5rem;">
+  <div id="form16Summary" style="padding:1.25rem;border-radius:var(--radius);margin-bottom:1rem;font-size:1.05rem;line-height:1.7;"></div>
+
+  <h3 style="font-size:1.1rem;margin-top:1rem;">Form 16 → ITR-1 mapping</h3>
+  <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:0.9rem;border:1px solid var(--color-border);border-radius:var(--radius);overflow:hidden;">
+      <thead style="background:var(--color-card-bg);">
+        <tr>
+          <th style="text-align:left;padding:0.5rem;border-bottom:1px solid var(--color-border);">Form 16 field</th>
+          <th style="text-align:right;padding:0.5rem;border-bottom:1px solid var(--color-border);">Value</th>
+          <th style="text-align:left;padding:0.5rem;border-bottom:1px solid var(--color-border);">ITR-1 box</th>
+        </tr>
+      </thead>
+      <tbody id="form16Map"></tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1.1rem;margin-top:1.25rem;">Tax computation</h3>
+  <div id="form16Tax" style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.85;"></div>
+</div>
+
+<div style="margin-top:2rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">How to read your Form 16</h2>
+  <ul style="margin:0 0 0 1.5rem;font-size:0.95rem;line-height:1.85;">
+    <li><strong>Part A</strong> is the TDS certificate — generated from the TRACES portal. Contains your PAN, employer's TAN, and quarterly TDS amounts. Use the <em>total TDS</em> figure here.</li>
+    <li><strong>Part B</strong> is the salary annexure — prepared by your employer. Has gross salary, exemptions, deductions, and the tax computed by the employer (which becomes the TDS in Part A).</li>
+    <li><strong>The numbers should reconcile.</strong> Tax in Part B = TDS in Part A. If they don't match, ask payroll to fix it before you file.</li>
+  </ul>
+
+  <h3 style="font-size:1.1rem;margin:1.25rem 0 0.5rem;">Common Form 16 → ITR-1 gotchas</h3>
+  <ul style="margin:0 0 0 1.5rem;font-size:0.95rem;line-height:1.85;">
+    <li><strong>Income from other sources (interest, dividend)</strong> isn't on your Form 16 — pull it from <a href="https://www.incometax.gov.in/" rel="noopener">AIS</a> on the IT portal and add it manually.</li>
+    <li><strong>Multiple Form 16s</strong> (job change mid-year): combine gross salary, take the higher std deduction (one-time, ₹50K old / ₹75K new), sum 80C contributions across both employers (capped at ₹1.5L).</li>
+    <li><strong>Standard deduction</strong> is automatic in ITR-1; don't manually add it.</li>
+    <li><strong>Capital gains, multiple houses, foreign assets</strong> → you can't use ITR-1. See our <a href="{{ '/tools/itr-form-picker' | relative_url }}">ITR Form Picker</a>.</li>
+  </ul>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">FAQ</h2>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">My Form 16 says I owe more / less than this calculator shows.</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">The most common reasons: (a) you have interest / dividend income not declared to your employer (it's not on Form 16), (b) the employer used the old regime but you should switch to new, or vice versa, (c) one of your deductions is invalid (e.g. 80C exceeds ₹1.5L). Reconcile by checking AIS on the IT portal.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">When does my employer issue Form 16?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">By <strong>15 June</strong> of the AY (so by 15 Jun 2026 for FY 2025-26). If your employer is delayed, ask payroll directly — they generate it from TRACES and can fast-track. You can file ITR without Form 16 using salary slips + AIS, but Form 16 makes reconciliation easier.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Should I file Old or New regime?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Toggle the radio buttons to see both. Use our <a href="{{ '/tools/income-tax-calculator' | relative_url }}">Income Tax Calculator</a> for a side-by-side comparison. Rule of thumb FY 2025-26: New regime wins for most salaried people unless their total deductions exceed ~₹4.5L.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">What if Form 16 shows a different regime than I want?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">You can change regime when filing ITR — the regime declared to your employer for TDS purposes is not binding. If your employer used old but you want new (or vice versa), just file under the regime that gives lower tax. The TDS already paid gets adjusted.</p>
+  </details>
+</div>
+
+<div style="margin-top:1.5rem;padding:1rem;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:var(--radius);font-size:0.9rem;">
+  <strong>Note:</strong> This is a manual-entry helper, not an OCR or PDF parser. Cross-check every value against your physical Form 16 before filing. For ITR-2 / ITR-3 use cases (capital gains, multiple houses, business income), use the official IT portal pre-fill instead.
+</div>
+
+<script>
+function fmtINR(n){
+  var s = Math.round(n).toString();
+  var neg = s.charAt(0) === '-';
+  if(neg) s = s.slice(1);
+  var last3 = s.slice(-3);
+  var rest = s.slice(0, -3);
+  if(rest) last3 = ',' + last3;
+  rest = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+  return (neg ? '-' : '') + '₹ ' + rest + last3;
+}
+
+function val(id){ return parseFloat(document.getElementById(id).value) || 0; }
+
+function taxNew(taxable){
+  var slabs = [[400000,0],[800000,0.05],[1200000,0.10],[1600000,0.15],[2000000,0.20],[2400000,0.25],[Infinity,0.30]];
+  return applySlabs(taxable, slabs);
+}
+function taxOld(taxable){
+  var slabs = [[250000,0],[500000,0.05],[1000000,0.20],[Infinity,0.30]];
+  return applySlabs(taxable, slabs);
+}
+function applySlabs(taxable, slabs){
+  var tax = 0, prev = 0;
+  for(var i=0;i<slabs.length;i++){
+    var upper = slabs[i][0], rate = slabs[i][1];
+    if(taxable <= prev) break;
+    tax += (Math.min(taxable, upper) - prev) * rate;
+    prev = upper;
+  }
+  return tax;
+}
+
+function mapForm16(){
+  var pan = document.getElementById('f_pan').value.toUpperCase();
+  var tan = document.getElementById('f_tan').value.toUpperCase();
+  var tds = val('f_tds');
+  var gross = val('f_gross');
+  var perq = val('f_perq');
+  var profit = val('f_profit');
+  var hra = val('f_hra');
+  var lta = val('f_lta');
+  var otherExempt = val('f_otherExempt');
+  var profTax = val('f_profTax');
+  var otherIncome = val('f_otherIncome');
+  var d80c = Math.min(val('f_80c'), 150000);
+  var d80d = val('f_80d');
+  var d80ccd = Math.min(val('f_80ccd'), 50000);
+  var d80other = val('f_80other');
+
+  if(gross <= 0){ alert('Enter gross salary at minimum.'); return; }
+
+  var regime = document.querySelector('input[name="regime"]:checked').value;
+
+  // Compute taxable salary
+  var totalSalary = gross + perq + profit;
+  var allowedExempt = regime === 'old' ? (hra + lta + otherExempt) : 0; // New regime: no HRA/LTA/etc allowance exemptions (with limited carve-outs)
+  var afterExempt = Math.max(0, totalSalary - allowedExempt);
+  var stdDed = regime === 'new' ? 75000 : 50000;
+  var afterStd = Math.max(0, afterExempt - stdDed);
+  var afterProfTax = regime === 'old' ? Math.max(0, afterStd - profTax) : afterStd;
+  var grossTotalIncome = afterProfTax + otherIncome;
+  var totalDeductions = regime === 'old' ? (d80c + d80d + d80ccd + d80other) : 0;
+  var taxableIncome = Math.max(0, grossTotalIncome - totalDeductions);
+
+  // Compute tax
+  var tax = regime === 'new' ? taxNew(taxableIncome) : taxOld(taxableIncome);
+  // 87A rebate
+  var rebate = 0;
+  if(regime === 'new' && taxableIncome <= 1200000){ rebate = tax; tax = 0; }
+  else if(regime === 'old' && taxableIncome <= 500000){ rebate = Math.min(tax, 12500); tax -= rebate; }
+  var cess = tax * 0.04;
+  var totalTax = tax + cess;
+  var refundOrPayable = tds - totalTax; // positive = refund, negative = balance due
+
+  // Mapping table
+  var rows = [
+    ['Gross salary [Sec 17(1)]', gross, 'Schedule S, line 1a (Salary as per sec 17(1))'],
+    ['Perquisites [Sec 17(2)]', perq, 'Schedule S, line 1b'],
+    ['Profit in lieu [Sec 17(3)]', profit, 'Schedule S, line 1c'],
+    ['Total gross salary', totalSalary, 'Schedule S, line 1 (sum of above)'],
+    ['Less: HRA exemption ' + (regime==='new'?'(N/A in new regime)':''), hra, 'Schedule S, line 2 (only old regime)'],
+    ['Less: LTA exemption ' + (regime==='new'?'(N/A in new regime)':''), lta, 'Schedule S, line 2'],
+    ['Less: Other 10(*) exemptions', otherExempt, 'Schedule S, line 2'],
+    ['Less: Standard deduction', stdDed, 'Schedule S, line 4 (auto)'],
+    ['Less: Professional tax ' + (regime==='new'?'(N/A in new regime)':''), profTax, 'Schedule S, line 5'],
+    ['Income from other sources', otherIncome, 'Schedule OS, line 1c'],
+    ['Less: 80C deduction', d80c, 'Schedule VI-A, 80C ' + (regime==='new'?'(N/A new)':'')],
+    ['Less: 80D health insurance', d80d, 'Schedule VI-A, 80D ' + (regime==='new'?'(N/A new)':'')],
+    ['Less: 80CCD(1B) NPS', d80ccd, 'Schedule VI-A, 80CCD(1B) ' + (regime==='new'?'(N/A new)':'')],
+    ['Less: Other 80(*) deductions', d80other, 'Schedule VI-A ' + (regime==='new'?'(N/A new)':'')],
+    ['Total taxable income', taxableIncome, 'Part B-TI, line 5'],
+    ['TDS deducted', tds, 'Schedule TDS — claim as credit']
+  ];
+  var html = '';
+  rows.forEach(function(r){
+    html += '<tr>'+
+      '<td style="padding:0.4rem 0.5rem;border-bottom:1px solid var(--color-border);">'+r[0]+'</td>'+
+      '<td style="text-align:right;padding:0.4rem 0.5rem;border-bottom:1px solid var(--color-border);">'+fmtINR(r[1])+'</td>'+
+      '<td style="padding:0.4rem 0.5rem;border-bottom:1px solid var(--color-border);font-size:0.85rem;color:var(--color-muted);">'+r[2]+'</td>'+
+      '</tr>';
+  });
+  document.getElementById('form16Map').innerHTML = html;
+
+  // Tax computation
+  document.getElementById('form16Tax').innerHTML =
+    'Taxable income: <strong>'+fmtINR(taxableIncome)+'</strong><br>'+
+    'Tax (' + regime + ' regime): '+fmtINR(tax + rebate)+'<br>'+
+    (rebate > 0 ? 'Less 87A rebate: −'+fmtINR(rebate)+'<br>' : '')+
+    'Cess @ 4%: '+fmtINR(cess)+'<br>'+
+    '<hr style="margin:0.5rem 0;border:none;border-top:1px solid var(--color-border);">'+
+    'Total tax payable: <strong>'+fmtINR(totalTax)+'</strong><br>'+
+    'TDS already deducted: '+fmtINR(tds)+'<br>'+
+    '<strong style="color:'+(refundOrPayable >= 0 ? '#15803d' : '#dc2626')+';">'+
+    (refundOrPayable >= 0 ? 'Refund expected: '+fmtINR(refundOrPayable) : 'Balance to pay: '+fmtINR(-refundOrPayable))+
+    '</strong>';
+
+  // Summary banner
+  var sumEl = document.getElementById('form16Summary');
+  if(refundOrPayable >= 0){
+    sumEl.style.background = '#dcfce7';
+    sumEl.style.borderLeft = '4px solid #15803d';
+    sumEl.innerHTML = '<strong>Refund expected: '+fmtINR(refundOrPayable)+'</strong><br>'+
+      '<span style="font-size:0.95rem;">File your ITR-1 to claim this refund. Total tax under '+regime+' regime is '+fmtINR(totalTax)+'.</span>';
+  } else {
+    sumEl.style.background = '#fef3c7';
+    sumEl.style.borderLeft = '4px solid #f59e0b';
+    sumEl.innerHTML = '<strong>Balance tax to pay: '+fmtINR(-refundOrPayable)+'</strong><br>'+
+      '<span style="font-size:0.95rem;">Pay before filing ITR-1 via Challan 280 (self-assessment tax). Late payment attracts 1% interest under sec 234B.</span>';
+  }
+
+  document.getElementById('form16Result').style.display = 'block';
+  document.getElementById('form16Result').scrollIntoView({behavior:'smooth', block:'start'});
+}
+</script>
