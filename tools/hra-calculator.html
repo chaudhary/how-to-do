@@ -1,0 +1,158 @@
+---
+layout: tool
+title: HRA Exemption Calculator (FY 2025-26)
+description: "Calculate the tax-exempt portion of your HRA in seconds. Metro vs non-metro, monthly breakdown, and exactly how the three rules apply to you."
+---
+
+<div class="tool-header">
+  <h1>HRA Exemption Calculator</h1>
+  <p>Find out how much of your House Rent Allowance is exempt from tax under section 10(13A). Works for FY 2025-26 (AY 2026-27) under the Old regime.</p>
+</div>
+
+<div class="calc-form">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="basic">Basic + DA (monthly ₹)</label>
+      <input type="number" id="basic" placeholder="e.g. 60000" min="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);">Use only DA forming part of retirement benefits.</small>
+    </div>
+    <div class="form-group">
+      <label for="hra">HRA received (monthly ₹)</label>
+      <input type="number" id="hra" placeholder="e.g. 25000" min="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="rent">Rent paid (monthly ₹)</label>
+      <input type="number" id="rent" placeholder="e.g. 22000" min="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="city">City type</label>
+      <select id="city" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+        <option value="metro">Metro (Mumbai, Delhi, Kolkata, Chennai)</option>
+        <option value="nonmetro">Non-metro (everywhere else)</option>
+      </select>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem;">
+    <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.9rem;color:var(--color-muted);">
+      <input type="checkbox" id="annualMode"> Inputs are annual (not monthly)
+    </label>
+  </div>
+
+  <div style="margin-top:1rem;">
+    <button class="btn" onclick="calcHra()">Calculate exemption</button>
+  </div>
+</div>
+
+<div id="hraResult" style="display:none;margin-top:1.5rem;">
+  <div id="hraSummary" style="padding:1rem 1.25rem;border-radius:var(--radius);margin-bottom:1rem;background:#dcfce7;border-left:3px solid #15803d;font-size:1.05rem;"></div>
+
+  <div style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);">
+    <h3 style="margin:0 0 0.75rem;font-size:1.05rem;">The three rules — exemption is the lowest of:</h3>
+    <div id="hraBreakdown" style="font-size:0.95rem;line-height:1.9;"></div>
+  </div>
+
+  <div id="hraTaxable" style="margin-top:1rem;padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.8;"></div>
+</div>
+
+<div style="margin-top:2rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">How HRA exemption works</h2>
+  <p style="font-size:0.95rem;color:var(--color-text);">Section 10(13A) lets you exempt the <em>least</em> of three numbers from your HRA:</p>
+  <ol style="margin:0.5rem 0 0.5rem 1.5rem;font-size:0.95rem;line-height:1.8;">
+    <li><strong>Actual HRA</strong> received from your employer.</li>
+    <li><strong>Rent paid minus 10% of (Basic + DA)</strong>.</li>
+    <li><strong>50% of (Basic + DA)</strong> if you live in a metro, else <strong>40%</strong>.</li>
+  </ol>
+  <p style="font-size:0.95rem;margin-top:0.5rem;">If you live with your parents and pay them rent, that's allowed — but you need a rent agreement, receipts, and your parents must declare the rent as income. If your annual rent exceeds ₹1,00,000, you must report your landlord's PAN.</p>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">FAQ</h2>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Can I claim HRA under the New tax regime?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">No. HRA exemption is available only under the Old regime. Use our <a href="{{ '/tools/income-tax-calculator' | relative_url }}">Income Tax Calculator</a> to compare both regimes.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Which cities count as metro?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">For HRA purposes, only Mumbai, Delhi, Kolkata, and Chennai are metros (the four "metropolitan" cities under the Income Tax Act). Bangalore, Hyderabad, Pune, Gurgaon — all non-metro for HRA, even though we colloquially call them metros.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Do I need rent receipts?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Yes — your employer will ask for them to allow HRA in TDS. Generate them with our <a href="{{ '/tools/rent-receipt-generator' | relative_url }}">Rent Receipt Generator</a>. If annual rent exceeds ₹1L, the landlord's PAN is mandatory.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">What if I own a house in another city?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">You can still claim HRA for the city you actually rent in, even if you own property elsewhere. The owned house is treated separately (self-occupied or let-out) for tax.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Can I claim both HRA and home loan interest?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Yes, if your owned home is in a different city or genuinely not feasible to live in (e.g. workplace far away). You can claim HRA for rent and the home loan interest deduction simultaneously.</p>
+  </details>
+</div>
+
+<div style="margin-top:1.5rem;padding:1rem;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:var(--radius);font-size:0.9rem;">
+  <strong>Note:</strong> This calculator uses the standard HRA formula under the Old regime. It does not handle changes mid-year (e.g. a rent change or a city change). For those, calculate exemption separately for each period.
+</div>
+
+<script>
+function fmtINR(n){
+  var s = Math.round(n).toString();
+  var neg = s.charAt(0) === '-';
+  if(neg) s = s.slice(1);
+  var last3 = s.slice(-3);
+  var rest = s.slice(0, -3);
+  if(rest) last3 = ',' + last3;
+  rest = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+  return (neg ? '-' : '') + '₹ ' + rest + last3;
+}
+
+function calcHra(){
+  var annual = document.getElementById('annualMode').checked;
+  var div = annual ? 1 : 12;
+  var basicM = parseFloat(document.getElementById('basic').value) || 0;
+  var hraM = parseFloat(document.getElementById('hra').value) || 0;
+  var rentM = parseFloat(document.getElementById('rent').value) || 0;
+  if(basicM <= 0 || hraM <= 0){ alert('Enter Basic + DA and HRA received.'); return; }
+  var city = document.getElementById('city').value;
+  // Convert to annual
+  var basic = annual ? basicM : basicM * 12;
+  var hra = annual ? hraM : hraM * 12;
+  var rent = annual ? rentM : rentM * 12;
+
+  var rule1 = hra;
+  var rule2 = Math.max(0, rent - 0.10 * basic);
+  var rule3 = (city === 'metro' ? 0.50 : 0.40) * basic;
+  var exempt = Math.min(rule1, rule2, rule3);
+  var taxable = Math.max(0, hra - exempt);
+
+  var lowestIdx = exempt === rule1 ? 0 : (exempt === rule2 ? 1 : 2);
+  var labels = [
+    'Actual HRA received',
+    'Rent paid − 10% of Basic+DA',
+    (city === 'metro' ? '50%' : '40%') + ' of Basic+DA'
+  ];
+  var formulas = [
+    fmtINR(hra),
+    fmtINR(rent) + ' − ' + fmtINR(0.10 * basic) + ' = ' + fmtINR(rule2),
+    (city === 'metro' ? '50%' : '40%') + ' × ' + fmtINR(basic) + ' = ' + fmtINR(rule3)
+  ];
+  var values = [rule1, rule2, rule3];
+
+  var html = '';
+  for(var i = 0; i < 3; i++){
+    var isMin = i === lowestIdx;
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;'+(isMin?'background:#dcfce7;border-left:3px solid #15803d;padding-left:0.6rem;border-radius:4px;':'')+'"><div><strong>'+labels[i]+'</strong><br><span style="color:var(--color-muted);font-size:0.85rem;">'+formulas[i]+'</span></div><div style="font-weight:'+(isMin?'700':'500')+';">'+fmtINR(values[i])+(isMin?' ←':'')+'</div></div>';
+  }
+  document.getElementById('hraBreakdown').innerHTML = html;
+
+  document.getElementById('hraSummary').innerHTML =
+    '<strong>Annual HRA exemption: '+fmtINR(exempt)+'</strong>'+
+    '<br><span style="font-size:0.9rem;">That\'s '+fmtINR(exempt/12)+' per month — saved from your taxable income.</span>';
+
+  document.getElementById('hraTaxable').innerHTML =
+    '<strong>Taxable HRA:</strong> '+fmtINR(taxable)+' per year ('+fmtINR(taxable/12)+'/month)<br>'+
+    '<span style="color:var(--color-muted);font-size:0.9rem;">This portion of your HRA is added to your taxable salary. The exempt portion of '+fmtINR(exempt)+' is not taxed.</span>';
+
+  document.getElementById('hraResult').style.display = 'block';
+}
+</script>
