@@ -1,0 +1,294 @@
+---
+layout: tool
+title: Capital Gains Tax Calculator (FY 2025-26, India)
+description: "Calculate STCG and LTCG on shares, mutual funds, gold, and property under the post-July-2024 rules. ₹1.25L equity exemption applied automatically."
+category: "Financial (More)"
+tagline: "STCG and LTCG on shares, MF, gold, property — with the post-July-2024 rates and ₹1.25L equity exemption."
+search: "capital gains calculator stcg ltcg shares mutual fund equity debt gold property india tax fy 2025-26 grandfathering 1.25 lakh exemption"
+card_title: "Capital Gains Calculator"
+---
+
+<div class="tool-header">
+  <h1>Capital Gains Tax Calculator</h1>
+  <p>Compute short-term and long-term capital gains tax for FY 2025-26 (AY 2026-27) under the rules effective from 23 July 2024.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="assetType">Asset type</label>
+    <select id="assetType" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;" onchange="onAssetChange()">
+      <option value="equity">Listed Equity Shares / Equity Mutual Funds</option>
+      <option value="debt">Debt Mutual Fund (purchased after 1 Apr 2023)</option>
+      <option value="debt_old">Debt Mutual Fund (purchased before 1 Apr 2023)</option>
+      <option value="gold">Gold (physical, ETF, SGB sold before maturity)</option>
+      <option value="property">Land / House Property</option>
+      <option value="unlisted">Unlisted Shares</option>
+    </select>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="purchaseDate">Purchase date</label>
+      <input type="date" id="purchaseDate" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="saleDate">Sale date</label>
+      <input type="date" id="saleDate" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="purchasePrice">Purchase price (₹)</label>
+      <input type="number" id="purchasePrice" placeholder="e.g. 500000" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="salePrice">Sale price (₹)</label>
+      <input type="number" id="salePrice" placeholder="e.g. 800000" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="expenses">Sale expenses (₹) <span style="font-weight:normal;color:var(--color-muted);font-size:0.85rem;">brokerage, stamp duty</span></label>
+      <input type="number" id="expenses" placeholder="0" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group" id="slabWrap" style="display:none;">
+      <label for="slabRate">Your slab rate (%)</label>
+      <select id="slabRate" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+        <option value="0">0% (income up to 4L new / 2.5L old)</option>
+        <option value="5">5%</option>
+        <option value="10">10%</option>
+        <option value="15">15%</option>
+        <option value="20">20%</option>
+        <option value="25">25%</option>
+        <option value="30" selected>30%</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="grandfatherWrap" style="margin-top:0.5rem;display:none;">
+    <div class="form-group">
+      <label for="fmv2018"><strong>Pre-2018 equity:</strong> Fair Market Value on 31 Jan 2018 (₹) <span style="font-weight:normal;color:var(--color-muted);font-size:0.85rem;">grandfathering</span></label>
+      <input type="number" id="fmv2018" placeholder="If purchased before 1 Feb 2018" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);">Cost is treated as max(actual cost, min(FMV on 31-Jan-2018, sale price)).</small>
+    </div>
+  </div>
+
+  <div id="propertyWrap" style="margin-top:0.5rem;display:none;">
+    <div class="form-group">
+      <label style="display:flex;align-items:center;gap:0.4rem;">
+        <input type="checkbox" id="propertyOption">
+        <span>Resident individual/HUF, property bought before 23 Jul 2024 — show comparison with old indexation method</span>
+      </label>
+    </div>
+    <div class="form-group" id="indexedWrap" style="display:none;">
+      <label for="indexedCost">Indexed cost of acquisition (₹) <span style="font-weight:normal;color:var(--color-muted);font-size:0.85rem;">if you want to compare with 20% indexed method</span></label>
+      <input type="number" id="indexedCost" placeholder="purchase × (CII sale year / CII purchase year)" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+  </div>
+
+  <div style="margin-top:1rem;">
+    <button class="btn" onclick="calcCG()">Calculate</button>
+  </div>
+</div>
+
+<div id="cgResult" style="display:none;margin-top:1.5rem;">
+  <div id="cgSummary" style="padding:1rem 1.25rem;border-radius:var(--radius);margin-bottom:1rem;font-size:1.05rem;"></div>
+
+  <div style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);">
+    <h3 style="margin:0 0 0.75rem;font-size:1.05rem;">Breakdown</h3>
+    <div id="cgBreakdown" style="font-size:0.95rem;line-height:1.9;"></div>
+  </div>
+
+  <div id="cgCompare" style="display:none;margin-top:1rem;padding:1rem;background:#eef2ff;border-left:3px solid #4f46e5;border-radius:var(--radius);font-size:0.95rem;line-height:1.7;"></div>
+</div>
+
+<div style="margin-top:2rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">Rules applied (post-23 July 2024)</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:0.9rem;margin-top:0.5rem;">
+    <thead>
+      <tr style="background:var(--color-card-bg);">
+        <th style="text-align:left;padding:0.5rem;border:1px solid var(--color-border);">Asset</th>
+        <th style="text-align:left;padding:0.5rem;border:1px solid var(--color-border);">STCG holding</th>
+        <th style="text-align:left;padding:0.5rem;border:1px solid var(--color-border);">STCG rate</th>
+        <th style="text-align:left;padding:0.5rem;border:1px solid var(--color-border);">LTCG rate</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Listed equity / equity MF</td><td style="padding:0.5rem;border:1px solid var(--color-border);">≤ 12 months</td><td style="padding:0.5rem;border:1px solid var(--color-border);">20%</td><td style="padding:0.5rem;border:1px solid var(--color-border);">12.5% over ₹1.25L</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Debt MF (post Apr-2023)</td><td style="padding:0.5rem;border:1px solid var(--color-border);">Always</td><td style="padding:0.5rem;border:1px solid var(--color-border);">Slab rate</td><td style="padding:0.5rem;border:1px solid var(--color-border);">N/A</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Debt MF (pre Apr-2023)</td><td style="padding:0.5rem;border:1px solid var(--color-border);">≤ 24 months</td><td style="padding:0.5rem;border:1px solid var(--color-border);">Slab</td><td style="padding:0.5rem;border:1px solid var(--color-border);">12.5% (no indexation)</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Gold</td><td style="padding:0.5rem;border:1px solid var(--color-border);">≤ 24 months</td><td style="padding:0.5rem;border:1px solid var(--color-border);">Slab</td><td style="padding:0.5rem;border:1px solid var(--color-border);">12.5% (no indexation)</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Property / land</td><td style="padding:0.5rem;border:1px solid var(--color-border);">≤ 24 months</td><td style="padding:0.5rem;border:1px solid var(--color-border);">Slab</td><td style="padding:0.5rem;border:1px solid var(--color-border);">12.5% (or 20% with indexation, see below)</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Unlisted shares</td><td style="padding:0.5rem;border:1px solid var(--color-border);">≤ 24 months</td><td style="padding:0.5rem;border:1px solid var(--color-border);">Slab</td><td style="padding:0.5rem;border:1px solid var(--color-border);">12.5% (no indexation)</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:0.75rem;font-size:0.9rem;color:var(--color-muted);">All LTCG figures here exclude surcharge and 4% cess. For property bought before 23 Jul 2024, resident individuals/HUFs may pay 20% with indexation if it's lower than 12.5% without — toggle the comparison option above.</p>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">FAQ</h2>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">What is grandfathering for pre-2018 equity?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">For listed equity bought before 1 Feb 2018, gains up to 31 Jan 2018 are exempt. The cost is taken as max(actual cost, min(31-Jan-2018 FMV, sale price)). Enter the FMV when prompted to apply grandfathering.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">When is the ₹1.25 lakh equity exemption applied?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Only on LTCG from listed equity and equity mutual funds (12.5% rate). The first ₹1.25L of LTCG in a financial year is exempt; only the excess is taxed.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Why are debt MFs different post-April 2023?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">From 1 Apr 2023, debt mutual funds (with &lt;35% equity) lost LTCG benefit entirely. All gains are taxed at slab, regardless of holding period. Older units retain the old treatment.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">How do I see my full tax picture?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Add this number to your salary tax via the <a href="{{ '/tools/income-tax-calculator' | relative_url }}">Income Tax Calculator</a>. Capital gains tax is computed separately and added to your total liability.</p>
+  </details>
+</div>
+
+<div style="margin-top:1.5rem;padding:1rem;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:var(--radius);font-size:0.9rem;">
+  <strong>Note:</strong> Surcharge and 4% cess are not included. Surcharge on LTCG is capped at 15%. Section 54/54F/54EC reinvestment exemptions are not modelled — for those, consult a CA.
+</div>
+
+<script>
+function fmtINR(n){
+  var s = Math.round(n).toString();
+  var neg = s.charAt(0) === '-';
+  if(neg) s = s.slice(1);
+  var last3 = s.slice(-3);
+  var rest = s.slice(0, -3);
+  if(rest) last3 = ',' + last3;
+  rest = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+  return (neg ? '-' : '') + '₹ ' + rest + last3;
+}
+
+function onAssetChange(){
+  var t = document.getElementById('assetType').value;
+  document.getElementById('grandfatherWrap').style.display = (t === 'equity') ? '' : 'none';
+  document.getElementById('propertyWrap').style.display = (t === 'property') ? '' : 'none';
+  // Slab needed for STCG (non-equity) and debt
+  var slabAssets = ['debt','debt_old','gold','property','unlisted'];
+  document.getElementById('slabWrap').style.display = slabAssets.indexOf(t) > -1 ? '' : '';
+  // Always show slab for non-equity to handle STCG cases; show for equity too because some users tag wrong
+  document.getElementById('slabWrap').style.display = '';
+}
+document.getElementById('propertyOption').addEventListener('change', function(){
+  document.getElementById('indexedWrap').style.display = this.checked ? '' : 'none';
+});
+onAssetChange();
+
+function monthsBetween(d1, d2){
+  return (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth()) - (d2.getDate() < d1.getDate() ? 1 : 0);
+}
+
+function calcCG(){
+  var t = document.getElementById('assetType').value;
+  var pd = document.getElementById('purchaseDate').value;
+  var sd = document.getElementById('saleDate').value;
+  var pp = parseFloat(document.getElementById('purchasePrice').value) || 0;
+  var sp = parseFloat(document.getElementById('salePrice').value) || 0;
+  var ex = parseFloat(document.getElementById('expenses').value) || 0;
+  var slab = parseFloat(document.getElementById('slabRate').value) || 0;
+
+  if(!pd || !sd){ alert('Enter both purchase and sale dates.'); return; }
+  if(pp <= 0 || sp <= 0){ alert('Enter purchase and sale prices.'); return; }
+  var pdate = new Date(pd), sdate = new Date(sd);
+  if(sdate <= pdate){ alert('Sale date must be after purchase date.'); return; }
+
+  var months = monthsBetween(pdate, sdate);
+  var stcgMonths = (t === 'equity') ? 12 : 24;
+  var isLT;
+  var rules = {
+    equity: { stcgRate: 20, ltcgRate: 12.5, ltcgExempt: 125000, ltcgIndexAvail: false, ltcgUseSlab: false, stcgUseSlab: false },
+    debt:   { stcgRate: slab, ltcgRate: slab, ltcgExempt: 0, ltcgIndexAvail: false, ltcgUseSlab: true, stcgUseSlab: true, alwaysShort: true },
+    debt_old:{stcgRate: slab, ltcgRate: 12.5, ltcgExempt: 0, ltcgIndexAvail: false, ltcgUseSlab: false, stcgUseSlab: true },
+    gold:   { stcgRate: slab, ltcgRate: 12.5, ltcgExempt: 0, ltcgIndexAvail: false, ltcgUseSlab: false, stcgUseSlab: true },
+    property:{stcgRate: slab, ltcgRate: 12.5, ltcgExempt: 0, ltcgIndexAvail: true,  ltcgUseSlab: false, stcgUseSlab: true },
+    unlisted:{stcgRate: slab, ltcgRate: 12.5, ltcgExempt: 0, ltcgIndexAvail: false, ltcgUseSlab: false, stcgUseSlab: true }
+  };
+  var rule = rules[t];
+
+  if(rule.alwaysShort){
+    isLT = false;
+  } else {
+    isLT = months >= stcgMonths;
+  }
+
+  // Cost: apply grandfathering for equity bought before 1 Feb 2018
+  var cost = pp;
+  var grandfathered = false;
+  if(t === 'equity' && pdate < new Date('2018-02-01')){
+    var fmv = parseFloat(document.getElementById('fmv2018').value) || 0;
+    if(fmv > 0){
+      var grandfatherCost = Math.max(pp, Math.min(fmv, sp));
+      cost = grandfatherCost;
+      grandfathered = true;
+    }
+  }
+
+  var netSale = sp - ex;
+  var gain = netSale - cost;
+
+  var tax = 0, breakdown = '', summaryClass = '', summaryText = '';
+  breakdown += 'Net sale value (sale − expenses): <strong>'+fmtINR(netSale)+'</strong><br>';
+  breakdown += 'Cost of acquisition'+(grandfathered ? ' (after grandfathering)' : '')+': <strong>'+fmtINR(cost)+'</strong><br>';
+  breakdown += 'Capital gain: <strong style="color:'+(gain>=0?'#15803d':'#dc2626')+';">'+fmtINR(gain)+'</strong><br>';
+  breakdown += 'Holding period: <strong>'+months+' months</strong> → '+(isLT ? 'Long-term' : 'Short-term')+'<br>';
+  breakdown += '<hr style="margin:0.5rem 0;border:none;border-top:1px dashed var(--color-border);">';
+
+  if(gain <= 0){
+    breakdown += '<strong>No tax — this is a loss.</strong> ';
+    breakdown += isLT ? 'LTCL can be carried forward 8 years and set off only against LTCG.' : 'STCL can be carried forward 8 years and set off against STCG or LTCG.';
+    summaryClass = '#fef3c7'; summaryText = '<strong>Net capital loss: '+fmtINR(-gain)+'</strong>';
+  } else if(isLT){
+    if(t === 'equity'){
+      var taxable = Math.max(0, gain - 125000);
+      tax = taxable * 0.125;
+      breakdown += 'Less ₹1,25,000 LTCG exemption: <strong>−'+fmtINR(Math.min(gain,125000))+'</strong><br>';
+      breakdown += 'Taxable LTCG: <strong>'+fmtINR(taxable)+'</strong><br>';
+      breakdown += 'Tax @ 12.5%: <strong>'+fmtINR(tax)+'</strong>';
+    } else if(rule.ltcgUseSlab){
+      tax = gain * (slab / 100);
+      breakdown += 'Tax at slab '+slab+'%: <strong>'+fmtINR(tax)+'</strong>';
+    } else {
+      tax = gain * (rule.ltcgRate / 100);
+      breakdown += 'Tax @ '+rule.ltcgRate+'% (no indexation): <strong>'+fmtINR(tax)+'</strong>';
+    }
+  } else {
+    if(t === 'equity'){
+      tax = gain * 0.20;
+      breakdown += 'Tax @ 20% (STCG on equity): <strong>'+fmtINR(tax)+'</strong>';
+    } else {
+      tax = gain * (slab / 100);
+      breakdown += 'Tax at slab '+slab+'%: <strong>'+fmtINR(tax)+'</strong>';
+    }
+  }
+
+  if(gain > 0){
+    summaryClass = '#dcfce7';
+    summaryText = '<strong>Capital gains tax: '+fmtINR(tax)+'</strong><br><span style="font-size:0.9rem;">'+(isLT ? 'Long-term' : 'Short-term')+' on '+fmtINR(gain)+' gain. Add 4% cess for the final figure.</span>';
+  }
+
+  var summaryEl = document.getElementById('cgSummary');
+  summaryEl.style.background = summaryClass;
+  summaryEl.style.borderLeft = '3px solid ' + (gain > 0 ? '#15803d' : '#f59e0b');
+  summaryEl.innerHTML = summaryText;
+  document.getElementById('cgBreakdown').innerHTML = breakdown;
+
+  // Property comparison: 12.5% no-index vs 20% indexed
+  var compEl = document.getElementById('cgCompare');
+  compEl.style.display = 'none';
+  if(t === 'property' && isLT && document.getElementById('propertyOption').checked && gain > 0){
+    var indexed = parseFloat(document.getElementById('indexedCost').value) || 0;
+    if(indexed > 0){
+      var newMethod = gain * 0.125;
+      var oldGain = Math.max(0, netSale - indexed);
+      var oldMethod = oldGain * 0.20;
+      var winner = newMethod < oldMethod ? '12.5% without indexation' : '20% with indexation';
+      var saved = Math.abs(newMethod - oldMethod);
+      compEl.innerHTML = '<strong>Method comparison (resident individuals/HUFs only):</strong><br>'+
+        '12.5% on '+fmtINR(gain)+' (no indexation): <strong>'+fmtINR(newMethod)+'</strong><br>'+
+        '20% on '+fmtINR(oldGain)+' (indexed): <strong>'+fmtINR(oldMethod)+'</strong><br>'+
+        '<strong style="color:#4f46e5;">Pick: '+winner+' — saves '+fmtINR(saved)+'.</strong>';
+      compEl.style.display = 'block';
+    }
+  }
+
+  document.getElementById('cgResult').style.display = 'block';
+}
+</script>
