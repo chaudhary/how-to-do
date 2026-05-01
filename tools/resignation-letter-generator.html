@@ -1,0 +1,270 @@
+---
+layout: tool
+title: Resignation Letter Generator (India) — Free, Print or PDF
+description: "Generate a professional resignation letter in 30 seconds. India-aware: notice period, FNF, PF transfer, relieving letter. Three tone options. No sign-up."
+category: "AI-Powered Tools"
+tagline: "India-aware draft mentioning notice period, FNF, PF transfer, relieving letter. Three tones, print or copy."
+search: "resignation letter generator india notice period fnf full and final settlement pf transfer relieving letter experience letter formal startup brief"
+card_title: "Resignation Letter Generator"
+---
+
+<div class="tool-header">
+  <h1>Resignation Letter Generator</h1>
+  <p>Fill in the basics and get a clean resignation letter that mentions notice period, full-and-final settlement (FNF), PF transfer, and relieving letter — the things Indian HR teams look for. Pick formal, friendly-startup, or brief tone.</p>
+</div>
+
+<div class="calc-form">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="yourName">Your name</label>
+      <input type="text" id="yourName" placeholder="e.g. Rahul Sharma" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="role">Your role / designation</label>
+      <input type="text" id="role" placeholder="e.g. Senior Software Engineer" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="empId">Employee ID <span style="color:var(--color-muted);font-weight:normal;font-size:0.85rem;">optional</span></label>
+      <input type="text" id="empId" placeholder="e.g. EMP12345" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="companyName">Company name</label>
+      <input type="text" id="companyName" placeholder="e.g. Acme Technologies Pvt. Ltd." style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="manager">Recipient (your manager / HR)</label>
+      <input type="text" id="manager" placeholder="e.g. Ms. Priya Nair, Manager" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="resignDate">Date of letter</label>
+      <input type="date" id="resignDate" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="lastDay">Proposed last working day</label>
+      <input type="date" id="lastDay" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small id="lwdHelp" style="color:var(--color-muted);"></small>
+    </div>
+    <div class="form-group">
+      <label for="noticeDays">Notice period (days)</label>
+      <input type="number" id="noticeDays" placeholder="30 / 60 / 90" min="0" max="180" value="60" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);">Per your offer letter / employment contract.</small>
+    </div>
+    <div class="form-group">
+      <label for="reason">Reason</label>
+      <select id="reason" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+        <option value="growth">Career growth / new role</option>
+        <option value="personal">Personal reasons</option>
+        <option value="relocation">Relocation</option>
+        <option value="health">Health / family</option>
+        <option value="education">Higher education</option>
+        <option value="generic">Prefer not to specify</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="tone">Tone</label>
+      <select id="tone" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+        <option value="formal" selected>Formal (corporate)</option>
+        <option value="startup">Friendly (startup)</option>
+        <option value="brief">Brief (3-line)</option>
+      </select>
+    </div>
+  </div>
+
+  <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+    <button class="btn" onclick="generateLetter()">Generate letter</button>
+    <button type="button" onclick="copyLetter()" id="copyBtn" style="display:none;background:none;border:1px solid var(--color-border);padding:0.5rem 1rem;border-radius:var(--radius);cursor:pointer;font-size:0.9rem;">Copy to clipboard</button>
+    <button type="button" onclick="printLetter()" id="printBtn" style="display:none;background:none;border:1px solid var(--color-border);padding:0.5rem 1rem;border-radius:var(--radius);cursor:pointer;font-size:0.9rem;">Print / Save PDF</button>
+  </div>
+</div>
+
+<div id="letterResult" style="display:none;margin-top:1.5rem;">
+  <div id="letterContent" style="padding:1.5rem;background:white;border:1px solid var(--color-border);border-radius:var(--radius);font-family:Georgia, serif;line-height:1.7;color:#1a1a2e;font-size:0.95rem;white-space:pre-wrap;"></div>
+</div>
+
+<div style="margin-top:2rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">What to do after submitting</h2>
+  <ol style="margin:0 0 0 1.5rem;font-size:0.95rem;line-height:1.85;">
+    <li><strong>Email + paper trail.</strong> Send the letter as a PDF over email to your manager + HR. Keep the email; companies sometimes lose the physical copy.</li>
+    <li><strong>Get acceptance in writing.</strong> Once HR acknowledges, ask for a written acceptance with the agreed last working day. This is your protection if the company drags FNF.</li>
+    <li><strong>Knowledge transfer plan.</strong> Volunteer one. Most managers appreciate it and it speeds up your relieving letter.</li>
+    <li><strong>Recover unused leaves.</strong> Confirm leave balance with HR before your last day — leave encashment is part of FNF.</li>
+    <li><strong>Don't withdraw PF — transfer it.</strong> Withdrawing breaks your 5-year continuity for tax-free EPF; transfer to your new employer instead. <a href="https://passbook.epfindia.gov.in/" rel="noopener">EPFO portal</a>.</li>
+  </ol>
+
+  <h3 style="font-size:1.1rem;margin:1.25rem 0 0.5rem;">Documents you should collect on your last day</h3>
+  <ul style="margin:0 0 0 1.5rem;font-size:0.95rem;line-height:1.85;">
+    <li><strong>Relieving letter</strong> — confirms separation date and clearance.</li>
+    <li><strong>Experience letter</strong> — your employment history with the company.</li>
+    <li><strong>Form 16</strong> — for the current FY's TDS, even if not yet generated (HR will email it after May).</li>
+    <li><strong>Full and Final Settlement (FNF) statement</strong> — itemizes pending salary, leave encashment, bonus, gratuity if applicable.</li>
+    <li><strong>NOC / no-dues clearance</strong> — sometimes required for the next company's onboarding.</li>
+  </ul>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">FAQ</h2>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Should I mention the new company in my resignation?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">No. Keep it neutral — "career growth" or "personal reasons" is enough. Naming the new employer can complicate things, especially around non-compete clauses and notice-period buyout discussions.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Can I leave before serving full notice?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Yes, by buying out the unserved days at your basic salary rate. Some companies accept buyout from your side; a few insist on the new employer paying. Use our <a href="{{ '/tools/notice-period-fnf-calculator' | relative_url }}">Notice Period & FNF Calculator</a> to see what you'll owe.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Do I need to give a reason in the letter?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">No, legally. But mentioning a vague reason ("career growth", "personal") is a courtesy that smooths the conversation. Avoid criticism of the company or specific people in the letter — keep that for the exit interview.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">When does FNF typically get paid?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Most Indian companies process FNF within 30-45 days of the last working day. Larger firms (TCS, Infosys, Accenture) tend to be on the slower side. Keep your relieving letter as proof — without it, your next employer's onboarding may stall.</p>
+  </details>
+</div>
+
+<div style="margin-top:1.5rem;padding:1rem;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:var(--radius);font-size:0.9rem;">
+  <strong>Note:</strong> This generates a starting draft. Edit before sending to add anything specific to your situation (e.g. handover plans, gratitude). Always check your offer letter / company policy for any clauses about resignation, notice, or non-compete before submitting.
+</div>
+
+<script>
+(function(){
+  document.getElementById('resignDate').valueAsDate = new Date();
+  // Auto-set last working day = today + notice days
+  function syncLastDay(){
+    var notice = parseInt(document.getElementById('noticeDays').value) || 0;
+    var d = new Date();
+    d.setDate(d.getDate() + notice);
+    document.getElementById('lastDay').valueAsDate = d;
+    document.getElementById('lwdHelp').textContent = 'Default: today + ' + notice + ' days. Edit if your notice runs from a different date.';
+  }
+  syncLastDay();
+  document.getElementById('noticeDays').addEventListener('input', syncLastDay);
+})();
+
+function fmtDate(yyyymmdd){
+  if(!yyyymmdd) return '';
+  var d = new Date(yyyymmdd);
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function reasonText(key, tone){
+  var f = {
+    growth: 'I have decided to resign in order to pursue a new opportunity that aligns with my long-term career growth.',
+    personal: 'I have decided to resign due to personal reasons.',
+    relocation: 'I have decided to resign as I will be relocating, which makes continuing in this role impractical.',
+    health: 'I have decided to resign due to health and family commitments that require my full attention.',
+    education: 'I have decided to resign in order to pursue higher education.',
+    generic: 'I have decided to resign from my position.'
+  };
+  var s = {
+    growth: 'I\'ve decided to move on to a new opportunity that I believe is the right next step for my career.',
+    personal: 'For some personal reasons, I\'ve decided this is the right time for me to move on.',
+    relocation: 'I\'m relocating, so I\'ve decided this is the right time to move on.',
+    health: 'I need to step away to focus on health and family for the foreseeable future.',
+    education: 'I\'m planning to go back to studies full time, so I\'ll be moving on.',
+    generic: 'I\'ve decided this is the right time for me to move on.'
+  };
+  var b = {
+    growth: 'I am moving on to a new opportunity.',
+    personal: 'I am resigning for personal reasons.',
+    relocation: 'I am resigning due to relocation.',
+    health: 'I am resigning to focus on health and family.',
+    education: 'I am resigning to pursue higher education.',
+    generic: 'I am resigning from my position.'
+  };
+  return tone === 'startup' ? s[key] : (tone === 'brief' ? b[key] : f[key]);
+}
+
+function generateLetter(){
+  var name = document.getElementById('yourName').value.trim();
+  var role = document.getElementById('role').value.trim();
+  var empId = document.getElementById('empId').value.trim();
+  var company = document.getElementById('companyName').value.trim();
+  var manager = document.getElementById('manager').value.trim();
+  var resignDate = document.getElementById('resignDate').value;
+  var lastDay = document.getElementById('lastDay').value;
+  var noticeDays = document.getElementById('noticeDays').value;
+  var reason = document.getElementById('reason').value;
+  var tone = document.getElementById('tone').value;
+
+  if(!name || !role || !company || !manager){
+    alert('Fill in your name, role, company, and recipient at minimum.');
+    return;
+  }
+
+  var resignFmt = fmtDate(resignDate);
+  var lastFmt = fmtDate(lastDay);
+  var letter = '';
+
+  if(tone === 'formal'){
+    letter =
+      resignFmt + '\n\n' +
+      'To,\n' + manager + '\n' + company + '\n\n' +
+      'Subject: Resignation from the position of ' + role + '\n\n' +
+      'Dear ' + manager.split(',')[0] + ',\n\n' +
+      'I am writing to formally tender my resignation from the position of ' + role +
+      (empId ? ' (Employee ID: ' + empId + ')' : '') + ' at ' + company + '. ' +
+      reasonText(reason, tone) + '\n\n' +
+      'In line with my notice period of ' + noticeDays + ' days as per my employment terms, ' +
+      'my last working day will be ' + lastFmt + '. I will ensure a smooth knowledge transfer of my responsibilities ' +
+      'and complete all pending deliverables before this date.\n\n' +
+      'I would be grateful if the necessary formalities — relieving letter, experience letter, full and final settlement, ' +
+      'and Form 16 — could be processed in line with company policy. I will also coordinate with HR to transfer my EPF ' +
+      'account to my next employer.\n\n' +
+      'I am genuinely thankful for the opportunities, learning, and support I have received during my time at ' + company + '. ' +
+      'It has been a meaningful chapter, and I leave with respect for the team and the work we have built together.\n\n' +
+      'Sincerely,\n' + name + (empId ? '\nEmployee ID: ' + empId : '');
+  } else if(tone === 'startup'){
+    letter =
+      resignFmt + '\n\n' +
+      'Hi ' + manager.split(',')[0] + ',\n\n' +
+      'This is hard to write, but I\'m resigning from my role as ' + role + ' at ' + company + '. ' +
+      reasonText(reason, tone) + ' My last working day, factoring in the ' + noticeDays + '-day notice period, will be ' + lastFmt + '.\n\n' +
+      'I\'ll do my best to wrap up open work cleanly and document everything for whoever picks it up. Happy to do a proper ' +
+      'handover — just let me know how you\'d like it structured.\n\n' +
+      'On the admin side, I\'d appreciate getting the relieving letter, experience letter, FNF, and Form 16 sorted in the ' +
+      'usual way. I\'ll handle the EPF transfer to my next employer through the EPFO portal.\n\n' +
+      'Genuinely thank you for everything. The work, the people, the trust — it\'s meant a lot. I\'m leaving as a fan of ' +
+      company + ', and I hope our paths cross again.\n\n' +
+      'Best,\n' + name + (empId ? ' (' + empId + ')' : '');
+  } else {
+    letter =
+      resignFmt + '\n\n' +
+      'To: ' + manager + ', ' + company + '\n\n' +
+      'Subject: Resignation\n\n' +
+      'Dear ' + manager.split(',')[0] + ',\n\n' +
+      reasonText(reason, tone) + ' Per my ' + noticeDays + '-day notice period, my last working day will be ' + lastFmt + '.\n\n' +
+      'Please process my relieving letter, experience letter, FNF, and Form 16 as per company policy.\n\n' +
+      'Thank you for the opportunity.\n\n' +
+      'Regards,\n' + name + (empId ? '\n' + empId : '');
+  }
+
+  document.getElementById('letterContent').textContent = letter;
+  document.getElementById('letterResult').style.display = 'block';
+  document.getElementById('copyBtn').style.display = '';
+  document.getElementById('printBtn').style.display = '';
+  document.getElementById('letterResult').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function copyLetter(){
+  var text = document.getElementById('letterContent').textContent;
+  navigator.clipboard.writeText(text).then(function(){
+    var btn = document.getElementById('copyBtn');
+    var orig = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    setTimeout(function(){ btn.textContent = orig; }, 1500);
+  }).catch(function(){
+    alert('Copy failed — select the letter manually and copy.');
+  });
+}
+
+function printLetter(){
+  var text = document.getElementById('letterContent').textContent;
+  var w = window.open('', '', 'width=800,height=900');
+  w.document.write('<!doctype html><html><head><title>Resignation Letter</title>' +
+    '<style>body{font-family:Georgia,serif;padding:48px;line-height:1.7;color:#1a1a2e;max-width:680px;margin:0 auto;white-space:pre-wrap;}@media print{body{padding:32px;}}</style></head><body>');
+  w.document.write(text.replace(/[&<>]/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}));
+  w.document.write('</body></html>');
+  w.document.close();
+  setTimeout(function(){ w.print(); }, 200);
+}
+</script>
