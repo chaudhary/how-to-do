@@ -1,0 +1,229 @@
+---
+layout: tool
+title: Home Loan Refinance / Balance Transfer Calculator (India)
+description: "Should you switch your home loan to a lower rate? Compare current vs new EMI, lifetime interest savings, and break-even month after fees. Updated for the post-rate-cut 2026 cycle."
+category: "Financial"
+tagline: "Should you switch your home loan to a lower rate? See break-even months and lifetime savings after fees."
+search: "home loan refinance balance transfer calculator india break even processing fee rbi rate cut switch lender financial"
+card_title: "Loan Refinance Calculator"
+---
+
+<div class="tool-header">
+  <h1>Home Loan Refinance Calculator</h1>
+  <p>RBI cut the repo rate by 125 bps in 2025. If your home loan is still on a 2023-24 rate, you may be overpaying ₹2K–₹5K every month. Find out in 30 seconds whether refinancing makes sense after fees.</p>
+</div>
+
+<div class="calc-form">
+  <h3 style="margin-bottom:0.75rem;font-size:1.05rem;">Your current loan</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="outstanding">Outstanding principal (₹)</label>
+      <input type="number" id="outstanding" placeholder="e.g. 4500000" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);">Current balance, not the original sanctioned amount.</small>
+    </div>
+    <div class="form-group">
+      <label for="currentRate">Current interest rate (% p.a.)</label>
+      <input type="number" id="currentRate" placeholder="e.g. 9.0" min="0" max="20" step="0.05" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="tenureLeft">Tenure remaining (years)</label>
+      <input type="number" id="tenureLeft" placeholder="e.g. 18" min="1" max="40" step="0.5" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+  </div>
+
+  <h3 style="margin:1.5rem 0 0.75rem;font-size:1.05rem;">New loan offer</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="newRate">New interest rate (% p.a.)</label>
+      <input type="number" id="newRate" placeholder="e.g. 7.5" min="0" max="20" step="0.05" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="processingFee">Processing fee (₹ or %)</label>
+      <input type="number" id="processingFee" placeholder="e.g. 5000 or 0.5" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <select id="feeType" style="margin-top:0.25rem;width:100%;padding:0.4rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.85rem;">
+        <option value="flat">Flat amount (₹)</option>
+        <option value="percent" selected>Percentage of outstanding (%)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="otherFees">Other charges (₹) <span style="color:var(--color-muted);font-weight:normal;font-size:0.85rem;">stamp, legal, MOD</span></label>
+      <input type="number" id="otherFees" placeholder="e.g. 5000" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="prepaymentPenalty">Existing loan prepayment / foreclosure charge (₹)</label>
+      <input type="number" id="prepaymentPenalty" placeholder="usually 0 for floating rate" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);">RBI bans prepayment penalty on floating-rate retail loans. Fixed-rate loans may charge.</small>
+    </div>
+  </div>
+
+  <div style="margin-top:1.25rem;">
+    <button class="btn" onclick="calcRefinance()">Calculate savings</button>
+  </div>
+</div>
+
+<div id="refResult" style="display:none;margin-top:1.5rem;">
+  <div id="refVerdict" style="padding:1.25rem;border-radius:var(--radius);margin-bottom:1rem;font-size:1.1rem;line-height:1.7;"></div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;">
+    <div style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);">
+      <h3 style="margin:0 0 0.75rem;font-size:1.05rem;">Current loan</h3>
+      <div id="refCurrent" style="font-size:0.95rem;line-height:1.85;"></div>
+    </div>
+    <div style="padding:1rem;background:#f0fdf4;border:1px solid #86efac;border-radius:var(--radius);">
+      <h3 style="margin:0 0 0.75rem;font-size:1.05rem;color:#15803d;">New loan</h3>
+      <div id="refNew" style="font-size:0.95rem;line-height:1.85;"></div>
+    </div>
+  </div>
+
+  <div id="refBreakeven" style="margin-top:1rem;padding:1rem;background:#eef2ff;border-left:3px solid #4f46e5;border-radius:var(--radius);font-size:0.95rem;line-height:1.7;"></div>
+</div>
+
+<div style="margin-top:2rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">When refinancing makes sense</h2>
+  <ul style="margin:0 0 0 1.5rem;font-size:0.95rem;line-height:1.85;">
+    <li><strong>Rate gap of at least 0.5%</strong> usually clears fees within 12-18 months. Below 0.25% — usually not worth the paperwork.</li>
+    <li><strong>Tenure remaining ≥ 5 years</strong> — most savings come from early years when interest dominates EMI. With under 3 years left, interest is mostly already paid.</li>
+    <li><strong>Break-even &lt; 50% of remaining tenure</strong> is the sweet spot. Beyond that, you might move banks again before recovering fees.</li>
+    <li><strong>RBI bans prepayment penalty</strong> on floating-rate retail loans. If your bank tries to charge one, push back — cite RBI's 5-Aug-2014 circular.</li>
+  </ul>
+
+  <h3 style="font-size:1.05rem;margin:1rem 0 0.5rem;">Cheaper alternative: ask your current bank first</h3>
+  <p style="font-size:0.95rem;">Your existing bank can usually drop your rate to current new-customer rates by paying a small "conversion fee" (typically ₹1,000–5,000 + GST or 0.25% of outstanding). No paperwork, no MOD, no waiting. Always ask your bank for a rate reset before considering a balance transfer.</p>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">FAQ</h2>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">What's the typical processing fee for a balance transfer?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Most banks charge 0.25%–0.5% of the outstanding loan amount, with a cap (usually ₹10K-25K). Negotiate — many banks waive fees for high-CIBIL borrowers. PSU banks tend to be cheaper than private.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Will my EMI drop or my tenure shrink?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">You can pick either. This calculator shows the new EMI assuming the same remaining tenure. To use the saved EMI to shorten tenure instead, plug the savings as extra principal monthly into our <a href="{{ '/tools/emi-calculator' | relative_url }}">EMI Calculator</a> — that's the higher-savings path.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Does my CIBIL score affect the rate I get?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Yes, significantly. CIBIL ≥ 750 typically gets the bank's lowest advertised rate. Below 700, expect a 25-50 bps premium. Pull your free CIBIL report before applying.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">What documents do I need?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Loan statement (last 12 months), property docs, KYC (PAN, Aadhaar), salary slips and Form 16 (last 2 years), bank statements (6 months). Some banks also ask for a no-objection / list of outstanding documents from your existing lender.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">How long does the transfer take?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Typically 30–45 days from application to disbursement. The new bank issues a cheque to your old bank for the outstanding, you continue paying EMIs to the old bank until handover, then start fresh with the new bank.</p>
+  </details>
+</div>
+
+<div style="margin-top:1.5rem;padding:1rem;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:var(--radius);font-size:0.9rem;">
+  <strong>Note:</strong> This calculator assumes a floating-rate loan with same tenure post-transfer. Tax impact (section 80C principal, section 24 interest deduction) is not modelled — total deduction stays the same; only timing shifts. For fixed-to-floating switches or non-residential properties, terms vary.
+</div>
+
+<script>
+function fmtINR(n){
+  var s = Math.round(n).toString();
+  var neg = s.charAt(0) === '-';
+  if(neg) s = s.slice(1);
+  var last3 = s.slice(-3);
+  var rest = s.slice(0, -3);
+  if(rest) last3 = ',' + last3;
+  rest = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+  return (neg ? '-' : '') + '₹ ' + rest + last3;
+}
+
+function emi(p, ratePct, years){
+  var r = (ratePct / 100) / 12;
+  var n = years * 12;
+  if(r === 0) return p / n;
+  return p * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+}
+
+function calcRefinance(){
+  var p = parseFloat(document.getElementById('outstanding').value) || 0;
+  var rCur = parseFloat(document.getElementById('currentRate').value) || 0;
+  var t = parseFloat(document.getElementById('tenureLeft').value) || 0;
+  var rNew = parseFloat(document.getElementById('newRate').value) || 0;
+  var feeRaw = parseFloat(document.getElementById('processingFee').value) || 0;
+  var feeType = document.getElementById('feeType').value;
+  var otherFees = parseFloat(document.getElementById('otherFees').value) || 0;
+  var prepayPenalty = parseFloat(document.getElementById('prepaymentPenalty').value) || 0;
+
+  if(p <= 0 || rCur <= 0 || rNew <= 0 || t <= 0){
+    alert('Fill in outstanding, both rates, and remaining tenure.');
+    return;
+  }
+
+  var processingFee = feeType === 'percent' ? p * feeRaw / 100 : feeRaw;
+  var totalFees = processingFee + otherFees + prepayPenalty;
+
+  var emiCur = emi(p, rCur, t);
+  var emiNew = emi(p, rNew, t);
+  var totalCurrent = emiCur * t * 12;
+  var totalNew = emiNew * t * 12;
+  var interestCurrent = totalCurrent - p;
+  var interestNew = totalNew - p;
+  var monthlySaving = emiCur - emiNew;
+  var grossSaving = totalCurrent - totalNew;
+  var netSaving = grossSaving - totalFees;
+  var breakEven = monthlySaving > 0 ? totalFees / monthlySaving : Infinity;
+  var totalMonths = t * 12;
+  var breakEvenRatio = breakEven / totalMonths;
+
+  // Verdict
+  var verdictEl = document.getElementById('refVerdict');
+  if(rNew >= rCur){
+    verdictEl.style.background = '#fee2e2';
+    verdictEl.style.borderLeft = '4px solid #dc2626';
+    verdictEl.innerHTML = '<strong>Don\'t do it.</strong> The new rate is the same or higher than your current rate — you\'d pay more, plus fees.';
+  } else if(monthlySaving < 200){
+    verdictEl.style.background = '#fee2e2';
+    verdictEl.style.borderLeft = '4px solid #dc2626';
+    verdictEl.innerHTML = '<strong>Skip it.</strong> Monthly savings of '+fmtINR(monthlySaving)+' aren\'t worth the paperwork. Ask your current bank for a rate reset instead.';
+  } else if(netSaving < 0){
+    verdictEl.style.background = '#fef3c7';
+    verdictEl.style.borderLeft = '4px solid #f59e0b';
+    verdictEl.innerHTML = '<strong>Borderline.</strong> You\'d save '+fmtINR(grossSaving)+' on EMIs but pay '+fmtINR(totalFees)+' in fees — net loss of '+fmtINR(-netSaving)+'. Negotiate fees down before proceeding.';
+  } else if(breakEvenRatio > 0.5){
+    verdictEl.style.background = '#fef3c7';
+    verdictEl.style.borderLeft = '4px solid #f59e0b';
+    verdictEl.innerHTML = '<strong>Risky.</strong> Break-even at month '+Math.round(breakEven)+' is more than half your remaining tenure. If you\'re likely to switch banks again or prepay early, you may not recover the fees.';
+  } else {
+    verdictEl.style.background = '#dcfce7';
+    verdictEl.style.borderLeft = '4px solid #15803d';
+    verdictEl.innerHTML = '<strong>Refinance.</strong> Net lifetime savings: '+fmtINR(netSaving)+'. You break even in <strong>'+Math.round(breakEven)+' months</strong>, so every EMI after that is pure savings.';
+  }
+
+  // Current
+  document.getElementById('refCurrent').innerHTML =
+    'EMI: <strong>'+fmtINR(emiCur)+'</strong> / month<br>'+
+    'Total payment: '+fmtINR(totalCurrent)+'<br>'+
+    'Total interest: '+fmtINR(interestCurrent)+'<br>'+
+    'Effective rate: '+rCur.toFixed(2)+'% over '+t+' yrs';
+
+  // New
+  document.getElementById('refNew').innerHTML =
+    'EMI: <strong>'+fmtINR(emiNew)+'</strong> / month <span style="color:#15803d;">(saving '+fmtINR(monthlySaving)+'/mo)</span><br>'+
+    'Total payment: '+fmtINR(totalNew)+'<br>'+
+    'Total interest: '+fmtINR(interestNew)+' <span style="color:#15803d;">(−'+fmtINR(interestCurrent - interestNew)+')</span><br>'+
+    'Effective rate: '+rNew.toFixed(2)+'% over '+t+' yrs';
+
+  // Break-even
+  if(monthlySaving > 0){
+    document.getElementById('refBreakeven').innerHTML =
+      '<strong>Fee breakdown</strong><br>'+
+      'Processing fee: '+fmtINR(processingFee)+(feeType==='percent' ? ' ('+feeRaw+'% of '+fmtINR(p)+')' : '')+'<br>'+
+      'Other charges: '+fmtINR(otherFees)+'<br>'+
+      'Existing loan prepayment penalty: '+fmtINR(prepayPenalty)+'<br>'+
+      'Total fees: <strong>'+fmtINR(totalFees)+'</strong><br>'+
+      '<hr style="margin:0.5rem 0;border:none;border-top:1px dashed var(--color-border);">'+
+      'Monthly saving on EMI: '+fmtINR(monthlySaving)+'<br>'+
+      'Break-even point: <strong>month '+Math.round(breakEven)+'</strong> ('+(breakEvenRatio*100).toFixed(0)+'% of remaining tenure)<br>'+
+      'Net lifetime saving (after fees): <strong style="color:#15803d;">'+fmtINR(netSaving)+'</strong>';
+  } else {
+    document.getElementById('refBreakeven').innerHTML = '';
+  }
+
+  document.getElementById('refResult').style.display = 'block';
+  document.getElementById('refResult').scrollIntoView({behavior:'smooth', block:'start'});
+}
+</script>
