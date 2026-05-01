@@ -1,0 +1,234 @@
+---
+layout: tool
+title: Crypto Tax Calculator India (FY 2025-26, 30% + 1% TDS)
+description: "Calculate tax on Bitcoin, Ethereum and other VDAs under India's 30% flat rate and 1% TDS rules. Schedule VDA-ready figures for ITR. No sign-up."
+category: "Financial (More)"
+tagline: "Bitcoin, Ethereum, and other VDAs: 30% flat tax + 1% TDS, with Schedule VDA-ready totals for ITR."
+search: "crypto tax calculator india vda virtual digital asset bitcoin ethereum 30 percent 1 tds section 194s schedule vda itr fy 2025-26"
+card_title: "Crypto Tax Calculator"
+---
+
+<div class="tool-header">
+  <h1>Crypto Tax Calculator (India)</h1>
+  <p>Compute the 30% flat tax on virtual digital assets (VDAs) and the 1% TDS under section 194S for FY 2025-26 (AY 2026-27). Schedule VDA-ready totals for your ITR.</p>
+</div>
+
+<div class="calc-form">
+  <h3 style="margin-bottom:0.5rem;font-size:1.05rem;">Transactions</h3>
+  <p style="font-size:0.9rem;color:var(--color-muted);margin-bottom:0.75rem;">Add each crypto sale or swap. Cost includes purchase price; sale proceeds are net of exchange fees if you want fees ignored, or enter fees separately.</p>
+
+  <div id="txns"></div>
+  <button type="button" onclick="addTxn()" style="background:none;border:1px dashed var(--color-border);padding:0.5rem 1rem;border-radius:var(--radius);color:var(--color-primary);cursor:pointer;font-size:0.9rem;margin-top:0.5rem;">+ Add transaction</button>
+
+  <div style="margin-top:1.5rem;display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+    <button class="btn" onclick="calcCrypto()">Calculate tax</button>
+    <button type="button" onclick="loadSample()" style="background:none;border:1px solid var(--color-border);padding:0.5rem 1rem;border-radius:var(--radius);cursor:pointer;font-size:0.9rem;">Load sample data</button>
+  </div>
+</div>
+
+<div id="cryptoResult" style="display:none;margin-top:1.5rem;">
+  <div id="cryptoSummary" style="padding:1rem 1.25rem;border-radius:var(--radius);margin-bottom:1rem;background:#dcfce7;border-left:3px solid #15803d;font-size:1.05rem;line-height:1.7;"></div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;">
+    <div style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);">
+      <h3 style="margin:0 0 0.75rem;font-size:1.05rem;">Tax breakdown</h3>
+      <div id="cryptoBreakdown" style="font-size:0.95rem;line-height:1.9;"></div>
+    </div>
+    <div style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);">
+      <h3 style="margin:0 0 0.75rem;font-size:1.05rem;">Schedule VDA (for ITR)</h3>
+      <div id="cryptoVda" style="font-size:0.95rem;line-height:1.9;"></div>
+    </div>
+  </div>
+
+  <div id="cryptoTxnTable" style="margin-top:1rem;overflow-x:auto;"></div>
+</div>
+
+<div style="margin-top:2rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">How crypto is taxed in India (FY 2025-26)</h2>
+  <ul style="margin:0 0 0 1.5rem;font-size:0.95rem;line-height:1.9;">
+    <li><strong>30% flat tax</strong> on all gains from VDAs under section 115BBH. Holding period doesn't matter — no LTCG/STCG split.</li>
+    <li><strong>1% TDS</strong> under section 194S on the gross transfer value if it crosses <strong>₹10,000</strong> in a financial year (₹50,000 for specified persons). Indian exchanges deduct this at source.</li>
+    <li><strong>No deductions</strong> except cost of acquisition. No mining costs, no infra, no internet.</li>
+    <li><strong>Losses cannot be offset or carried forward.</strong> A loss on one coin doesn't reduce gains on another.</li>
+    <li><strong>4% cess</strong> applies on top of the 30% tax. Surcharge applies if total income crosses ₹50L.</li>
+    <li><strong>Schedule VDA</strong> reporting in ITR-2 / ITR-3 is mandatory from FY 2025-26. Missing it triggers a <strong>₹200/day penalty</strong> per the Feb 2026 budget.</li>
+  </ul>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">FAQ</h2>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">What counts as a VDA transfer?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Any sale, swap (crypto-to-crypto), or use of crypto to buy goods/services. Each swap is a taxable event — selling ETH for USDT counts even though you didn't touch INR.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Do I owe tax on transfers between my own wallets?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">No. Moving crypto between wallets you own (e.g. exchange to MetaMask) is not a transfer. Document it though — exchanges will report TDS on outgoing transactions and you'll need to reconcile.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">How do I claim the 1% TDS already deducted?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">The TDS appears in your Form 26AS / AIS. Claim it as a credit against your final 30% tax liability when filing ITR. If TDS exceeds total tax, you get a refund.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">What about airdrops, staking, mining?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">All taxable. Airdrops and mining rewards are taxed at their fair value on receipt (under "income from other sources" at slab rates), then the 30% rule applies on any subsequent gain when you sell. Staking rewards: same treatment.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Where does this go in my ITR?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Schedule VDA in ITR-2 (capital gains) or ITR-3 (business income, if you trade frequently as your main income). The schedule needs date of acquisition, date of transfer, cost, and consideration per transaction. Use our <a href="{{ '/tools/income-tax-calculator' | relative_url }}">Income Tax Calculator</a> to add this to your full tax picture.</p>
+  </details>
+</div>
+
+<div style="margin-top:1.5rem;padding:1rem;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:var(--radius);font-size:0.9rem;">
+  <strong>Note:</strong> This calculator does not handle airdrops, staking rewards, or NFT royalties — those need separate "income from other sources" treatment. Surcharge on income above ₹50L is not included. Indian exchanges typically deduct the 1% TDS automatically; foreign exchange usage is your responsibility to report.
+</div>
+
+<script>
+function fmtINR(n){
+  var s = Math.round(n).toString();
+  var neg = s.charAt(0) === '-';
+  if(neg) s = s.slice(1);
+  var last3 = s.slice(-3);
+  var rest = s.slice(0, -3);
+  if(rest) last3 = ',' + last3;
+  rest = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+  return (neg ? '-' : '') + '₹ ' + rest + last3;
+}
+
+function escape(s){
+  return (s || '').replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c];});
+}
+
+var txnCount = 0;
+function addTxn(prefill){
+  txnCount++;
+  var div = document.createElement('div');
+  div.id = 'txn-' + txnCount;
+  div.className = 'crypto-txn';
+  div.style.cssText = 'display:grid;grid-template-columns:1.2fr 0.9fr 0.9fr 1fr 1fr 0.7fr auto;gap:0.5rem;align-items:end;margin-bottom:0.5rem;padding:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);background:var(--color-card-bg);';
+  var p = prefill || {};
+  div.innerHTML =
+    '<div><label style="font-size:0.75rem;color:var(--color-muted);">Coin / pair</label><input type="text" class="t-asset" placeholder="BTC, ETH, SOL/USDT" value="'+escape(p.asset||'')+'" style="width:100%;padding:0.4rem;border:1px solid var(--color-border);border-radius:4px;font-size:0.9rem;"></div>'+
+    '<div><label style="font-size:0.75rem;color:var(--color-muted);">Buy date</label><input type="date" class="t-buyDate" value="'+escape(p.buyDate||'')+'" style="width:100%;padding:0.4rem;border:1px solid var(--color-border);border-radius:4px;font-size:0.9rem;"></div>'+
+    '<div><label style="font-size:0.75rem;color:var(--color-muted);">Sell/swap date</label><input type="date" class="t-sellDate" value="'+escape(p.sellDate||'')+'" style="width:100%;padding:0.4rem;border:1px solid var(--color-border);border-radius:4px;font-size:0.9rem;"></div>'+
+    '<div><label style="font-size:0.75rem;color:var(--color-muted);">Cost (INR)</label><input type="number" class="t-cost" placeholder="100000" min="0" step="any" value="'+(p.cost||'')+'" style="width:100%;padding:0.4rem;border:1px solid var(--color-border);border-radius:4px;font-size:0.9rem;"></div>'+
+    '<div><label style="font-size:0.75rem;color:var(--color-muted);">Proceeds (INR)</label><input type="number" class="t-proceeds" placeholder="150000" min="0" step="any" value="'+(p.proceeds||'')+'" style="width:100%;padding:0.4rem;border:1px solid var(--color-border);border-radius:4px;font-size:0.9rem;"></div>'+
+    '<div><label style="font-size:0.75rem;color:var(--color-muted);">Fees</label><input type="number" class="t-fees" placeholder="0" min="0" step="any" value="'+(p.fees||'')+'" style="width:100%;padding:0.4rem;border:1px solid var(--color-border);border-radius:4px;font-size:0.9rem;"></div>'+
+    '<button onclick="this.parentElement.remove()" style="background:#dc2626;color:white;border:none;border-radius:4px;padding:0.4rem 0.6rem;cursor:pointer;font-size:0.85rem;">×</button>';
+  document.getElementById('txns').appendChild(div);
+}
+
+function loadSample(){
+  document.getElementById('txns').innerHTML = '';
+  txnCount = 0;
+  addTxn({asset:'BTC', buyDate:'2025-06-15', sellDate:'2025-12-20', cost:500000, proceeds:780000, fees:1500});
+  addTxn({asset:'ETH', buyDate:'2025-09-01', sellDate:'2026-02-10', cost:200000, proceeds:185000, fees:500});
+  addTxn({asset:'SOL', buyDate:'2025-08-10', sellDate:'2026-01-05', cost:80000, proceeds:130000, fees:200});
+}
+
+function calcCrypto(){
+  var rows = document.querySelectorAll('#txns .crypto-txn');
+  if(!rows.length){ alert('Add at least one transaction.'); return; }
+
+  var totalCost = 0, totalProceeds = 0, totalFees = 0;
+  var totalGain = 0, totalLoss = 0;
+  var taxableGains = 0;
+  var rowDetails = [];
+
+  rows.forEach(function(row, idx){
+    var asset = row.querySelector('.t-asset').value.trim() || ('Txn ' + (idx+1));
+    var buyDate = row.querySelector('.t-buyDate').value;
+    var sellDate = row.querySelector('.t-sellDate').value;
+    var cost = parseFloat(row.querySelector('.t-cost').value) || 0;
+    var proceeds = parseFloat(row.querySelector('.t-proceeds').value) || 0;
+    var fees = parseFloat(row.querySelector('.t-fees').value) || 0;
+    var gain = proceeds - cost - fees;
+
+    totalCost += cost;
+    totalProceeds += proceeds;
+    totalFees += fees;
+    if(gain >= 0){ totalGain += gain; taxableGains += gain; }
+    else { totalLoss += -gain; }
+
+    rowDetails.push({asset:asset, buyDate:buyDate, sellDate:sellDate, cost:cost, proceeds:proceeds, fees:fees, gain:gain});
+  });
+
+  // 30% on each profitable txn (losses don't offset)
+  var taxBeforeCess = taxableGains * 0.30;
+  var cess = taxBeforeCess * 0.04;
+  var totalTax = taxBeforeCess + cess;
+
+  // 1% TDS — gross transfer value, only on transfers > 10K
+  var tdsApplicable = 0;
+  rowDetails.forEach(function(r){
+    if(r.proceeds >= 10000) tdsApplicable += r.proceeds;
+  });
+  var tdsAmount = tdsApplicable * 0.01;
+  var netPayable = Math.max(0, totalTax - tdsAmount);
+
+  // Summary
+  document.getElementById('cryptoSummary').innerHTML =
+    '<strong>Total tax payable: '+fmtINR(totalTax)+'</strong> on '+fmtINR(taxableGains)+' of taxable gains.<br>'+
+    '<span style="font-size:0.9rem;">Estimated TDS already deducted (1% of transfers): '+fmtINR(tdsAmount)+'. <strong>Net payable after TDS credit: '+fmtINR(netPayable)+'</strong></span>'+
+    (totalLoss > 0 ? '<br><span style="font-size:0.9rem;color:#b45309;"><strong>'+fmtINR(totalLoss)+'</strong> in losses cannot be offset against gains under current rules.</span>' : '');
+
+  // Tax breakdown
+  document.getElementById('cryptoBreakdown').innerHTML =
+    'Total proceeds: <strong>'+fmtINR(totalProceeds)+'</strong><br>'+
+    'Total cost: <strong>'+fmtINR(totalCost)+'</strong><br>'+
+    'Total fees: <strong>'+fmtINR(totalFees)+'</strong><br>'+
+    '<hr style="margin:0.5rem 0;border:none;border-top:1px dashed var(--color-border);">'+
+    'Gross gains (winning trades only): <strong style="color:#15803d;">'+fmtINR(totalGain)+'</strong><br>'+
+    'Gross losses (cannot offset): <strong style="color:#dc2626;">'+fmtINR(totalLoss)+'</strong><br>'+
+    'Taxable amount: <strong>'+fmtINR(taxableGains)+'</strong><br>'+
+    'Tax @ 30%: '+fmtINR(taxBeforeCess)+'<br>'+
+    'Cess @ 4%: '+fmtINR(cess)+'<br>'+
+    '<hr style="margin:0.5rem 0;border:none;border-top:1px solid var(--color-border);">'+
+    '<strong>Total tax: '+fmtINR(totalTax)+'</strong><br>'+
+    'Less TDS credit: −'+fmtINR(tdsAmount)+'<br>'+
+    '<strong style="color:#1e40af;">Net payable: '+fmtINR(netPayable)+'</strong>';
+
+  // Schedule VDA values
+  document.getElementById('cryptoVda').innerHTML =
+    '<small style="color:var(--color-muted);">These figures map to Schedule VDA columns in ITR-2 / ITR-3.</small>'+
+    '<table style="width:100%;border-collapse:collapse;margin-top:0.5rem;font-size:0.9rem;">'+
+    '<tr><td style="padding:0.35rem 0;">Cost of acquisition</td><td style="text-align:right;font-weight:600;">'+fmtINR(totalCost)+'</td></tr>'+
+    '<tr><td style="padding:0.35rem 0;">Consideration received</td><td style="text-align:right;font-weight:600;">'+fmtINR(totalProceeds)+'</td></tr>'+
+    '<tr><td style="padding:0.35rem 0;">Income from VDA transfer</td><td style="text-align:right;font-weight:600;">'+fmtINR(taxableGains)+'</td></tr>'+
+    '<tr><td style="padding:0.35rem 0;">TDS deducted u/s 194S</td><td style="text-align:right;font-weight:600;">'+fmtINR(tdsAmount)+'</td></tr>'+
+    '</table>'+
+    '<p style="margin-top:0.5rem;font-size:0.85rem;color:var(--color-muted);">Schedule VDA is filed per-transaction. Keep this calculator open while filling the schedule, or use the table below to copy values.</p>';
+
+  // Per-transaction table
+  var tableHtml = '<table style="width:100%;border-collapse:collapse;font-size:0.85rem;border:1px solid var(--color-border);border-radius:var(--radius);overflow:hidden;">'+
+    '<thead style="background:var(--color-card-bg);"><tr>'+
+    '<th style="text-align:left;padding:0.5rem;border-bottom:1px solid var(--color-border);">Asset</th>'+
+    '<th style="text-align:left;padding:0.5rem;border-bottom:1px solid var(--color-border);">Bought</th>'+
+    '<th style="text-align:left;padding:0.5rem;border-bottom:1px solid var(--color-border);">Sold</th>'+
+    '<th style="text-align:right;padding:0.5rem;border-bottom:1px solid var(--color-border);">Cost</th>'+
+    '<th style="text-align:right;padding:0.5rem;border-bottom:1px solid var(--color-border);">Proceeds</th>'+
+    '<th style="text-align:right;padding:0.5rem;border-bottom:1px solid var(--color-border);">Gain/Loss</th>'+
+    '<th style="text-align:right;padding:0.5rem;border-bottom:1px solid var(--color-border);">Tax (30%)</th>'+
+    '</tr></thead><tbody>';
+  rowDetails.forEach(function(r){
+    var rowTax = r.gain > 0 ? r.gain * 0.30 : 0;
+    var color = r.gain >= 0 ? '#15803d' : '#dc2626';
+    tableHtml += '<tr>'+
+      '<td style="padding:0.5rem;border-bottom:1px solid var(--color-border);">'+escape(r.asset)+'</td>'+
+      '<td style="padding:0.5rem;border-bottom:1px solid var(--color-border);">'+escape(r.buyDate)+'</td>'+
+      '<td style="padding:0.5rem;border-bottom:1px solid var(--color-border);">'+escape(r.sellDate)+'</td>'+
+      '<td style="text-align:right;padding:0.5rem;border-bottom:1px solid var(--color-border);">'+fmtINR(r.cost)+'</td>'+
+      '<td style="text-align:right;padding:0.5rem;border-bottom:1px solid var(--color-border);">'+fmtINR(r.proceeds)+'</td>'+
+      '<td style="text-align:right;padding:0.5rem;border-bottom:1px solid var(--color-border);color:'+color+';font-weight:600;">'+fmtINR(r.gain)+'</td>'+
+      '<td style="text-align:right;padding:0.5rem;border-bottom:1px solid var(--color-border);">'+fmtINR(rowTax)+'</td>'+
+      '</tr>';
+  });
+  tableHtml += '</tbody></table>';
+  document.getElementById('cryptoTxnTable').innerHTML = tableHtml;
+
+  document.getElementById('cryptoResult').style.display = 'block';
+  document.getElementById('cryptoResult').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+addTxn();
+</script>
