@@ -40,3 +40,5 @@ jobs:
             --repo "$REPO" \
             --squash \
             --delete-branch
+
+          gh workflow run pages.yml --repo "$REPO"
