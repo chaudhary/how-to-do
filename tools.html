@@ -1,7 +1,17 @@
 ---
 layout: default
 title: Tools
-description: "52 free online tools and calculators. EMI, SIP, income tax, stock fundamentals, PDF merger, JWT decoder, JSON formatter, SQL explainer, cURL to code, log analyzer, SEO gap finder, AI writing tools, and more."
+description: "Free online tools and calculators. EMI, SIP, income tax, stock fundamentals, PDF merger, JWT decoder, JSON formatter, SQL explainer, cURL to code, log analyzer, SEO gap finder, AI writing tools, and more."
+category_order:
+  - Financial
+  - Everyday Math
+  - Health
+  - Tech / Dev
+  - Productivity
+  - Financial (More)
+  - Developer Tools (More)
+  - Everyday Utility
+  - AI-Powered Tools
 ---
 
 <h1>Tools</h1>
@@ -13,253 +23,42 @@ description: "52 free online tools and calculators. EMI, SIP, income tax, stock 
 
 <div id="tools-content">
 
-<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Financial</h2>
-<div class="tools-grid">
-  <a href="{{ '/tools/emi-calculator' | relative_url }}" class="tool-card" data-search="emi calculator loan monthly payment interest amortization financial">
-    <h3>EMI Calculator</h3>
-    <p>Calculate monthly loan EMI, total interest, and view a full amortization schedule.</p>
-  </a>
-  <a href="{{ '/tools/sip-calculator' | relative_url }}" class="tool-card" data-search="sip systematic investment plan mutual fund returns financial future value">
-    <h3>SIP Calculator</h3>
-    <p>Quick future-value estimate for a monthly SIP at your expected return rate.</p>
-  </a>
-  <a href="{{ '/tools/fd-rd-calculator' | relative_url }}" class="tool-card" data-search="fd rd fixed deposit recurring deposit maturity interest financial">
-    <h3>FD/RD Calculator</h3>
-    <p>Calculate maturity amount for Fixed Deposits and Recurring Deposits.</p>
-  </a>
-  <a href="{{ '/tools/loan-comparison' | relative_url }}" class="tool-card" data-search="loan comparison compare two loans interest rate financial">
-    <h3>Loan Comparison</h3>
-    <p>Compare two loans side by side to find the better deal.</p>
-  </a>
-  <a href="{{ '/tools/cagr-calculator' | relative_url }}" class="tool-card" data-search="cagr compound annual growth rate investment returns financial">
-    <h3>CAGR Calculator</h3>
-    <p>Calculate the Compound Annual Growth Rate of any investment.</p>
-  </a>
-  <a href="{{ '/tools/rent-vs-buy' | relative_url }}" class="tool-card" data-search="rent vs buy house property home emi financial">
-    <h3>Rent vs Buy</h3>
-    <p>Compare renting and buying to make a smarter housing decision.</p>
-  </a>
-</div>
+{% assign all_tools = site.pages | where: "layout", "tool" | sort: "title" %}
+{% assign known_cats = page.category_order %}
 
-<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Everyday Math</h2>
+{% for cat in known_cats %}
+  {% assign cat_tools = all_tools | where: "category", cat %}
+  {% if cat_tools.size > 0 %}
+<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">{{ cat }}</h2>
 <div class="tools-grid">
-  <a href="{{ '/tools/percentage-calculator' | relative_url }}" class="tool-card" data-search="percentage calculator percent math discount tax gst">
-    <h3>Percentage Calculator</h3>
-    <p>Solve any percentage problem: X% of Y, percentage change, increase/decrease.</p>
+  {% for tool in cat_tools %}
+  <a href="{{ tool.url | relative_url }}" class="tool-card" data-search="{{ tool.search | default: tool.title | downcase }}">
+    <h3>{{ tool.card_title | default: tool.title }}</h3>
+    <p>{{ tool.tagline | default: tool.description }}</p>
   </a>
-  <a href="{{ '/tools/unit-converter' | relative_url }}" class="tool-card" data-search="unit converter length weight temperature volume area speed metric imperial">
-    <h3>Unit Converter</h3>
-    <p>Convert between units of length, weight, temperature, volume, area, and speed.</p>
-  </a>
-  <a href="{{ '/tools/age-calculator' | relative_url }}" class="tool-card" data-search="age calculator birthday date years months days">
-    <h3>Age Calculator</h3>
-    <p>Calculate exact age in years, months, days, weeks, and total days.</p>
-  </a>
-  <a href="{{ '/tools/tip-calculator' | relative_url }}" class="tool-card" data-search="tip calculator bill splitter restaurant split">
-    <h3>Tip Calculator</h3>
-    <p>Calculate tip and split the bill among friends.</p>
-  </a>
+  {% endfor %}
 </div>
+  {% endif %}
+{% endfor %}
 
-<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Health</h2>
+{% comment %} Catch-all for any tool whose category isn't in category_order {% endcomment %}
+{% assign other_tools = "" | split: "" %}
+{% for tool in all_tools %}
+  {% unless known_cats contains tool.category %}
+    {% assign other_tools = other_tools | push: tool %}
+  {% endunless %}
+{% endfor %}
+{% if other_tools.size > 0 %}
+<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Other</h2>
 <div class="tools-grid">
-  <a href="{{ '/tools/bmi-calculator' | relative_url }}" class="tool-card" data-search="bmi body mass index weight height health">
-    <h3>BMI Calculator</h3>
-    <p>Calculate your Body Mass Index and see your healthy weight range.</p>
+  {% for tool in other_tools %}
+  <a href="{{ tool.url | relative_url }}" class="tool-card" data-search="{{ tool.search | default: tool.title | downcase }}">
+    <h3>{{ tool.card_title | default: tool.title }}</h3>
+    <p>{{ tool.tagline | default: tool.description }}</p>
   </a>
-  <a href="{{ '/tools/calorie-calculator' | relative_url }}" class="tool-card" data-search="calorie calculator tdee bmr diet weight loss gain health">
-    <h3>Calorie Calculator</h3>
-    <p>Estimate daily calorie needs based on BMR and activity level.</p>
-  </a>
-  <a href="{{ '/tools/water-intake-calculator' | relative_url }}" class="tool-card" data-search="water intake hydration drink health">
-    <h3>Water Intake Calculator</h3>
-    <p>Find out how much water you should drink daily.</p>
-  </a>
+  {% endfor %}
 </div>
-
-<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Tech / Dev</h2>
-<div class="tools-grid">
-  <a href="{{ '/tools/json-formatter' | relative_url }}" class="tool-card" data-search="json formatter validator minify format api developer tech">
-    <h3>JSON Formatter</h3>
-    <p>Format, validate, and minify JSON data instantly.</p>
-  </a>
-  <a href="{{ '/tools/base64-codec' | relative_url }}" class="tool-card" data-search="base64 encode decode encoding text binary developer tech">
-    <h3>Base64 Encode/Decode</h3>
-    <p>Encode text to Base64 or decode Base64 back to text.</p>
-  </a>
-  <a href="{{ '/tools/color-converter' | relative_url }}" class="tool-card" data-search="color converter hex rgb hsl css design developer tech">
-    <h3>Color Converter</h3>
-    <p>Convert between HEX, RGB, and HSL color formats with live preview.</p>
-  </a>
-  <a href="{{ '/tools/regex-tester' | relative_url }}" class="tool-card" data-search="regex regular expression tester pattern match developer tech">
-    <h3>Regex Tester</h3>
-    <p>Test regular expressions with real-time highlighting and match details.</p>
-  </a>
-</div>
-
-<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Productivity</h2>
-<div class="tools-grid">
-  <a href="{{ '/tools/pomodoro-timer' | relative_url }}" class="tool-card" data-search="pomodoro timer focus work break productivity">
-    <h3>Pomodoro Timer</h3>
-    <p>Stay focused with timed work and break intervals.</p>
-  </a>
-  <a href="{{ '/tools/word-counter' | relative_url }}" class="tool-card" data-search="word counter character sentence paragraph reading time text productivity">
-    <h3>Word Counter</h3>
-    <p>Count words, characters, sentences, paragraphs, and reading time.</p>
-  </a>
-  <a href="{{ '/tools/date-difference' | relative_url }}" class="tool-card" data-search="date difference duration between two dates days weeks months productivity">
-    <h3>Date Difference</h3>
-    <p>Find the exact duration between any two dates.</p>
-  </a>
-  <a href="{{ '/tools/timezone-converter' | relative_url }}" class="tool-card" data-search="timezone time zone converter world clock remote productivity">
-    <h3>Time Zone Converter</h3>
-    <p>Convert time between zones with a live world clock.</p>
-  </a>
-</div>
-
-<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Financial (More)</h2>
-<div class="tools-grid">
-  <a href="{{ '/tools/gst-calculator' | relative_url }}" class="tool-card" data-search="gst calculator tax goods services india cgst sgst">
-    <h3>GST Calculator</h3>
-    <p>Add or remove GST at standard Indian rates with CGST/SGST breakdown.</p>
-  </a>
-  <a href="{{ '/tools/salary-calculator' | relative_url }}" class="tool-card" data-search="salary calculator ctc in hand take home tax india">
-    <h3>Salary Calculator</h3>
-    <p>Convert CTC to in-hand salary with tax breakdown (India, new regime).</p>
-  </a>
-  <a href="{{ '/tools/ppf-calculator' | relative_url }}" class="tool-card" data-search="ppf public provident fund maturity interest india">
-    <h3>PPF Calculator</h3>
-    <p>Calculate maturity amount for Public Provident Fund investments.</p>
-  </a>
-  <a href="{{ '/tools/mf-returns-calculator' | relative_url }}" class="tool-card" data-search="mutual fund returns calculator expense ratio sip lumpsum fees drag">
-    <h3>MF Returns Calculator</h3>
-    <p>SIP or lumpsum returns, factoring in how much the expense ratio eats into your corpus.</p>
-  </a>
-  <a href="{{ '/tools/stock-fundamentals' | relative_url }}" class="tool-card" data-search="stock fundamentals cheatsheet indian listed company bse pe pb roe valuation ratios shares equity research ai">
-    <h3>Stock Fundamentals Cheatsheet</h3>
-    <p>Key valuation, profitability, and growth ratios for any BSE-listed stock, with plain-English benchmarks and an AI summary. Educational only.</p>
-  </a>
-  <a href="{{ '/tools/income-tax-calculator' | relative_url }}" class="tool-card" data-search="income tax calculator old new regime india slab 87a rebate fy 2025-26">
-    <h3>Income Tax Calculator</h3>
-    <p>Compare Old vs New regime tax liability for FY 2025-26 with full breakdown.</p>
-  </a>
-  <a href="{{ '/tools/hra-calculator' | relative_url }}" class="tool-card" data-search="hra calculator house rent allowance exemption section 10 13a metro non-metro india tax old regime">
-    <h3>HRA Exemption Calculator</h3>
-    <p>Find your tax-exempt HRA portion under section 10(13A). Metro/non-metro and full three-rule breakdown.</p>
-  </a>
-  <a href="{{ '/tools/amount-in-words' | relative_url }}" class="tool-card" data-search="amount in words rupees indian lakh crore cheque invoice number to text">
-    <h3>Amount in Words (INR)</h3>
-    <p>Convert rupee amounts to words in Indian numbering (lakh, crore) for cheques and invoices.</p>
-  </a>
-</div>
-
-<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Developer Tools (More)</h2>
-<div class="tools-grid">
-  <a href="{{ '/tools/url-encoder-decoder' | relative_url }}" class="tool-card" data-search="url encoder decoder encode decode uri component">
-    <h3>URL Encoder/Decoder</h3>
-    <p>Encode or decode URL components and query strings.</p>
-  </a>
-  <a href="{{ '/tools/hash-generator' | relative_url }}" class="tool-card" data-search="hash generator md5 sha1 sha256 sha512 checksum">
-    <h3>Hash Generator</h3>
-    <p>Generate MD5, SHA-1, SHA-256, and SHA-512 hashes from text.</p>
-  </a>
-  <a href="{{ '/tools/lorem-ipsum-generator' | relative_url }}" class="tool-card" data-search="lorem ipsum generator placeholder text dummy content">
-    <h3>Lorem Ipsum Generator</h3>
-    <p>Generate placeholder text for designs and mockups.</p>
-  </a>
-  <a href="{{ '/tools/diff-checker' | relative_url }}" class="tool-card" data-search="diff checker compare text difference side by side">
-    <h3>Diff Checker</h3>
-    <p>Compare two text blocks and see the differences highlighted.</p>
-  </a>
-  <a href="{{ '/tools/cron-parser' | relative_url }}" class="tool-card" data-search="cron expression parser schedule explain crontab">
-    <h3>Cron Expression Parser</h3>
-    <p>Understand what a cron schedule means in plain English.</p>
-  </a>
-  <a href="{{ '/tools/uuid-generator' | relative_url }}" class="tool-card" data-search="uuid generator random unique id guid">
-    <h3>UUID Generator</h3>
-    <p>Generate random UUIDs (v4) instantly.</p>
-  </a>
-  <a href="{{ '/tools/markdown-to-html' | relative_url }}" class="tool-card" data-search="markdown to html converter preview live">
-    <h3>Markdown to HTML</h3>
-    <p>Convert Markdown text to HTML with live preview.</p>
-  </a>
-  <a href="{{ '/tools/image-to-base64' | relative_url }}" class="tool-card" data-search="image to base64 converter encode embed data uri">
-    <h3>Image to Base64</h3>
-    <p>Convert images to Base64 encoded strings for embedding.</p>
-  </a>
-  <a href="{{ '/tools/jwt-decoder' | relative_url }}" class="tool-card" data-search="jwt decoder json web token header payload claims auth developer">
-    <h3>JWT Decoder</h3>
-    <p>Decode JSON Web Tokens and inspect header, payload, and expiry. Client-side only.</p>
-  </a>
-</div>
-
-<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">Everyday Utility</h2>
-<div class="tools-grid">
-  <a href="{{ '/tools/password-generator' | relative_url }}" class="tool-card" data-search="password generator random strong secure">
-    <h3>Password Generator</h3>
-    <p>Generate strong, random passwords with customizable options.</p>
-  </a>
-  <a href="{{ '/tools/qr-code-generator' | relative_url }}" class="tool-card" data-search="qr code generator barcode scan url text">
-    <h3>QR Code Generator</h3>
-    <p>Generate QR codes from text, URLs, or any data.</p>
-  </a>
-  <a href="{{ '/tools/invoice-generator' | relative_url }}" class="tool-card" data-search="invoice generator bill receipt pdf print business">
-    <h3>Invoice Generator</h3>
-    <p>Create professional invoices and print or save as PDF.</p>
-  </a>
-  <a href="{{ '/tools/pdf-merger' | relative_url }}" class="tool-card" data-search="pdf merger splitter combine split pages client-side browser">
-    <h3>PDF Merger & Splitter</h3>
-    <p>Combine PDFs or split by page ranges. 100% browser-based, files never upload.</p>
-  </a>
-  <a href="{{ '/tools/image-compressor' | relative_url }}" class="tool-card" data-search="image compressor resize jpeg png webp quality optimize file size">
-    <h3>Image Compressor</h3>
-    <p>Shrink JPEG, PNG, and WebP images by quality and size. Runs in your browser.</p>
-  </a>
-</div>
-
-<h2 class="section-cat" style="margin-top:2rem;font-size:1.15rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.05em;">AI-Powered Tools</h2>
-<div class="tools-grid">
-  <a href="{{ '/tools/linkedin-post-generator' | relative_url }}" class="tool-card" data-search="linkedin post generator ai content writer social media">
-    <h3>LinkedIn Post Generator</h3>
-    <p>Generate engaging LinkedIn posts from a topic or context using AI.</p>
-  </a>
-  <a href="{{ '/tools/twitter-post-generator' | relative_url }}" class="tool-card" data-search="twitter x post tweet generator ai social media">
-    <h3>Twitter/X Post Generator</h3>
-    <p>Generate tweets and threads from a topic using AI.</p>
-  </a>
-  <a href="{{ '/tools/blog-outline-generator' | relative_url }}" class="tool-card" data-search="blog outline generator ai content writing structure">
-    <h3>Blog Outline Generator</h3>
-    <p>Generate structured blog post outlines from any topic.</p>
-  </a>
-  <a href="{{ '/tools/email-writer' | relative_url }}" class="tool-card" data-search="email writer generator ai professional casual business">
-    <h3>Email Writer</h3>
-    <p>Generate professional or casual emails from bullet points.</p>
-  </a>
-  <a href="{{ '/tools/text-summarizer' | relative_url }}" class="tool-card" data-search="text summarizer ai summary tldr bullet points">
-    <h3>Text Summarizer</h3>
-    <p>Summarize long text into concise key points using AI.</p>
-  </a>
-  <a href="{{ '/tools/grammar-checker' | relative_url }}" class="tool-card" data-search="grammar checker rewriter ai spelling proofreader">
-    <h3>Grammar Checker</h3>
-    <p>Fix grammar, improve clarity, or rewrite text using AI.</p>
-  </a>
-  <a href="{{ '/tools/sql-explainer' | relative_url }}" class="tool-card" data-search="sql explainer query explain optimize index recommendation postgres mysql developer ai">
-    <h3>SQL Query Explainer</h3>
-    <p>Get a plain-English breakdown, optimization tips, and index suggestions for any SQL query.</p>
-  </a>
-  <a href="{{ '/tools/curl-to-code' | relative_url }}" class="tool-card" data-search="curl to code converter node python ruby rails go php axios requests httpx guzzle http client api developer ai">
-    <h3>cURL to Production Code</h3>
-    <p>Convert a curl command into clean code with retries, timeouts, and error handling.</p>
-  </a>
-  <a href="{{ '/tools/log-analyzer' | relative_url }}" class="tool-card" data-search="log analyzer root cause stack trace debugging sre severity fix error ai developer">
-    <h3>Log Root Cause Analyzer</h3>
-    <p>Paste noisy logs or a stack trace and get a root cause, severity, and possible fixes.</p>
-  </a>
-  <a href="{{ '/tools/seo-gap-finder' | relative_url }}" class="tool-card" data-search="seo gap finder blog keyword research competitor content strategy ai marketing">
-    <h3>SEO Gap Finder</h3>
-    <p>Find missing topics, competitor gaps, and easy-to-rank keywords for your blog niche.</p>
-  </a>
-</div>
+{% endif %}
 
 </div>
 
