@@ -1,0 +1,275 @@
+---
+layout: tool
+title: Rent Receipt Generator (Free, Printable)
+description: "Generate monthly rent receipts for HRA claims in seconds. Add landlord PAN, signature space, and print or save as PDF — no sign-up."
+category: "Financial (More)"
+tagline: "Generate printable rent receipts for HRA claims. Monthly, quarterly, or yearly with PAN and signature space."
+search: "rent receipt generator hra landlord pan revenue stamp printable pdf india tax monthly quarterly"
+card_title: "Rent Receipt Generator"
+---
+
+<div class="tool-header">
+  <h1>Rent Receipt Generator</h1>
+  <p>Create printable rent receipts for HRA exemption. Generate one or all 12 months at once. PAN, revenue stamp note, and signature space included.</p>
+</div>
+
+<div class="calc-form">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+    <div class="form-group">
+      <label for="tenantName">Tenant name (you)</label>
+      <input type="text" id="tenantName" placeholder="e.g. Rahul Sharma" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="landlordName">Landlord name</label>
+      <input type="text" id="landlordName" placeholder="e.g. Mr. Suresh Kumar" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="propertyAddr">Property address</label>
+    <textarea id="propertyAddr" rows="2" placeholder="Flat 302, Sunrise Apartments, MG Road, Bangalore 560001" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;resize:vertical;"></textarea>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="rentAmount">Monthly rent (₹)</label>
+      <input type="number" id="rentAmount" placeholder="e.g. 25000" min="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="landlordPan">Landlord PAN <span style="color:var(--color-muted);font-weight:normal;font-size:0.85rem;">(if rent &gt; ₹1L/yr)</span></label>
+      <input type="text" id="landlordPan" placeholder="ABCDE1234F" maxlength="10" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;text-transform:uppercase;">
+    </div>
+    <div class="form-group">
+      <label for="paymentMode">Payment mode</label>
+      <select id="paymentMode" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+        <option value="Cash">Cash</option>
+        <option value="UPI" selected>UPI</option>
+        <option value="Bank Transfer">Bank Transfer</option>
+        <option value="Cheque">Cheque</option>
+      </select>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="periodType">Generate</label>
+      <select id="periodType" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+        <option value="single">Single receipt</option>
+        <option value="monthly" selected>Monthly receipts (range)</option>
+        <option value="quarterly">Quarterly receipts</option>
+        <option value="yearly">Single yearly receipt</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="fromDate">From month</label>
+      <input type="month" id="fromDate" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group" id="toDateWrap">
+      <label for="toDate">To month</label>
+      <input type="month" id="toDate" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+  </div>
+
+  <div style="margin-top:1rem;">
+    <button class="btn" onclick="generateReceipts()">Generate receipts</button>
+  </div>
+</div>
+
+<div id="receiptOutput" style="display:none;margin-top:1.5rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+    <p style="margin:0;font-size:0.9rem;color:var(--color-muted);" id="receiptCount"></p>
+    <button class="btn" onclick="printReceipts()">Print / Save as PDF</button>
+  </div>
+  <div id="receiptList" style="display:flex;flex-direction:column;gap:1rem;"></div>
+</div>
+
+<div style="margin-top:2rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">Why employers ask for rent receipts</h2>
+  <p style="font-size:0.95rem;">Your employer needs proof of rent to allow HRA exemption in your TDS. Without receipts, full HRA gets taxed and shows up in Form 16, forcing you to claim it back at filing.</p>
+
+  <h3 style="font-size:1.05rem;margin:1rem 0 0.5rem;">What you'll need</h3>
+  <ul style="margin:0 0 0 1.5rem;font-size:0.95rem;line-height:1.8;">
+    <li>Receipts for the months you're claiming.</li>
+    <li>Landlord's PAN if annual rent exceeds <strong>₹1,00,000</strong>.</li>
+    <li>A revenue stamp on receipts where rent above <strong>₹5,000 was paid in cash</strong>.</li>
+    <li>A rent agreement, if your employer asks for one (most do).</li>
+  </ul>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">FAQ</h2>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Can I pay rent to my parents and claim HRA?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Yes — rent paid to parents is allowed if it's a real arrangement: a rent agreement, money actually transferred, and parents declaring it as income in their ITR. Don't pay yourself rent for a property you co-own.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">When is landlord's PAN mandatory?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">If annual rent exceeds ₹1,00,000 (₹8,333/month). If the landlord doesn't have a PAN, you need a signed declaration from them with Form 60.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">How many receipts do I need to submit?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Most employers ask for monthly or quarterly receipts. Some accept a single consolidated yearly receipt. Check with your payroll team — when in doubt, generate monthly.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Compute my actual HRA exemption</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Use our <a href="{{ '/tools/hra-calculator' | relative_url }}">HRA Exemption Calculator</a> to see exactly how much of your HRA is tax-free.</p>
+  </details>
+</div>
+
+<div style="margin-top:1.5rem;padding:1rem;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:var(--radius);font-size:0.9rem;">
+  <strong>Note:</strong> Receipts must be signed by the landlord — there's a signature line on each. Print and get them signed manually before submission.
+</div>
+
+<script>
+(function(){
+  var now = new Date();
+  var fy = now.getMonth() < 3 ? now.getFullYear() - 1 : now.getFullYear();
+  document.getElementById('fromDate').value = fy + '-04';
+  document.getElementById('toDate').value = (fy + 1) + '-03';
+})();
+
+document.getElementById('periodType').addEventListener('change', function(){
+  var v = this.value;
+  document.getElementById('toDateWrap').style.display = (v === 'single' || v === 'yearly') ? 'none' : '';
+});
+
+function fmtINR(n){
+  var s = Math.round(n).toString();
+  var last3 = s.slice(-3);
+  var rest = s.slice(0, -3);
+  if(rest) last3 = ',' + last3;
+  rest = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+  return '₹ ' + rest + last3;
+}
+
+function numberToWordsIndian(num){
+  if(num === 0) return 'Zero';
+  var ones = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+  var tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+  function under1000(n){
+    var s = '';
+    if(n >= 100){ s += ones[Math.floor(n/100)] + ' Hundred '; n %= 100; }
+    if(n >= 20){ s += tens[Math.floor(n/10)] + ' '; n %= 10; }
+    if(n > 0) s += ones[n] + ' ';
+    return s;
+  }
+  var parts = [];
+  var crore = Math.floor(num/10000000); num %= 10000000;
+  var lakh = Math.floor(num/100000); num %= 100000;
+  var thousand = Math.floor(num/1000); num %= 1000;
+  var rest = num;
+  if(crore) parts.push(under1000(crore).trim() + ' Crore');
+  if(lakh) parts.push(under1000(lakh).trim() + ' Lakh');
+  if(thousand) parts.push(under1000(thousand).trim() + ' Thousand');
+  if(rest) parts.push(under1000(rest).trim());
+  return parts.join(' ').replace(/\s+/g,' ').trim();
+}
+
+function monthName(d){
+  return d.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+}
+
+function buildPeriods(type, from, to){
+  var periods = [];
+  var fromY = parseInt(from.slice(0,4)), fromM = parseInt(from.slice(5,7)) - 1;
+  var toY = parseInt(to.slice(0,4)), toM = parseInt(to.slice(5,7)) - 1;
+  if(type === 'single'){
+    var d = new Date(fromY, fromM, 1);
+    periods.push({label: monthName(d), from: d, to: new Date(fromY, fromM+1, 0), months: 1});
+    return periods;
+  }
+  if(type === 'yearly'){
+    var sf = new Date(fromY, fromM, 1);
+    var st = new Date(toY, toM+1, 0);
+    var months = (toY - fromY)*12 + (toM - fromM) + 1;
+    periods.push({label: monthName(sf) + ' to ' + monthName(st), from: sf, to: st, months: months});
+    return periods;
+  }
+  if(type === 'quarterly'){
+    var cur = new Date(fromY, fromM, 1);
+    while(cur <= new Date(toY, toM, 1)){
+      var qStart = new Date(cur);
+      var qEnd = new Date(cur.getFullYear(), cur.getMonth() + 3, 0);
+      var actualEnd = qEnd > new Date(toY, toM+1, 0) ? new Date(toY, toM+1, 0) : qEnd;
+      var months = (actualEnd.getFullYear() - qStart.getFullYear())*12 + (actualEnd.getMonth() - qStart.getMonth()) + 1;
+      periods.push({label: monthName(qStart) + ' to ' + monthName(actualEnd), from: qStart, to: actualEnd, months: months});
+      cur = new Date(cur.getFullYear(), cur.getMonth() + 3, 1);
+    }
+    return periods;
+  }
+  // monthly
+  var cur2 = new Date(fromY, fromM, 1);
+  while(cur2 <= new Date(toY, toM, 1)){
+    var s = new Date(cur2);
+    var e = new Date(cur2.getFullYear(), cur2.getMonth()+1, 0);
+    periods.push({label: monthName(s), from: s, to: e, months: 1});
+    cur2 = new Date(cur2.getFullYear(), cur2.getMonth()+1, 1);
+  }
+  return periods;
+}
+
+function receiptHTML(p, idx, data){
+  var amount = data.rent * p.months;
+  var receiptDate = p.to.toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
+  var needsStamp = data.payment === 'Cash' && amount > 5000;
+  return '<div class="rent-receipt" style="background:white;border:2px solid #1a1a2e;padding:1.5rem;border-radius:var(--radius);page-break-after:always;font-family:serif;color:#1a1a2e;">'
+    + '<div style="text-align:center;border-bottom:2px solid #1a1a2e;padding-bottom:0.75rem;margin-bottom:1rem;">'
+    +   '<h2 style="margin:0;font-size:1.4rem;letter-spacing:0.05em;">RENT RECEIPT</h2>'
+    +   '<p style="margin:0.25rem 0 0;font-size:0.85rem;color:#444;">Receipt No. '+(idx+1)+' &middot; Issued on '+receiptDate+'</p>'
+    + '</div>'
+    + '<p style="font-size:1.05rem;line-height:1.8;margin:0;">Received with thanks from <strong>'+escape(data.tenant)+'</strong> a sum of <strong>'+fmtINR(amount)+'</strong> ('+numberToWordsIndian(amount)+' Rupees only) by <strong>'+escape(data.payment)+'</strong> towards rent for the period <strong>'+p.label+'</strong> for the property situated at:</p>'
+    + '<p style="margin:0.75rem 0 0;font-size:1rem;padding:0.5rem 0.75rem;background:#f8fafc;border-left:3px solid #1a1a2e;font-style:italic;">'+escape(data.address).replace(/\n/g,'<br>')+'</p>'
+    + (data.pan ? '<p style="margin-top:0.75rem;font-size:0.95rem;">Landlord PAN: <strong>'+escape(data.pan)+'</strong></p>' : '')
+    + '<div style="margin-top:2rem;display:flex;justify-content:space-between;align-items:flex-end;">'
+    +   '<div style="font-size:0.85rem;color:#444;">'+(needsStamp ? '<em>Affix ₹1 revenue stamp here<br>(rent paid in cash &gt; ₹5,000)</em>' : '')+'</div>'
+    +   '<div style="text-align:right;">'
+    +     '<div style="border-top:1px solid #1a1a2e;padding-top:0.4rem;min-width:220px;">'
+    +       '<strong>'+escape(data.landlord)+'</strong><br>'
+    +       '<span style="font-size:0.85rem;color:#444;">(Landlord signature)</span>'
+    +     '</div>'
+    +   '</div>'
+    + '</div>'
+    + '</div>';
+}
+
+function escape(s){
+  return (s || '').replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c];});
+}
+
+function generateReceipts(){
+  var data = {
+    tenant: document.getElementById('tenantName').value.trim(),
+    landlord: document.getElementById('landlordName').value.trim(),
+    address: document.getElementById('propertyAddr').value.trim(),
+    rent: parseFloat(document.getElementById('rentAmount').value) || 0,
+    pan: document.getElementById('landlordPan').value.trim().toUpperCase(),
+    payment: document.getElementById('paymentMode').value
+  };
+  if(!data.tenant || !data.landlord || !data.address || data.rent <= 0){
+    alert('Fill in tenant, landlord, address and a valid rent amount.');
+    return;
+  }
+  var type = document.getElementById('periodType').value;
+  var from = document.getElementById('fromDate').value;
+  var to = document.getElementById('toDate').value || from;
+  var periods = buildPeriods(type, from, to);
+  if(!periods.length){ alert('Select a valid period.'); return; }
+
+  var html = '';
+  periods.forEach(function(p, i){ html += receiptHTML(p, i, data); });
+  document.getElementById('receiptList').innerHTML = html;
+  document.getElementById('receiptCount').textContent = periods.length + ' receipt(s) generated. Total rent: ' + fmtINR(periods.reduce(function(a,p){return a + data.rent * p.months;}, 0));
+  document.getElementById('receiptOutput').style.display = 'block';
+  document.getElementById('receiptOutput').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function printReceipts(){
+  var content = document.getElementById('receiptList').innerHTML;
+  var w = window.open('', '', 'width=820,height=900');
+  w.document.write('<!doctype html><html><head><title>Rent Receipts</title><style>body{font-family:Georgia,serif;padding:24px;color:#1a1a2e;background:white;}h2{margin:0;}.rent-receipt{border:2px solid #1a1a2e;padding:24px;border-radius:8px;margin-bottom:24px;page-break-after:always;}@media print{body{padding:0;}.rent-receipt{margin:12px;}}</style></head><body>');
+  w.document.write(content);
+  w.document.write('</body></html>');
+  w.document.close();
+  setTimeout(function(){ w.print(); }, 200);
+}
+</script>
