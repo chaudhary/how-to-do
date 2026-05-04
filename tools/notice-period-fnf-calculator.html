@@ -1,0 +1,267 @@
+---
+layout: tool
+title: Notice Period Buyout & FNF Calculator (India)
+description: "Calculate your notice-period buyout owed, leave encashment, gratuity, and full-and-final settlement in seconds. Includes tax treatment for each component."
+category: "Financial (More)"
+tagline: "Compute notice buyout, leave encashment, gratuity, and net full-and-final settlement with tax treatment."
+search: "notice period buyout full and final settlement fnf calculator india leave encashment gratuity 20 lakh exemption job switch resignation 25 lakh tax"
+card_title: "Notice Period & FNF Calculator"
+---
+
+<div class="tool-header">
+  <h1>Notice Period & FNF Calculator</h1>
+  <p>Switching jobs? Compute the buyout you owe (or receive), leave encashment, gratuity if eligible, and the net full-and-final (FNF) settlement — with tax treatment per component.</p>
+</div>
+
+<div class="calc-form">
+  <h3 style="margin-bottom:0.5rem;font-size:1.05rem;">Salary basics</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="basic">Basic + DA (monthly ₹)</label>
+      <input type="number" id="basic" placeholder="e.g. 60000" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);">Buyout & gratuity are computed on Basic + DA, not full CTC.</small>
+    </div>
+    <div class="form-group">
+      <label for="grossSalary">Gross monthly salary (₹)</label>
+      <input type="number" id="grossSalary" placeholder="e.g. 150000" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);">Used for leave encashment and pending salary.</small>
+    </div>
+  </div>
+
+  <h3 style="margin:1.25rem 0 0.5rem;font-size:1.05rem;">Notice period</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="noticeDays">Notice period (days, per contract)</label>
+      <input type="number" id="noticeDays" placeholder="30 / 60 / 90" min="0" max="180" value="60" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="daysServed">Days you'll actually serve</label>
+      <input type="number" id="daysServed" placeholder="e.g. 30" min="0" max="365" value="60" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="buyoutBase">Buyout calculated on</label>
+      <select id="buyoutBase" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+        <option value="basic" selected>Basic + DA only (most common)</option>
+        <option value="gross">Gross salary (some companies)</option>
+      </select>
+    </div>
+  </div>
+
+  <h3 style="margin:1.25rem 0 0.5rem;font-size:1.05rem;">Other FNF components</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="leaveBalance">Leave balance to encash (days)</label>
+      <input type="number" id="leaveBalance" placeholder="e.g. 25" min="0" max="365" value="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="pendingSalary">Pending salary (days, current month)</label>
+      <input type="number" id="pendingSalary" placeholder="days worked till last day" min="0" max="31" value="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="bonus">Pending bonus / variable (₹)</label>
+      <input type="number" id="bonus" placeholder="if applicable" min="0" step="any" value="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+  </div>
+
+  <h3 style="margin:1.25rem 0 0.5rem;font-size:1.05rem;">Gratuity (if eligible)</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="totalYears">Years of service</label>
+      <input type="number" id="totalYears" placeholder="e.g. 5.5" min="0" max="50" step="0.1" value="0" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);">Gratuity payable after 5 years (or 4 yrs 240+ days).</small>
+    </div>
+    <div class="form-group">
+      <label for="orgType">Organisation type</label>
+      <select id="orgType" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+        <option value="covered" selected>Covered under Payment of Gratuity Act</option>
+        <option value="notCovered">Not covered</option>
+      </select>
+    </div>
+  </div>
+
+  <div style="margin-top:1.25rem;">
+    <button class="btn" onclick="calcFnf()">Calculate FNF</button>
+  </div>
+</div>
+
+<div id="fnfResult" style="display:none;margin-top:1.5rem;">
+  <div id="fnfSummary" style="padding:1.25rem;border-radius:var(--radius);margin-bottom:1rem;font-size:1.05rem;line-height:1.7;"></div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;">
+    <div style="padding:1rem;background:#f0fdf4;border:1px solid #86efac;border-radius:var(--radius);">
+      <h3 style="margin:0 0 0.75rem;font-size:1.05rem;color:#15803d;">You will receive</h3>
+      <div id="fnfReceive" style="font-size:0.95rem;line-height:1.85;"></div>
+    </div>
+    <div style="padding:1rem;background:#fee2e2;border:1px solid #fca5a5;border-radius:var(--radius);">
+      <h3 style="margin:0 0 0.75rem;font-size:1.05rem;color:#dc2626;">You will pay</h3>
+      <div id="fnfPay" style="font-size:0.95rem;line-height:1.85;"></div>
+    </div>
+  </div>
+
+  <div id="fnfTax" style="margin-top:1rem;padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.85;"></div>
+</div>
+
+<div style="margin-top:2rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">How each component works</h2>
+  <h3 style="font-size:1.05rem;margin:1rem 0 0.5rem;">Notice-period buyout</h3>
+  <p style="font-size:0.95rem;">If you can't serve the full notice, you (or your new employer) pay the company for the unserved days. Most contracts use Basic + DA × unserved days / 30. A few use gross salary — check your offer letter. The amount is treated as a normal salary deduction; your tax actually goes down because your taxable salary for the year drops by this amount.</p>
+
+  <h3 style="font-size:1.05rem;margin:1rem 0 0.5rem;">Leave encashment</h3>
+  <p style="font-size:0.95rem;">Unused privilege / earned leaves get paid out at <strong>(monthly basic + DA / 26) × leave days</strong> in most companies. <strong>Tax treatment:</strong> tax-free up to the lower of (a) actual amount, (b) average salary for last 10 months × (leave entitled), (c) ₹25 lakh aggregate lifetime cap (raised from ₹3L in 2023). Government employees: fully exempt.</p>
+
+  <h3 style="font-size:1.05rem;margin:1rem 0 0.5rem;">Gratuity</h3>
+  <p style="font-size:0.95rem;">Payable after 5 continuous years (or 4 years + 240 days). Formula: <strong>(last drawn Basic + DA) × 15 × years of service / 26</strong> for companies covered under the Gratuity Act. <strong>Tax-free up to ₹20 lakh</strong> in aggregate across employers.</p>
+
+  <h3 style="font-size:1.05rem;margin:1rem 0 0.5rem;">Pending salary & bonus</h3>
+  <p style="font-size:0.95rem;">Days worked in your last month + any unpaid variable / bonus. Fully taxable as salary in the year received. Form 16 from the company will reflect these.</p>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">FAQ</h2>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Can I refuse to pay the notice-period buyout?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Legally murky. Your employment contract typically allows the company to recover the buyout; refusing risks getting a relieving letter withheld, which can block your next onboarding. Negotiation: ask the new employer to "buy your notice" — many do for senior hires. If you do pay, ensure it's deducted gross from your final salary so you get a tax benefit.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Is the new employer's notice-buyout reimbursement taxable?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Yes — it's perquisite income from your new employer. They'll add it to your CTC and deduct TDS. Net-net you may be slightly worse off than serving the notice, depending on your slab. Use our <a href="{{ '/tools/income-tax-calculator' | relative_url }}">Income Tax Calculator</a> to model the difference.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">My company says gratuity is "non-taxable" — is it always?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Not always. The ₹20 lakh exemption is a <em>lifetime aggregate</em> across all employers. If you previously received ₹15L gratuity from another job, only ₹5L of this gratuity is exempt. The rest is taxed at slab.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">When does FNF get paid?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Most Indian companies process within 30-45 days of last working day. The Maharashtra Shops &amp; Establishment Act (and similar in other states) requires payment within 2 working days for resignations, but in practice 30-45 days is the norm. If FNF is delayed beyond 60 days, escalate to the labour commissioner.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Need a resignation letter?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Use our <a href="{{ '/tools/resignation-letter-generator' | relative_url }}">Resignation Letter Generator</a> — it's pre-formatted to mention FNF, relieving letter, and PF transfer.</p>
+  </details>
+</div>
+
+<div style="margin-top:1.5rem;padding:1rem;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:var(--radius);font-size:0.9rem;">
+  <strong>Note:</strong> Different companies use different bases for buyout (basic+DA most common, sometimes gross). Always check your appointment letter / contract. Gratuity exemption thresholds and the ₹25L leave-encashment cap are as per Income-tax Act amendments in force for FY 2025-26.
+</div>
+
+<script>
+function fmtINR(n){
+  var s = Math.round(n).toString();
+  var neg = s.charAt(0) === '-';
+  if(neg) s = s.slice(1);
+  var last3 = s.slice(-3);
+  var rest = s.slice(0, -3);
+  if(rest) last3 = ',' + last3;
+  rest = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+  return (neg ? '-' : '') + '₹ ' + rest + last3;
+}
+
+function calcFnf(){
+  var basic = parseFloat(document.getElementById('basic').value) || 0;
+  var gross = parseFloat(document.getElementById('grossSalary').value) || 0;
+  var noticeDays = parseFloat(document.getElementById('noticeDays').value) || 0;
+  var daysServed = parseFloat(document.getElementById('daysServed').value) || 0;
+  var buyoutBase = document.getElementById('buyoutBase').value;
+  var leaveBal = parseFloat(document.getElementById('leaveBalance').value) || 0;
+  var pendingDays = parseFloat(document.getElementById('pendingSalary').value) || 0;
+  var bonus = parseFloat(document.getElementById('bonus').value) || 0;
+  var totalYears = parseFloat(document.getElementById('totalYears').value) || 0;
+  var orgType = document.getElementById('orgType').value;
+
+  if(basic <= 0 || gross <= 0){ alert('Enter Basic + DA and Gross monthly salary.'); return; }
+
+  // Notice buyout
+  var unservedDays = Math.max(0, noticeDays - daysServed);
+  var buyoutPerDay = (buyoutBase === 'gross' ? gross : basic) / 30;
+  var buyoutAmount = buyoutPerDay * unservedDays;
+
+  // Leave encashment (paid to you)
+  var encashPerDay = (basic + 0) / 26; // basic + DA already combined in input
+  var leaveEncash = encashPerDay * leaveBal;
+  // Tax exemption: lifetime cap ₹25L; we don't have history, so assume this is current leave only.
+  // Simpler: cap exemption at ₹25L for the calculation.
+  var leaveExempt = Math.min(leaveEncash, 2500000);
+  var leaveTaxable = Math.max(0, leaveEncash - leaveExempt);
+
+  // Pending salary
+  var pendingSalary = (gross / 30) * pendingDays;
+
+  // Gratuity
+  var gratuity = 0, gratuityExempt = 0, gratuityTaxable = 0;
+  var roundedYears = Math.floor(totalYears) + (totalYears - Math.floor(totalYears) >= 0.5 ? 1 : 0); // round up if 6+ months
+  var eligible = totalYears >= 5 || (totalYears >= 4 && (totalYears - Math.floor(totalYears)) >= 240/365);
+  if(eligible && roundedYears >= 5){
+    if(orgType === 'covered'){
+      gratuity = (basic * 15 * roundedYears) / 26;
+    } else {
+      // Not covered: half-month average salary × completed years, denominator 30
+      gratuity = (basic * 15 * Math.floor(totalYears)) / 30;
+    }
+    gratuityExempt = Math.min(gratuity, 2000000); // ₹20L cap
+    gratuityTaxable = Math.max(0, gratuity - gratuityExempt);
+  }
+
+  // Totals
+  var totalReceive = leaveEncash + pendingSalary + bonus + gratuity;
+  var totalPay = buyoutAmount;
+  var net = totalReceive - totalPay;
+
+  // Summary
+  var sumEl = document.getElementById('fnfSummary');
+  if(net >= 0){
+    sumEl.style.background = '#dcfce7';
+    sumEl.style.borderLeft = '4px solid #15803d';
+    sumEl.innerHTML = '<strong>Net FNF: '+fmtINR(net)+' in your favour.</strong><br>'+
+      '<span style="font-size:0.95rem;">You will receive '+fmtINR(totalReceive)+' and pay '+fmtINR(totalPay)+' for the unserved notice.</span>';
+  } else {
+    sumEl.style.background = '#fee2e2';
+    sumEl.style.borderLeft = '4px solid #dc2626';
+    sumEl.innerHTML = '<strong>Net FNF: '+fmtINR(-net)+' you owe the company.</strong><br>'+
+      '<span style="font-size:0.95rem;">Buyout '+fmtINR(totalPay)+' exceeds your dues '+fmtINR(totalReceive)+'. Consider serving more notice or asking your new employer to cover.</span>';
+  }
+
+  // Receivables
+  var rec = '';
+  rec += 'Pending salary ('+pendingDays+' days @ '+fmtINR(gross/30)+'): <strong>'+fmtINR(pendingSalary)+'</strong><br>';
+  rec += 'Leave encashment ('+leaveBal+' days @ '+fmtINR(encashPerDay)+'): <strong>'+fmtINR(leaveEncash)+'</strong><br>';
+  if(bonus > 0) rec += 'Pending bonus: <strong>'+fmtINR(bonus)+'</strong><br>';
+  if(gratuity > 0){
+    rec += 'Gratuity ('+roundedYears+' years, '+orgType+'): <strong>'+fmtINR(gratuity)+'</strong><br>';
+  } else if(totalYears > 0) {
+    rec += 'Gratuity: <span style="color:var(--color-muted);">not yet eligible (need 5+ years)</span><br>';
+  }
+  rec += '<hr style="margin:0.5rem 0;border:none;border-top:1px solid var(--color-border);">';
+  rec += '<strong style="color:#15803d;">Total receivable: '+fmtINR(totalReceive)+'</strong>';
+  document.getElementById('fnfReceive').innerHTML = rec;
+
+  // Payables
+  var pay = '';
+  if(buyoutAmount > 0){
+    pay += 'Notice buyout ('+unservedDays+' unserved days @ '+fmtINR(buyoutPerDay)+'): <strong>'+fmtINR(buyoutAmount)+'</strong><br>';
+    pay += '<small style="color:var(--color-muted);">Computed on '+(buyoutBase==='gross'?'gross':'basic + DA')+'.</small><br>';
+  } else {
+    pay += '<span style="color:var(--color-muted);">No buyout — you serve the full notice.</span><br>';
+  }
+  pay += '<hr style="margin:0.5rem 0;border:none;border-top:1px solid var(--color-border);">';
+  pay += '<strong style="color:#dc2626;">Total payable: '+fmtINR(totalPay)+'</strong>';
+  document.getElementById('fnfPay').innerHTML = pay;
+
+  // Tax treatment
+  var taxHtml = '<strong>Tax treatment:</strong><br>';
+  taxHtml += '• Pending salary, bonus: <span style="color:#dc2626;">fully taxable</span> at slab.<br>';
+  if(leaveEncash > 0){
+    taxHtml += '• Leave encashment: '+fmtINR(leaveExempt)+' exempt, <span style="color:'+(leaveTaxable>0?'#dc2626':'#15803d')+';">'+fmtINR(leaveTaxable)+' taxable</span> (₹25L lifetime cap; we assume no prior encashment).<br>';
+  }
+  if(gratuity > 0){
+    taxHtml += '• Gratuity: '+fmtINR(gratuityExempt)+' exempt (₹20L cap), <span style="color:'+(gratuityTaxable>0?'#dc2626':'#15803d')+';">'+fmtINR(gratuityTaxable)+' taxable</span>.<br>';
+  }
+  if(buyoutAmount > 0){
+    taxHtml += '• Notice buyout: deducted gross from final salary → reduces your taxable income for the year, effectively a tax saving of '+fmtINR(buyoutAmount * 0.30)+' if you\'re in the 30% slab.<br>';
+  }
+  taxHtml += '<br><strong>Use the <a href="{{ "/tools/income-tax-calculator" | relative_url }}">Income Tax Calculator</a></strong> to model the impact on your annual filing.';
+  document.getElementById('fnfTax').innerHTML = taxHtml;
+
+  document.getElementById('fnfResult').style.display = 'block';
+  document.getElementById('fnfResult').scrollIntoView({behavior:'smooth', block:'start'});
+}
+</script>
