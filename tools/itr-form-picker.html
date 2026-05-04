@@ -1,0 +1,329 @@
+---
+layout: tool
+title: ITR Form Picker (FY 2025-26) — Which ITR Form Should I File?
+description: "Answer a few yes/no questions and find out whether you should file ITR-1, ITR-2, ITR-3, or ITR-4 for FY 2025-26 (AY 2026-27). Includes the late-filing penalty under section 234F."
+category: "Financial (More)"
+tagline: "Answer 6–8 yes/no questions and find out whether to file ITR-1, ITR-2, ITR-3, or ITR-4 for FY 2025-26."
+search: "itr form picker which itr should i file india fy 2025-26 ay 2026-27 itr-1 itr-2 itr-3 itr-4 sahaj sugam salary capital gains business freelance"
+card_title: "ITR Form Picker"
+---
+
+<div class="tool-header">
+  <h1>Which ITR Form Should I File?</h1>
+  <p>Answer 6–8 yes/no questions and we'll tell you which ITR form fits your FY 2025-26 (AY 2026-27) situation, the deadline, and the penalty if you miss it.</p>
+</div>
+
+<div class="calc-form">
+  <div id="quiz" style="display:flex;flex-direction:column;gap:0.75rem;">
+    <div class="quiz-q" data-q="resident">
+      <strong>Are you a resident Indian for FY 2025-26?</strong>
+      <p style="font-size:0.85rem;color:var(--color-muted);margin:0.25rem 0;">Resident if you were in India for ≥ 182 days in FY 2025-26, or ≥ 60 days this year + ≥ 365 days in the previous 4 FYs.</p>
+      <div class="quiz-opts" style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+        <button type="button" class="quiz-btn" data-val="yes">Yes</button>
+        <button type="button" class="quiz-btn" data-val="no">No (NRI/RNOR)</button>
+      </div>
+    </div>
+
+    <div class="quiz-q" data-q="incomeSource" style="display:none;">
+      <strong>What's your main income source?</strong>
+      <div class="quiz-opts" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+        <button type="button" class="quiz-btn" data-val="salary">Salary / Pension</button>
+        <button type="button" class="quiz-btn" data-val="business">Business / Profession</button>
+        <button type="button" class="quiz-btn" data-val="freelance">Freelance / Gig work</button>
+        <button type="button" class="quiz-btn" data-val="onlyOther">Only other income (interest, dividends, etc.)</button>
+      </div>
+    </div>
+
+    <div class="quiz-q" data-q="totalIncome" style="display:none;">
+      <strong>Is your total income for FY 2025-26 above ₹50 lakh?</strong>
+      <div class="quiz-opts" style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+        <button type="button" class="quiz-btn" data-val="yes">Yes</button>
+        <button type="button" class="quiz-btn" data-val="no">No (₹50L or less)</button>
+      </div>
+    </div>
+
+    <div class="quiz-q" data-q="capitalGains" style="display:none;">
+      <strong>Did you have any capital gains? (sold shares, MF, property, crypto, gold)</strong>
+      <p style="font-size:0.85rem;color:var(--color-muted);margin:0.25rem 0;">Even one equity/MF redemption with a gain counts.</p>
+      <div class="quiz-opts" style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+        <button type="button" class="quiz-btn" data-val="yes">Yes</button>
+        <button type="button" class="quiz-btn" data-val="no">No</button>
+      </div>
+    </div>
+
+    <div class="quiz-q" data-q="houseProps" style="display:none;">
+      <strong>How many house properties do you own?</strong>
+      <div class="quiz-opts" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+        <button type="button" class="quiz-btn" data-val="zero">None</button>
+        <button type="button" class="quiz-btn" data-val="one">One</button>
+        <button type="button" class="quiz-btn" data-val="multi">More than one</button>
+      </div>
+    </div>
+
+    <div class="quiz-q" data-q="foreign" style="display:none;">
+      <strong>Do you have any foreign income, foreign assets, or foreign bank accounts?</strong>
+      <div class="quiz-opts" style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+        <button type="button" class="quiz-btn" data-val="yes">Yes</button>
+        <button type="button" class="quiz-btn" data-val="no">No</button>
+      </div>
+    </div>
+
+    <div class="quiz-q" data-q="agri" style="display:none;">
+      <strong>Did you earn agricultural income above ₹5,000 in FY 2025-26?</strong>
+      <div class="quiz-opts" style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+        <button type="button" class="quiz-btn" data-val="yes">Yes</button>
+        <button type="button" class="quiz-btn" data-val="no">No (or below ₹5,000)</button>
+      </div>
+    </div>
+
+    <div class="quiz-q" data-q="director" style="display:none;">
+      <strong>Are you a company director, or do you hold unlisted equity shares?</strong>
+      <div class="quiz-opts" style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+        <button type="button" class="quiz-btn" data-val="yes">Yes</button>
+        <button type="button" class="quiz-btn" data-val="no">No</button>
+      </div>
+    </div>
+
+    <div class="quiz-q" data-q="crypto" style="display:none;">
+      <strong>Did you have any crypto / VDA transactions in FY 2025-26?</strong>
+      <p style="font-size:0.85rem;color:var(--color-muted);margin:0.25rem 0;">Even small swaps or sales count for Schedule VDA reporting.</p>
+      <div class="quiz-opts" style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+        <button type="button" class="quiz-btn" data-val="yes">Yes</button>
+        <button type="button" class="quiz-btn" data-val="no">No</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+    <button type="button" class="btn" id="restartBtn" onclick="restart()" style="display:none;">Start over</button>
+  </div>
+</div>
+
+<div id="itrResult" style="display:none;margin-top:1.5rem;">
+  <div id="itrAnswer" style="padding:1.25rem;border-radius:var(--radius);margin-bottom:1rem;background:#dcfce7;border-left:4px solid #15803d;font-size:1.1rem;line-height:1.7;"></div>
+  <div id="itrReasoning" style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.8;"></div>
+  <div id="itrNotes" style="margin-top:1rem;padding:1rem;background:#eef2ff;border-left:3px solid #4f46e5;border-radius:var(--radius);font-size:0.95rem;line-height:1.7;"></div>
+</div>
+
+<div style="margin-top:2rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">Quick form guide</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0.75rem;">
+    <div style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);">
+      <strong style="font-size:1.05rem;">ITR-1 (Sahaj)</strong>
+      <p style="font-size:0.9rem;margin:0.4rem 0 0;">Resident with income only from salary, one house property, other sources (interest, dividend, family pension), and agricultural income up to ₹5,000. Total income up to ₹50L.</p>
+    </div>
+    <div style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);">
+      <strong style="font-size:1.05rem;">ITR-2</strong>
+      <p style="font-size:0.9rem;margin:0.4rem 0 0;">Anyone whose income includes capital gains, more than one house, foreign assets/income, agricultural income &gt; ₹5,000, or income above ₹50L — but no business/profession income.</p>
+    </div>
+    <div style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);">
+      <strong style="font-size:1.05rem;">ITR-3</strong>
+      <p style="font-size:0.9rem;margin:0.4rem 0 0;">Individuals/HUFs with income from a business or profession, including freelancers and consultants who don't qualify for presumptive taxation.</p>
+    </div>
+    <div style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);">
+      <strong style="font-size:1.05rem;">ITR-4 (Sugam)</strong>
+      <p style="font-size:0.9rem;margin:0.4rem 0 0;">Resident individuals/HUFs with presumptive business income under section 44AD/44ADA/44AE. Total income up to ₹50L; freelancers earning &lt; ₹50L often pick this.</p>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">Deadlines & penalties</h2>
+  <ul style="margin:0 0 0 1.5rem;font-size:0.95rem;line-height:1.9;">
+    <li><strong>31 July 2026</strong> — non-audit cases (most salaried, ITR-1/2/4 filers).</li>
+    <li><strong>31 October 2026</strong> — audit cases (businesses with turnover &gt; ₹1 crore not opting for presumptive scheme).</li>
+    <li><strong>31 December 2026</strong> — belated/revised return last date.</li>
+    <li>Late filing penalty under <strong>section 234F</strong>: ₹5,000 if total income &gt; ₹5L, ₹1,000 if income ≤ ₹5L. Plus 1%/month interest on unpaid tax under section 234A.</li>
+  </ul>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">FAQ</h2>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Does the new Income Tax Act 2025 apply for FY 2025-26?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">No. The Income Tax Act, 2025 applies from <strong>1 April 2026 onwards</strong> (i.e. FY 2026-27 / AY 2027-28). Your FY 2025-26 return is still governed by the Income-tax Act, 1961.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">I'm a freelancer — ITR-3 or ITR-4?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">If gross receipts are below ₹50L (for professionals) or ₹2 crore (for businesses) and you opt for the presumptive scheme (section 44ADA/44AD), use <strong>ITR-4</strong> — you declare 50%/8% (or 6% if digital) of receipts as income, no books needed. Otherwise use <strong>ITR-3</strong> with proper P&amp;L and balance sheet.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">I sold one mutual fund — do I need ITR-2?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Yes. Any capital gain — even ₹100 — disqualifies ITR-1. Use ITR-2 for capital gains. Use our <a href="{{ '/tools/capital-gains-calculator' | relative_url }}">Capital Gains Calculator</a> to figure the tax.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">What if I had crypto transactions?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">You must report under <strong>Schedule VDA</strong>, which is in ITR-2 and ITR-3 (not ITR-1 or ITR-4). Even one swap counts. Compute the tax in our <a href="{{ '/tools/crypto-tax-calculator' | relative_url }}">Crypto Tax Calculator</a>.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Do I need to file at all?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">If your gross total income exceeds the basic exemption (₹2.5L old / ₹3L new for &lt; 60 yrs), yes. You also must file if you have foreign assets, paid &gt; ₹1L electricity bill, deposited &gt; ₹1 crore in current accounts (₹50L savings), or your TDS exceeds ₹25K (₹50K for senior citizens), regardless of income.</p>
+  </details>
+</div>
+
+<div style="margin-top:1.5rem;padding:1rem;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:var(--radius);font-size:0.9rem;">
+  <strong>Note:</strong> This picker covers the common cases. Edge cases (HUF with business income, partner in firm, ITR-5/6/7 for entities) are out of scope. When in doubt, consult a CA.
+</div>
+
+<style>
+.quiz-q { padding: 0.9rem 1rem; border: 1px solid var(--color-border); border-radius: var(--radius); background: var(--color-card-bg); }
+.quiz-q.answered { background: #f0fdf4; border-color: #86efac; }
+.quiz-btn { background: white; border: 1px solid var(--color-border); padding: 0.5rem 1rem; border-radius: var(--radius); cursor: pointer; font-size: 0.95rem; transition: all 0.15s; }
+.quiz-btn:hover { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+.quiz-btn.selected { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+</style>
+
+<script>
+var answers = {};
+var order = ['resident', 'incomeSource', 'totalIncome', 'capitalGains', 'houseProps', 'foreign', 'agri', 'director', 'crypto'];
+
+function showQuestion(qId){
+  var el = document.querySelector('.quiz-q[data-q="' + qId + '"]');
+  if(el) el.style.display = '';
+}
+
+function answer(qId, val){
+  answers[qId] = val;
+  var el = document.querySelector('.quiz-q[data-q="' + qId + '"]');
+  el.classList.add('answered');
+  el.querySelectorAll('.quiz-btn').forEach(function(b){ b.classList.remove('selected'); });
+  el.querySelector('.quiz-btn[data-val="' + val + '"]').classList.add('selected');
+
+  // Decide next question or compute
+  next(qId);
+}
+
+function next(justAnswered){
+  var idx = order.indexOf(justAnswered);
+  // Decision logic — short-circuit when we have enough info
+  if(answers.resident === 'no'){
+    return finish('ITR-2', ['NRI / RNOR — ITR-1 and ITR-4 are not available to non-residents.']);
+  }
+  if(answers.incomeSource === 'business'){
+    return showQuestion('foreign'), askRemaining();
+  }
+  if(answers.incomeSource === 'freelance'){
+    return showQuestion('totalIncome'), askRemaining();
+  }
+  if(idx < order.length - 1){
+    // Show next
+    var nextQ = order[idx + 1];
+    // Skip questions that aren't relevant
+    while(nextQ && shouldSkip(nextQ)){
+      idx++;
+      nextQ = order[idx + 1];
+    }
+    if(nextQ) showQuestion(nextQ);
+    else compute();
+  } else {
+    compute();
+  }
+}
+
+function askRemaining(){
+  // For business/freelance paths, still ask about foreign, agri, director, crypto if needed
+  ['foreign','agri','director','crypto'].forEach(function(q){
+    if(!(q in answers)) showQuestion(q);
+  });
+}
+
+function shouldSkip(q){
+  // Currently we ask all in order; future could skip some based on answers
+  return false;
+}
+
+function finish(form, reasons){
+  var deadlines = {
+    'ITR-1': '31 July 2026',
+    'ITR-2': '31 July 2026',
+    'ITR-3': '31 October 2026 (if audit applies; else 31 July 2026)',
+    'ITR-4': '31 July 2026'
+  };
+  var copy = {
+    'ITR-1': 'You qualify for the simplest form — <strong>ITR-1 (Sahaj)</strong>. Most salaried filers without capital gains land here.',
+    'ITR-2': 'You need <strong>ITR-2</strong>. It covers capital gains, multiple houses, foreign income, and high-income individuals.',
+    'ITR-3': 'You need <strong>ITR-3</strong>. It covers business and professional income with a full P&L and balance sheet.',
+    'ITR-4': 'You qualify for <strong>ITR-4 (Sugam)</strong> under presumptive taxation — declare a fixed % of receipts as income and skip the books.'
+  };
+  document.getElementById('itrAnswer').innerHTML = copy[form] + '<br><span style="font-size:0.95rem;font-weight:normal;">Filing deadline: <strong>' + deadlines[form] + '</strong></span>';
+  document.getElementById('itrReasoning').innerHTML = '<strong>Why:</strong><ul style="margin:0.5rem 0 0 1.25rem;">' + reasons.map(function(r){return '<li>' + r + '</li>';}).join('') + '</ul>';
+  document.getElementById('itrNotes').innerHTML =
+    '<strong>What to do next:</strong><br>' +
+    '• Late filing penalty under section 234F: <strong>₹5,000</strong> if income &gt; ₹5L, ₹1,000 otherwise. Plus interest under section 234A.<br>' +
+    '• FY 2025-26 returns use the <strong>Income-tax Act, 1961</strong>; the new IT Act 2025 applies from FY 2026-27 onwards.<br>' +
+    '• Compute your liability with the <a href="{{ "/tools/income-tax-calculator" | relative_url }}">Income Tax Calculator</a>' +
+    (answers.capitalGains === 'yes' ? ', <a href="{{ "/tools/capital-gains-calculator" | relative_url }}">Capital Gains Calculator</a>' : '') +
+    (answers.crypto === 'yes' ? ', <a href="{{ "/tools/crypto-tax-calculator" | relative_url }}">Crypto Tax Calculator</a>' : '') +
+    '.';
+
+  document.getElementById('itrResult').style.display = 'block';
+  document.getElementById('restartBtn').style.display = '';
+  document.getElementById('itrResult').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function compute(){
+  var reasons = [];
+  var form;
+
+  if(answers.incomeSource === 'business'){
+    form = 'ITR-3';
+    reasons.push('Business / professional income disqualifies ITR-1 and ITR-2.');
+    if(answers.foreign === 'yes') reasons.push('Foreign assets/income require ITR-2 or ITR-3 (you have business income, so ITR-3).');
+  } else if(answers.incomeSource === 'freelance'){
+    if(answers.totalIncome === 'no'){
+      form = 'ITR-4';
+      reasons.push('Freelance income under ₹50L: you can opt for presumptive taxation under section 44ADA — declare 50% of receipts as income, file ITR-4.');
+      reasons.push('If you don\'t want presumptive (e.g. claim higher expenses), use ITR-3 instead.');
+    } else {
+      form = 'ITR-3';
+      reasons.push('Freelance income above ₹50L: presumptive scheme not available — use ITR-3 with full books.');
+    }
+    if(answers.foreign === 'yes' && form === 'ITR-4'){
+      form = 'ITR-3';
+      reasons.push('Foreign assets/income disqualify ITR-4. Use ITR-3 instead.');
+    }
+  } else {
+    // salary or onlyOther
+    var disqualifiers = [];
+    if(answers.totalIncome === 'yes') disqualifiers.push('Total income above ₹50L disqualifies ITR-1.');
+    if(answers.capitalGains === 'yes') disqualifiers.push('Any capital gain (shares, MF, property, crypto, gold) disqualifies ITR-1.');
+    if(answers.houseProps === 'multi') disqualifiers.push('More than one house property disqualifies ITR-1.');
+    if(answers.foreign === 'yes') disqualifiers.push('Foreign income / assets / bank accounts disqualify ITR-1.');
+    if(answers.agri === 'yes') disqualifiers.push('Agricultural income above ₹5,000 disqualifies ITR-1.');
+    if(answers.director === 'yes') disqualifiers.push('Being a director or holding unlisted shares disqualifies ITR-1.');
+    if(answers.crypto === 'yes') disqualifiers.push('Crypto / VDA transactions require Schedule VDA, not available in ITR-1.');
+
+    if(disqualifiers.length === 0){
+      form = 'ITR-1';
+      reasons.push('Resident, salary/pension/other-source income, single (or no) house property, no capital gains, no foreign assets, agri ≤ ₹5K, total income ≤ ₹50L.');
+      reasons.push('You qualify for the simplest form.');
+    } else {
+      form = 'ITR-2';
+      reasons = disqualifiers;
+      reasons.push('No business/profession income → ITR-2 is the right form (not ITR-3).');
+    }
+  }
+
+  finish(form, reasons);
+}
+
+function restart(){
+  answers = {};
+  document.querySelectorAll('.quiz-q').forEach(function(q, i){
+    q.style.display = i === 0 ? '' : 'none';
+    q.classList.remove('answered');
+    q.querySelectorAll('.quiz-btn').forEach(function(b){ b.classList.remove('selected'); });
+  });
+  document.getElementById('itrResult').style.display = 'none';
+  document.getElementById('restartBtn').style.display = 'none';
+  window.scrollTo({top: 0, behavior:'smooth'});
+}
+
+// Wire up
+document.querySelectorAll('.quiz-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var q = btn.closest('.quiz-q').dataset.q;
+    answer(q, btn.dataset.val);
+  });
+});
+</script>
