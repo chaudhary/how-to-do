@@ -26,20 +26,20 @@ jobs:
             --repo "$REPO" \
             --state open \
             --label auto-merge \
-            --json number,title,createdAt,mergeable \
-            --jq 'sort_by(.createdAt) | map(select(.mergeable == "MERGEABLE")) | .[0].number')
+            --json number,createdAt \
+            --jq 'sort_by(.createdAt) | .[0].number')
 
           if [ -z "$target" ] || [ "$target" = "null" ]; then
-            echo "No mergeable PRs with auto-merge label. Nothing to do."
+            echo "No open PRs with auto-merge label. Nothing to do."
             exit 0
           fi
 
           title=$(gh pr view "$target" --repo "$REPO" --json title --jq '.title')
-          echo "Merging PR #$target — $title"
+          echo "Attempting to merge PR #$target: $title"
 
-          gh pr merge "$target" \
-            --repo "$REPO" \
-            --squash \
-            --delete-branch
-
-          gh workflow run pages.yml --repo "$REPO"
+          if gh pr merge "$target" --repo "$REPO" --squash --delete-branch; then
+            gh workflow run pages.yml --repo "$REPO"
+          else
+            echo "PR #$target was not mergeable. Skipping; will retry next run."
+            exit 0
+          fi
