@@ -1,0 +1,231 @@
+---
+layout: tool
+title: UPI Limit & 2FA Checker (India, 1 Apr 2026 rules)
+description: "Find your daily UPI transaction limit, the 2FA factors required, and the new balance-check cap under RBI's Authentication Mechanisms 2025 directive (effective 1 April 2026)."
+category: "Financial (More)"
+tagline: "Find your daily UPI limit, required 2FA factors, and the 50/day balance-check cap under RBI's 2025 directive."
+search: "upi limit checker 2fa authentication mechanisms 2025 rbi 1 april 2026 daily cap balance check 50 per day npci tax education healthcare capital market new registration"
+card_title: "UPI Limit & 2FA Checker"
+---
+
+<div class="tool-header">
+  <h1>UPI Limit & 2FA Checker</h1>
+  <p>RBI's "Authentication Mechanisms for Digital Payment Transactions Directions, 2025" took effect on 1 April 2026. Limits and authentication factors now depend on what you're paying for. Pick your use case to see what applies.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="useCase">What are you trying to do?</label>
+    <select id="useCase" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;" onchange="renderCheck()">
+      <option value="">Pick a use case…</option>
+      <option value="p2p">Send money to a friend / family (P2P)</option>
+      <option value="merchant">Pay a merchant (kirana, restaurant, online store)</option>
+      <option value="tax">Pay income tax / GST / advance tax</option>
+      <option value="education">Pay college / school fees</option>
+      <option value="healthcare">Pay hospital / health insurance / pharmacy</option>
+      <option value="capitalmarket">Capital market (stocks, IPO, mutual funds)</option>
+      <option value="newAccount">First UPI transaction within 24 hours of registration</option>
+      <option value="balance">Check account balance</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="amount">Transaction amount (₹) <span style="color:var(--color-muted);font-weight:normal;font-size:0.85rem;">optional, to validate against limit</span></label>
+    <input type="number" id="amount" placeholder="e.g. 25000" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;" oninput="renderCheck()">
+  </div>
+</div>
+
+<div id="upiResult" style="display:none;margin-top:1.5rem;">
+  <div id="upiSummary" style="padding:1.25rem;border-radius:var(--radius);margin-bottom:1rem;font-size:1.05rem;line-height:1.7;"></div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;">
+    <div style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);">
+      <h3 style="margin:0 0 0.75rem;font-size:1.05rem;">Daily limit</h3>
+      <div id="upiLimit" style="font-size:0.95rem;line-height:1.85;"></div>
+    </div>
+    <div style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);">
+      <h3 style="margin:0 0 0.75rem;font-size:1.05rem;">Authentication required</h3>
+      <div id="upiAuth" style="font-size:0.95rem;line-height:1.85;"></div>
+    </div>
+  </div>
+
+  <div id="upiNotes" style="margin-top:1rem;padding:1rem;background:#eef2ff;border-left:3px solid #4f46e5;border-radius:var(--radius);font-size:0.95rem;line-height:1.7;"></div>
+</div>
+
+<div style="margin-top:2rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">What changed on 1 April 2026</h2>
+  <ul style="margin:0 0 0 1.5rem;font-size:0.95rem;line-height:1.85;">
+    <li><strong>Two-factor authentication (2FA) is mandatory</strong> for every digital payment, including UPI. Factors must come from at least two different categories: <em>knowledge</em> (PIN), <em>possession</em> (registered device, token), <em>inherence</em> (biometric).</li>
+    <li><strong>Balance check capped at 50/day</strong> per UPI app to prevent background polling that overloads the network.</li>
+    <li><strong>Higher per-day limit (₹10L)</strong> available for tax, education, healthcare, and capital-market payments to verified merchant categories.</li>
+    <li><strong>New UPI registrations capped at ₹5,000</strong> per transaction in the first 24 hours.</li>
+    <li><strong>OTP alone is no longer sufficient</strong> — at least one dynamic factor (UPI PIN, biometric, or hardware token response) is required for every transfer.</li>
+  </ul>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">Daily limit table</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+    <thead>
+      <tr style="background:var(--color-card-bg);">
+        <th style="text-align:left;padding:0.5rem;border:1px solid var(--color-border);">Use case</th>
+        <th style="text-align:left;padding:0.5rem;border:1px solid var(--color-border);">Per-transaction</th>
+        <th style="text-align:left;padding:0.5rem;border:1px solid var(--color-border);">Daily cap</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">P2P / general merchant</td><td style="padding:0.5rem;border:1px solid var(--color-border);">₹1,00,000</td><td style="padding:0.5rem;border:1px solid var(--color-border);">₹1,00,000</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Tax payments (income tax, GST)</td><td style="padding:0.5rem;border:1px solid var(--color-border);">₹5,00,000</td><td style="padding:0.5rem;border:1px solid var(--color-border);">₹10,00,000</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Education fees</td><td style="padding:0.5rem;border:1px solid var(--color-border);">₹5,00,000</td><td style="padding:0.5rem;border:1px solid var(--color-border);">₹10,00,000</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Healthcare / hospitals</td><td style="padding:0.5rem;border:1px solid var(--color-border);">₹5,00,000</td><td style="padding:0.5rem;border:1px solid var(--color-border);">₹10,00,000</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Capital market (IPO, MF, stock)</td><td style="padding:0.5rem;border:1px solid var(--color-border);">₹5,00,000</td><td style="padding:0.5rem;border:1px solid var(--color-border);">₹5,00,000</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">First 24h after new UPI registration</td><td style="padding:0.5rem;border:1px solid var(--color-border);">₹5,000</td><td style="padding:0.5rem;border:1px solid var(--color-border);">₹5,000</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:0.5rem;font-size:0.85rem;color:var(--color-muted);">Banks may set lower limits than NPCI's ceiling. Check your bank's UPI policy if a transfer fails inside the cap.</p>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">FAQ</h2>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Why does my balance check fail after a few tries?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">From 1 April 2026, RBI capped balance checks at <strong>50 per app per day</strong>. Background polling by apps (refreshing whenever you open them) was overloading bank servers. Your check button works fine; just don't reopen the app 80 times.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">My new UPI fails for ₹10,000 transfers — why?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">In the first 24 hours after a new UPI registration, individual transfers are capped at <strong>₹5,000</strong>. This is a fraud-prevention measure. After 24 hours, your normal ₹1L daily limit kicks in.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">How do I unlock the ₹10L higher limit?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Higher limits apply automatically when you transact with verified merchant categories — tax payment portals (NPCI / TIN-NSDL), recognized educational institutions, registered hospitals, and SEBI-regulated capital-market intermediaries. The merchant must be tagged correctly by the acquirer; if your tax payment fails at ₹2L, the issue is on the merchant side, not your bank.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Are UPI transactions still free?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Yes for P2P and most merchant payments. Wallet-to-UPI loads above ₹2,000 attract a 1.1% interchange fee paid by the merchant (not the consumer). Banks may charge for cardless ATM withdrawals via UPI once free transaction limits are exhausted.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Can I disable 2FA?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">No. RBI's 2025 directive makes 2FA mandatory for every digital payment. Apps that previously allowed PIN-only payments above device-level biometric had to update by 1 April 2026.</p>
+  </details>
+</div>
+
+<div style="margin-top:1.5rem;padding:1rem;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:var(--radius);font-size:0.9rem;">
+  <strong>Note:</strong> Limits below the NPCI ceiling may be set by your bank or app. The balance-check cap is per app — switching between PhonePe, Google Pay, and Paytm gives you 50 checks each.
+</div>
+
+<script>
+function fmtINR(n){
+  var s = Math.round(n).toString();
+  var last3 = s.slice(-3);
+  var rest = s.slice(0, -3);
+  if(rest) last3 = ',' + last3;
+  rest = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+  return '₹ ' + rest + last3;
+}
+
+var rules = {
+  p2p: {
+    label: 'P2P / general merchant payment',
+    perTxn: 100000,
+    perDay: 100000,
+    factors: ['UPI PIN (knowledge)', 'Registered device binding (possession)'],
+    extra: 'OTP alone is not sufficient post-1-Apr-2026. Your phone\'s SIM binding to the UPI app counts as the possession factor.'
+  },
+  merchant: {
+    label: 'Merchant payment',
+    perTxn: 100000,
+    perDay: 100000,
+    factors: ['UPI PIN (knowledge)', 'Registered device binding (possession)'],
+    extra: 'For merchants in the higher-limit categories (education, healthcare, tax, capital market), see those use cases instead.'
+  },
+  tax: {
+    label: 'Tax payment (income tax, GST, advance tax)',
+    perTxn: 500000,
+    perDay: 1000000,
+    factors: ['UPI PIN (knowledge)', 'Registered device binding (possession)'],
+    extra: 'Higher limit applies only when paying via verified tax-payment portals (NSDL TIN, GSTN). Your bank must support the merchant category.'
+  },
+  education: {
+    label: 'College / school fees',
+    perTxn: 500000,
+    perDay: 1000000,
+    factors: ['UPI PIN (knowledge)', 'Registered device binding (possession)'],
+    extra: 'Institution must be registered with the higher-limit MCC (merchant category code) at its acquiring bank. Random "edu-tech" platforms may not qualify.'
+  },
+  healthcare: {
+    label: 'Healthcare / hospital / pharmacy',
+    perTxn: 500000,
+    perDay: 1000000,
+    factors: ['UPI PIN (knowledge)', 'Registered device binding (possession)'],
+    extra: 'Hospitals and registered pharmacies qualify. Health-insurance premium top-ups may also qualify if the insurer is registered correctly.'
+  },
+  capitalmarket: {
+    label: 'Capital market (stocks, IPO, mutual funds)',
+    perTxn: 500000,
+    perDay: 500000,
+    factors: ['UPI PIN (knowledge)', 'Registered device binding (possession)'],
+    extra: 'IPO subscriptions can use the full ₹5L per-transaction limit. Stock-broker fund transfers depend on the broker\'s integration.'
+  },
+  newAccount: {
+    label: 'First 24h after new UPI registration',
+    perTxn: 5000,
+    perDay: 5000,
+    factors: ['UPI PIN (knowledge)', 'Registered device binding (possession)', 'Optional: device biometric for added safety'],
+    extra: 'Limit lifts automatically 24 hours after your first successful transaction. This is a fraud-prevention guard against SIM-swap and device-takeover attacks.'
+  },
+  balance: {
+    label: 'Account balance check',
+    perTxn: null,
+    perDay: '50 checks per app',
+    factors: ['UPI PIN (knowledge)'],
+    extra: 'Capped to reduce server load from background polling. If you need to check more often, use net banking instead — it has no such cap.'
+  }
+};
+
+function renderCheck(){
+  var key = document.getElementById('useCase').value;
+  if(!key){ document.getElementById('upiResult').style.display = 'none'; return; }
+  var rule = rules[key];
+  var amount = parseFloat(document.getElementById('amount').value) || 0;
+
+  var summary = '';
+  var summaryClass = '#dcfce7';
+  var summaryBorder = '#15803d';
+
+  if(rule.perTxn === null){
+    summary = '<strong>Balance checks: '+rule.perDay+'</strong>';
+    summaryClass = '#eef2ff';
+    summaryBorder = '#4f46e5';
+  } else if(amount > 0){
+    if(amount > rule.perTxn){
+      summary = '<strong>Over the per-transaction limit.</strong> ₹'+fmtINR(amount).replace('₹ ','')+' exceeds the '+fmtINR(rule.perTxn)+' cap for "'+rule.label+'".';
+      summaryClass = '#fee2e2';
+      summaryBorder = '#dc2626';
+    } else {
+      summary = '<strong>Within limits.</strong> ₹'+fmtINR(amount).replace('₹ ','')+' is allowed for "'+rule.label+'" — under the '+fmtINR(rule.perTxn)+' per-transaction cap.';
+    }
+  } else {
+    summary = '<strong>You can pay up to '+fmtINR(rule.perTxn)+' per transaction</strong> for '+rule.label+'.';
+  }
+
+  var summaryEl = document.getElementById('upiSummary');
+  summaryEl.style.background = summaryClass;
+  summaryEl.style.borderLeft = '4px solid ' + summaryBorder;
+  summaryEl.innerHTML = summary;
+
+  document.getElementById('upiLimit').innerHTML =
+    (rule.perTxn !== null
+      ? 'Per-transaction: <strong>'+fmtINR(rule.perTxn)+'</strong><br>'
+      : '') +
+    'Daily cap: <strong>'+(typeof rule.perDay === 'number' ? fmtINR(rule.perDay) : rule.perDay)+'</strong>';
+
+  document.getElementById('upiAuth').innerHTML =
+    '<ul style="margin:0;padding-left:1.25rem;">' +
+    rule.factors.map(function(f){ return '<li>'+f+'</li>'; }).join('') +
+    '</ul>';
+
+  document.getElementById('upiNotes').innerHTML = rule.extra;
+
+  document.getElementById('upiResult').style.display = 'block';
+}
+</script>
