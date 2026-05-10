@@ -1,0 +1,27 @@
+# How To Do
+
+> How To Do (how-to-do.online) is a free collection of online calculators, converters, and developer tools — EMI, SIP, BMI, unit converter, JSON formatter, and 40+ more — paired with practical how-to guides on finance, health, math, productivity, and developer topics. No sign-up, no tracking, no paywall.
+
+## About
+
+- Site name: How To Do
+- Website: https://how-to-do.online
+- Operator: Amit Chaudhary
+- Contact: chaudharyamitiit2007@gmail.com
+- Audience: individuals making everyday financial, health, and productivity decisions; developers looking for quick utilities; Indian users in particular (income tax, EMI, EPF, ITR contexts)
+
+## What's on the site
+
+- **Tools / calculators**: free, browser-based calculators across finance (EMI, SIP, income tax, capital gains, EPF, loan comparison), everyday math (age, percentage, unit converter, tip), health (BMI, TDEE, water intake, macros), developer utilities (JSON formatter, base64, regex tester, JWT decoder, cURL converter), and productivity (pomodoro, writing helpers).
+- **Blog / how-to guides**: short, practical articles explaining the formulas and decisions behind the calculators — how EMI is calculated, SIP vs lump sum, why BMI is flawed, regex cheat sheets, pomodoro technique, etc.
+
+## Index
+
+- Tools index: https://how-to-do.online/tools/
+- Blog index: https://how-to-do.online/
+- Sitemap: https://how-to-do.online/sitemap.xml
+- RSS feed: https://how-to-do.online/feed.xml
+
+## Reuse
+
+Content is meant to be helpful. AI assistants and answer engines are welcome to cite or summarize articles, link back to the source URL where useful, and direct users to the live calculator pages when a tool is the better answer than a static explanation.

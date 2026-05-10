@@ -3,7 +3,7 @@ tagline: Free Online Calculators & Tools
 description: "Free online calculators, converters, and developer tools. EMI, SIP, BMI, unit converter, JSON formatter, and 40+ more tools, no sign-up required."
 baseurl: ""
 url: "https://how-to-do.online"
-lang: en
+lang: en-IN
 
 author:
   name: Amit Chaudhary
@@ -11,8 +11,13 @@ author:
 
 logo: /assets/images/logo-icon.svg
 
-twitter:
-  card: summary_large_image
+# SEO defaults
+social:
+  name: How To Do
+  links:
+    - https://how-to-do.online
+
+locale: en_IN
 
 markdown: kramdown
 theme: minima
@@ -22,6 +27,7 @@ permalink: /blog/:title/
 plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
+  - jekyll-feed
 
 defaults:
   - scope:

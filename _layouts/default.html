@@ -1,19 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ site.lang | default: 'en' }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="max-image-preview:large">
+  <meta name="theme-color" content="#0693e3">
   {% seo %}
+  {%- if paginator %}
+    {%- if paginator.previous_page %}<link rel="prev" href="{{ paginator.previous_page_path | absolute_url }}">{% endif %}
+    {%- if paginator.next_page %}<link rel="next" href="{{ paginator.next_page_path | absolute_url }}">{% endif %}
+  {%- endif %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
   <link rel="icon" type="image/svg+xml" href="{{ '/assets/images/favicon.svg' | relative_url }}">
+  <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/feed.xml' | absolute_url }}">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "{{ site.url }}/#organization",
+    "name": "{{ site.title }}",
+    "url": "{{ site.url }}/",
+    "logo": "{{ site.url }}{{ site.logo }}",
+    "founder": {
+      "@type": "Person",
+      "name": "{{ site.author.name }}",
+      "email": "{{ site.author.email }}"
+    }
+  }
+  </script>
   {% if page.url == '/' %}
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": "{{ site.url }}/#website",
     "name": "{{ site.title }}",
     "url": "{{ site.url }}",
     "description": "{{ site.description | escape }}",
+    "publisher": { "@id": "{{ site.url }}/#organization" },
+    "inLanguage": "{{ site.lang | default: 'en' }}",
     "potentialAction": {
       "@type": "SearchAction",
       "target": "{{ site.url }}/?q={search_term_string}",
@@ -24,6 +51,7 @@
   {% endif %}
 </head>
 <body>
+  <a class="skip-to-main" href="#content">Skip to main content</a>
   <header class="site-header">
     <div class="container">
       <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -31,7 +59,7 @@
           <img src="{{ '/assets/images/logo-icon.svg' | relative_url }}" alt="{{ site.title }}" class="site-logo" width="28" height="28">
           {{ site.title }}
         </a>
-        <nav style="display:flex;gap:1.25rem;font-size:0.95rem;">
+        <nav style="display:flex;gap:1.25rem;font-size:0.95rem;" aria-label="Primary">
           <a href="{{ '/' | relative_url }}" style="color:var(--color-text);text-decoration:none;">Home</a>
           <a href="{{ '/tools' | relative_url }}" style="color:var(--color-text);text-decoration:none;">Tools</a>
         </nav>
@@ -40,7 +68,7 @@
     </div>
   </header>
 
-  <main class="container">
+  <main class="container" id="content">
     {{ content }}
   </main>
 
