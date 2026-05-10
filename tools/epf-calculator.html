@@ -1,0 +1,247 @@
+---
+layout: tool
+title: EPF Calculator with Rule 9D Split (FY 2025-26)
+description: "Project your EPF corpus at 8.25% interest and see exactly how much interest is taxable under Rule 9D when your own contribution exceeds ₹2.5 lakh (₹5 lakh for govt employees)."
+category: "Financial (More)"
+tagline: "Project your EPF corpus at 8.25% and see how much interest is taxable under Rule 9D for contributions above ₹2.5L."
+search: "epf calculator employee provident fund 8.25 percent rule 9d taxable interest vpf voluntary fy 2025-26 retirement corpus india"
+card_title: "EPF Calculator (Rule 9D)"
+---
+
+<div class="tool-header">
+  <h1>EPF Calculator (Rule 9D-aware)</h1>
+  <p>Project your Employee Provident Fund corpus at the FY 2025-26 rate of 8.25%. Unlike most calculators online, this one splits your interest into <strong>taxable vs non-taxable</strong> under Rule 9D — the rule that bites high earners and VPF contributors.</p>
+</div>
+
+<div class="calc-form">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="basic">Basic + DA (monthly ₹)</label>
+      <input type="number" id="basic" placeholder="e.g. 50000" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);">EPF is calculated on Basic + DA, not on full CTC.</small>
+    </div>
+    <div class="form-group">
+      <label for="empPct">Employee contribution (%)</label>
+      <input type="number" id="empPct" value="12" min="12" max="100" step="0.5" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);">Statutory 12%. Set higher for VPF (Voluntary PF).</small>
+    </div>
+    <div class="form-group">
+      <label for="empBalance">Current EPF balance (₹) <span style="color:var(--color-muted);font-weight:normal;font-size:0.85rem;">optional</span></label>
+      <input type="number" id="empBalance" placeholder="e.g. 800000" min="0" step="any" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="years">Years until retirement</label>
+      <input type="number" id="years" placeholder="e.g. 25" min="1" max="45" step="1" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="growth">Annual salary growth (%)</label>
+      <input type="number" id="growth" value="8" min="0" max="30" step="0.5" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+    </div>
+    <div class="form-group">
+      <label for="empType">Employee type</label>
+      <select id="empType" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+        <option value="private">Private (Rule 9D limit: ₹2.5L)</option>
+        <option value="govt">Government (Rule 9D limit: ₹5L)</option>
+      </select>
+    </div>
+  </div>
+
+  <div style="margin-top:1rem;">
+    <button class="btn" onclick="calcEPF()">Calculate</button>
+  </div>
+</div>
+
+<div id="epfResult" style="display:none;margin-top:1.5rem;">
+  <div id="epfSummary" style="padding:1.25rem;border-radius:var(--radius);margin-bottom:1rem;background:#dcfce7;border-left:4px solid #15803d;font-size:1.05rem;line-height:1.7;"></div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;">
+    <div style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);">
+      <h3 style="margin:0 0 0.75rem;font-size:1.05rem;">At retirement</h3>
+      <div id="epfTotals" style="font-size:0.95rem;line-height:1.85;"></div>
+    </div>
+    <div style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);">
+      <h3 style="margin:0 0 0.75rem;font-size:1.05rem;">Rule 9D split</h3>
+      <div id="epfRule9D" style="font-size:0.95rem;line-height:1.85;"></div>
+    </div>
+  </div>
+
+  <details style="margin-top:1rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Year-by-year projection</summary>
+    <div id="epfTable" style="margin-top:0.75rem;overflow-x:auto;"></div>
+  </details>
+</div>
+
+<div style="margin-top:2rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">How EPF works (in 30 seconds)</h2>
+  <ul style="margin:0 0 0 1.5rem;font-size:0.95rem;line-height:1.85;">
+    <li><strong>You contribute 12% of Basic + DA</strong>, all of which goes to your EPF account.</li>
+    <li><strong>Employer also contributes 12%</strong>, split: 8.33% to EPS (pension, capped at ₹15K basic, max contribution ₹1,250/month) + 3.67% to EPF.</li>
+    <li><strong>Interest is 8.25% for FY 2025-26</strong>, credited annually on the closing balance. Compounded monthly internally.</li>
+    <li><strong>Tax-free at withdrawal</strong> if you complete 5 continuous years of service (across employers, if PF transferred).</li>
+  </ul>
+
+  <h3 style="font-size:1.1rem;margin:1.25rem 0 0.5rem;">What is Rule 9D?</h3>
+  <p style="font-size:0.95rem;">Introduced in 2021, Rule 9D splits your EPF account into two notional buckets:</p>
+  <ul style="margin:0.5rem 0 0 1.5rem;font-size:0.95rem;line-height:1.85;">
+    <li><strong>Non-taxable bucket</strong> — interest on contributions up to <strong>₹2.5L/year</strong> (₹5L for government employees with no employer contribution).</li>
+    <li><strong>Taxable bucket</strong> — interest on contributions <em>above</em> that threshold gets taxed at your slab rate as "income from other sources".</li>
+  </ul>
+  <p style="font-size:0.95rem;margin-top:0.5rem;">If you contribute exactly 12% of Basic+DA and your basic is below <strong>₹1,73,611/month</strong>, you stay under the ₹2.5L limit and Rule 9D doesn't bite. VPF (Voluntary PF) contributions and high earners regularly cross it.</p>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">FAQ</h2>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Should I do VPF?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Until your <em>own</em> contribution stays at ₹2.5L/year, VPF gives you an 8.25% tax-free return — better than most fixed-income alternatives. Above ₹2.5L, the interest becomes taxable, dropping the post-tax yield to ~5.7% in the 30% slab. At that point, equity MFs or NPS may be better.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Is the employer's contribution counted toward the ₹2.5L Rule 9D limit?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">No. Rule 9D applies only to <em>your</em> contributions (12% statutory + any VPF). Employer's 3.67% to EPF is separate.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">What about EPS (pension)?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Employer contributes 8.33% of capped basic (₹15K, so ₹1,250/month max) to your EPS account. EPS does not earn interest. You receive a monthly pension after retirement (formula: pensionable salary × pensionable service ÷ 70). This calculator focuses on EPF, not EPS.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Is EPF withdrawal tax-free?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Yes, if you complete <strong>5 continuous years of service</strong>. Below 5 years, the entire withdrawal is taxable at your slab. PF transfers between employers count toward continuity — don't withdraw between jobs unless you have to.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">How do I add EPF to my full retirement plan?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Combine the EPF corpus shown here with your equity SIP corpus (use our <a href="{{ '/tools/sip-calculator' | relative_url }}">SIP Calculator</a>) and PPF (use our <a href="{{ '/tools/ppf-calculator' | relative_url }}">PPF Calculator</a>). Together they typically form 70-80% of an Indian salaried retirement plan.</p>
+  </details>
+</div>
+
+<div style="margin-top:1.5rem;padding:1rem;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:var(--radius);font-size:0.9rem;">
+  <strong>Note:</strong> 8.25% is the EPFO-declared rate for FY 2025-26 — the rate is reset annually. EPS contribution is excluded from corpus projections (it's a separate pension scheme). For employees under the international worker provisions, contribution rules differ.
+</div>
+
+<script>
+function fmtINR(n){
+  var s = Math.round(n).toString();
+  var neg = s.charAt(0) === '-';
+  if(neg) s = s.slice(1);
+  var last3 = s.slice(-3);
+  var rest = s.slice(0, -3);
+  if(rest) last3 = ',' + last3;
+  rest = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+  return (neg ? '-' : '') + '₹ ' + rest + last3;
+}
+
+function calcEPF(){
+  var basicM = parseFloat(document.getElementById('basic').value) || 0;
+  var empPct = parseFloat(document.getElementById('empPct').value) || 12;
+  var startBal = parseFloat(document.getElementById('empBalance').value) || 0;
+  var years = parseFloat(document.getElementById('years').value) || 0;
+  var growth = parseFloat(document.getElementById('growth').value) || 0;
+  var empType = document.getElementById('empType').value;
+
+  if(basicM <= 0 || years <= 0){
+    alert('Enter Basic + DA and years until retirement.');
+    return;
+  }
+
+  var rate = 0.0825; // EPF rate FY 2025-26
+  var ruleLimit = empType === 'govt' ? 500000 : 250000;
+  var employerRate = 0.0367; // 3.67% to EPF (8.33% goes to EPS, capped — simplified here for non-EPS portion)
+
+  // Simple model: monthly contributions, monthly interest accrual at rate/12
+  var balance = startBal;
+  // Track Rule 9D split — interest from "excess" contributions is taxable
+  // We approximate: each year, if employee annual contribution > limit, the EXCESS portion's
+  // interest (compounding from that year on) goes to taxable bucket.
+  // Track two notional buckets: nonTaxBal (contributions <= limit), taxBal (contributions > limit).
+  var nonTaxBal = startBal; // assume historical balance falls under non-taxable for simplicity
+  var taxBal = 0;
+  var rows = [];
+
+  var monthlyBasic = basicM;
+  for(var y = 1; y <= years; y++){
+    var empYearly = monthlyBasic * 12 * (empPct / 100);
+    var employerYearly = monthlyBasic * 12 * employerRate;
+    var underLimit = Math.min(empYearly, ruleLimit);
+    var overLimit = Math.max(0, empYearly - ruleLimit);
+
+    // Apply contribution + interest. Compound monthly at rate/12.
+    var monthlyRate = rate / 12;
+    for(var m = 0; m < 12; m++){
+      // Add monthly contribution to each bucket proportionally
+      nonTaxBal += (underLimit / 12) + (employerYearly / 12);
+      taxBal += (overLimit / 12);
+      // Interest
+      nonTaxBal *= (1 + monthlyRate);
+      taxBal *= (1 + monthlyRate);
+    }
+
+    balance = nonTaxBal + taxBal;
+
+    rows.push({
+      year: y,
+      basic: monthlyBasic,
+      empContrib: empYearly,
+      employerContrib: employerYearly,
+      overLimit: overLimit,
+      balance: balance,
+      taxBucket: taxBal
+    });
+
+    // Salary growth
+    monthlyBasic *= (1 + growth / 100);
+  }
+
+  // Compute total interest (rough) and Rule 9D taxable portion
+  var totalContributions = startBal + rows.reduce(function(a, r){ return a + r.empContrib + r.employerContrib; }, 0);
+  var totalInterest = balance - totalContributions;
+  // Taxable bucket interest = taxBal − sum of contributions to taxBal (i.e. sum of overLimit)
+  var taxBucketContribs = rows.reduce(function(a, r){ return a + r.overLimit; }, 0);
+  var taxableInterest = taxBal - taxBucketContribs;
+  var nonTaxableInterest = totalInterest - taxableInterest;
+
+  // Summary
+  var ruleHits = rows.some(function(r){ return r.overLimit > 0; });
+  var ruleNote = ruleHits ?
+    '<br><span style="color:#b45309;"><strong>Rule 9D applies</strong> — your annual contribution crosses ₹'+(ruleLimit/100000)+'L in some years. Interest in the taxable bucket: <strong>'+fmtINR(taxableInterest)+'</strong> (taxed at your slab rate).</span>' :
+    '<br><span style="color:#15803d;">Your contributions stay under the Rule 9D limit. All interest is tax-free.</span>';
+
+  document.getElementById('epfSummary').innerHTML =
+    '<strong>Projected EPF corpus at retirement: '+fmtINR(balance)+'</strong>' + ruleNote;
+
+  document.getElementById('epfTotals').innerHTML =
+    'Total contributions (you + employer): <strong>'+fmtINR(totalContributions)+'</strong><br>'+
+    'Total interest earned: <strong>'+fmtINR(totalInterest)+'</strong><br>'+
+    '<hr style="margin:0.5rem 0;border:none;border-top:1px dashed var(--color-border);">'+
+    'Final corpus: <strong style="color:#15803d;">'+fmtINR(balance)+'</strong>';
+
+  document.getElementById('epfRule9D').innerHTML =
+    'Rule 9D limit: <strong>₹'+(ruleLimit/100000)+'L/year</strong> ('+(empType==='govt'?'government':'private')+' employee)<br>'+
+    'Non-taxable interest: <strong style="color:#15803d;">'+fmtINR(nonTaxableInterest)+'</strong><br>'+
+    'Taxable interest (at slab rate): <strong style="color:#dc2626;">'+fmtINR(taxableInterest)+'</strong><br>'+
+    'Tax-bucket balance at retirement: <strong>'+fmtINR(taxBal)+'</strong>';
+
+  // Year-by-year table
+  var tableHtml = '<table style="width:100%;border-collapse:collapse;font-size:0.85rem;border:1px solid var(--color-border);border-radius:var(--radius);overflow:hidden;">'+
+    '<thead style="background:var(--color-card-bg);"><tr>'+
+    '<th style="text-align:left;padding:0.4rem;border-bottom:1px solid var(--color-border);">Year</th>'+
+    '<th style="text-align:right;padding:0.4rem;border-bottom:1px solid var(--color-border);">Basic+DA (mo)</th>'+
+    '<th style="text-align:right;padding:0.4rem;border-bottom:1px solid var(--color-border);">Your contrib</th>'+
+    '<th style="text-align:right;padding:0.4rem;border-bottom:1px solid var(--color-border);">Over Rule 9D</th>'+
+    '<th style="text-align:right;padding:0.4rem;border-bottom:1px solid var(--color-border);">Balance</th>'+
+    '</tr></thead><tbody>';
+  rows.forEach(function(r){
+    var color = r.overLimit > 0 ? '#dc2626' : '#15803d';
+    tableHtml += '<tr>'+
+      '<td style="padding:0.4rem;border-bottom:1px solid var(--color-border);">'+r.year+'</td>'+
+      '<td style="text-align:right;padding:0.4rem;border-bottom:1px solid var(--color-border);">'+fmtINR(r.basic)+'</td>'+
+      '<td style="text-align:right;padding:0.4rem;border-bottom:1px solid var(--color-border);">'+fmtINR(r.empContrib)+'</td>'+
+      '<td style="text-align:right;padding:0.4rem;border-bottom:1px solid var(--color-border);color:'+color+';">'+fmtINR(r.overLimit)+'</td>'+
+      '<td style="text-align:right;padding:0.4rem;border-bottom:1px solid var(--color-border);font-weight:600;">'+fmtINR(r.balance)+'</td>'+
+      '</tr>';
+  });
+  tableHtml += '</tbody></table>';
+  document.getElementById('epfTable').innerHTML = tableHtml;
+
+  document.getElementById('epfResult').style.display = 'block';
+  document.getElementById('epfResult').scrollIntoView({behavior:'smooth', block:'start'});
+}
+</script>
