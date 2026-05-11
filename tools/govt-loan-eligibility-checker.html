@@ -1,0 +1,232 @@
+---
+layout: tool
+title: PM Vishwakarma & PM Mudra Eligibility Checker (2026)
+description: "Find out which government scheme fits your trade or business: PM Vishwakarma (₹3L collateral-free, ₹15K toolkit) or PM Mudra (Shishu / Kishore / Tarun). 30-second eligibility check."
+category: "Financial"
+tagline: "3-question check to see whether PM Vishwakarma (₹3L, 5%, ₹15K toolkit) or PM Mudra (Shishu/Kishore/Tarun) fits your trade."
+search: "pm vishwakarma pm mudra eligibility loan scheme india artisan craftsperson 18 trades shishu kishore tarun udyam business stand-up cgtmse collateral free 5 percent toolkit grant"
+card_title: "PM Vishwakarma & Mudra Eligibility"
+---
+
+<div class="tool-header">
+  <h1>Govt Loan Eligibility Checker</h1>
+  <p>Two of India's biggest non-collateral business loan schemes — PM Vishwakarma (artisans, 18 traditional trades) and PM Mudra (Shishu / Kishore / Tarun) — have very different eligibility rules. Answer 3 questions and see which scheme fits, with the loan range and documents you'll need.</p>
+</div>
+
+<div class="calc-form">
+  <div class="form-group">
+    <label for="trade">Your trade / line of work</label>
+    <select id="trade" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;" onchange="renderCheck()">
+      <option value="">Pick one…</option>
+      <optgroup label="PM Vishwakarma trades (artisan / craftsperson)">
+        <option value="vw">Carpenter (बढ़ई)</option>
+        <option value="vw">Boat maker (नाव निर्माता)</option>
+        <option value="vw">Armourer (शस्त्रकार)</option>
+        <option value="vw">Blacksmith (लोहार)</option>
+        <option value="vw">Hammer & toolkit maker (हथौड़ा एवं अन्य औजार निर्माता)</option>
+        <option value="vw">Locksmith (ताला बनाने वाला)</option>
+        <option value="vw">Goldsmith (सुनार)</option>
+        <option value="vw">Potter (कुम्हार)</option>
+        <option value="vw">Sculptor / stone carver (मूर्तिकार / पत्थर तराशने वाला)</option>
+        <option value="vw">Cobbler / footwear artisan (मोची)</option>
+        <option value="vw">Mason (राजमिस्त्री)</option>
+        <option value="vw">Basket / mat / broom maker (बुनकर / झाड़ू बनाने वाला)</option>
+        <option value="vw">Doll & toy maker, traditional (खिलौना निर्माता)</option>
+        <option value="vw">Barber (नाई)</option>
+        <option value="vw">Garland maker (मालाकार)</option>
+        <option value="vw">Washerman (धोबी)</option>
+        <option value="vw">Tailor (दर्जी)</option>
+        <option value="vw">Fishing-net maker (मछली पकड़ने का जाल बनाने वाला)</option>
+      </optgroup>
+      <optgroup label="Other small business / service">
+        <option value="mudra">Kirana / general store</option>
+        <option value="mudra">Food stall / tiffin / canteen</option>
+        <option value="mudra">Auto / taxi / transport</option>
+        <option value="mudra">Beauty parlour / salon (non-traditional)</option>
+        <option value="mudra">Tuition / coaching</option>
+        <option value="mudra">Manufacturing / processing unit</option>
+        <option value="mudra">Trading / wholesale</option>
+        <option value="mudra">IT services / freelance</option>
+        <option value="mudra">Other small business</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="stage">Business stage</label>
+    <select id="stage" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;" onchange="renderCheck()">
+      <option value="">Pick one…</option>
+      <option value="new">Just starting / pre-revenue (need ≤ ₹50K)</option>
+      <option value="early">Up & running, need to scale (₹50K – ₹5L)</option>
+      <option value="growth">Established, want to expand (₹5L – ₹10L)</option>
+      <option value="enterprise">Need beyond ₹10L</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label style="display:flex;align-items:center;gap:0.4rem;">
+      <input type="checkbox" id="hasUdyam" onchange="renderCheck()">
+      <span>Registered on Udyam / Udyog Aadhaar</span>
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label style="display:flex;align-items:center;gap:0.4rem;">
+      <input type="checkbox" id="hasRegistered" onchange="renderCheck()">
+      <span>Already registered on the PM Vishwakarma portal</span>
+    </label>
+  </div>
+</div>
+
+<div id="loanResult" style="display:none;margin-top:1.5rem;">
+  <div id="loanVerdict" style="padding:1.25rem;border-radius:var(--radius);margin-bottom:1rem;font-size:1.05rem;line-height:1.7;"></div>
+  <div id="loanDetails" style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.85;"></div>
+  <div id="loanDocs" style="margin-top:1rem;padding:1rem;background:#eef2ff;border-left:3px solid #4f46e5;border-radius:var(--radius);font-size:0.95rem;line-height:1.7;"></div>
+</div>
+
+<div style="margin-top:2rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">Quick scheme comparison</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+    <thead>
+      <tr style="background:var(--color-card-bg);">
+        <th style="text-align:left;padding:0.5rem;border:1px solid var(--color-border);">Feature</th>
+        <th style="text-align:left;padding:0.5rem;border:1px solid var(--color-border);">PM Vishwakarma</th>
+        <th style="text-align:left;padding:0.5rem;border:1px solid var(--color-border);">PM Mudra</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Who qualifies</td><td style="padding:0.5rem;border:1px solid var(--color-border);">18 traditional trades only</td><td style="padding:0.5rem;border:1px solid var(--color-border);">Any non-farm small business</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Loan size</td><td style="padding:0.5rem;border:1px solid var(--color-border);">Up to <strong>₹3 lakh</strong> (₹1L tranche-1, ₹2L tranche-2)</td><td style="padding:0.5rem;border:1px solid var(--color-border);">Up to <strong>₹10 lakh</strong> (Shishu / Kishore / Tarun)</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Interest rate</td><td style="padding:0.5rem;border:1px solid var(--color-border);">5% (concessional)</td><td style="padding:0.5rem;border:1px solid var(--color-border);">~8.5–12% (bank's MCLR-linked)</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Collateral</td><td style="padding:0.5rem;border:1px solid var(--color-border);">None</td><td style="padding:0.5rem;border:1px solid var(--color-border);">None</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Extras</td><td style="padding:0.5rem;border:1px solid var(--color-border);">₹15K toolkit grant + ₹500/day skill training stipend + digital incentive</td><td style="padding:0.5rem;border:1px solid var(--color-border);">Working capital + term loan flexibility</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">Apply via</td><td style="padding:0.5rem;border:1px solid var(--color-border);"><a href="https://pmvishwakarma.gov.in/" rel="noopener">pmvishwakarma.gov.in</a></td><td style="padding:0.5rem;border:1px solid var(--color-border);">Any PSU bank, RRB, NBFC-MFI, or <a href="https://www.udyamimitra.in/" rel="noopener">udyamimitra.in</a></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">PM Mudra slabs</h2>
+  <ul style="margin:0 0 0 1.5rem;font-size:0.95rem;line-height:1.85;">
+    <li><strong>Shishu</strong> — up to ₹50,000. For pre-revenue or just-starting businesses.</li>
+    <li><strong>Kishore</strong> — ₹50,001 to ₹5 lakh. For businesses up & running, needing scale capital.</li>
+    <li><strong>Tarun</strong> — ₹5,00,001 to ₹10 lakh. For established businesses ready to expand. <strong>Tarun Plus</strong> (up to ₹20 lakh) is also available since FY 2024-25 for borrowers who have repaid an earlier Tarun loan on time.</li>
+  </ul>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">FAQ</h2>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Can I apply for both schemes?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">No, not simultaneously. PM Vishwakarma beneficiaries are not eligible for PM Mudra during the active loan period. Pick whichever fits — Vishwakarma is cheaper (5% rate) but only for the 18 listed trades and capped at ₹3L.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Do I need an Udyam / Udyog Aadhaar?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">For Mudra Tarun (₹5L+), most banks expect Udyam registration. Shishu and Kishore are usually fine without it. Vishwakarma uses its own portal-based registration; you don't need Udyam separately.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">How long does Vishwakarma processing take?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Three-step process: portal registration → Gram Panchayat / ULB verification → district committee approval. Usually 30-45 days end-to-end. Skill training (5-7 days) can run in parallel and unlocks the ₹15K toolkit voucher.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">What if my Mudra application is rejected?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Mudra has no central eligibility test — each bank decides. If one rejects, try another (PSU banks have higher Mudra disbursal targets than private banks). NBFC-MFIs are usually most accessible for Shishu loans.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Is the interest tax-deductible?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">Yes — interest paid on either loan is a business expense, fully deductible from your business income. Use our <a href="{{ '/tools/income-tax-calculator' | relative_url }}">Income Tax Calculator</a> for the bottom-line impact.</p>
+  </details>
+</div>
+
+<div style="margin-top:1.5rem;padding:1rem;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:var(--radius);font-size:0.9rem;">
+  <strong>Note:</strong> Eligibility rules can change with each annual budget. Always check the official portal before applying. Other schemes worth knowing: Stand-Up India (SC/ST + women, ₹10L–₹1Cr), Stree Shakti (women entrepreneurs, SBI), Credit Guarantee Fund Trust for MSE (CGTMSE) — also collateral-free.
+</div>
+
+<script>
+function renderCheck(){
+  var trade = document.getElementById('trade').value;
+  var stage = document.getElementById('stage').value;
+  var hasUdyam = document.getElementById('hasUdyam').checked;
+  var hasRegistered = document.getElementById('hasRegistered').checked;
+
+  if(!trade || !stage){
+    document.getElementById('loanResult').style.display = 'none';
+    return;
+  }
+
+  var verdict, details, docs;
+  var verdictBg = '#dcfce7', verdictBorder = '#15803d';
+
+  if(trade === 'vw'){
+    if(stage === 'enterprise'){
+      verdictBg = '#fef3c7'; verdictBorder = '#f59e0b';
+      verdict = '<strong>Vishwakarma covers up to ₹3L; you need beyond ₹10L.</strong> Combine: take the Vishwakarma loan + toolkit grant for working capital, then apply separately for a Mudra Tarun Plus (up to ₹20L) or a CGTMSE-backed bank loan for the larger expansion.';
+    } else {
+      verdict = '<strong>You qualify for PM Vishwakarma.</strong> Concessional rate of 5%, no collateral, plus ₹15K toolkit grant and ₹500/day stipend during skill training.';
+    }
+    details =
+      '<strong>Loan structure:</strong><br>'+
+      '• <strong>Tranche 1: ₹1 lakh</strong>, repayable in 18 months.<br>'+
+      '• <strong>Tranche 2: ₹2 lakh</strong> (after 6 months of timely tranche-1 repayment + advanced skill training), repayable in 30 months.<br>'+
+      '• <strong>₹15K toolkit grant</strong> (e-RUPI voucher) after basic training.<br>'+
+      '• <strong>Skill training stipend: ₹500/day</strong> during the 5-7 day basic course.<br>'+
+      '• <strong>Digital transaction incentive: ₹1/transaction</strong>, capped at ₹100/month.';
+    docs =
+      '<strong>What you need to apply:</strong><br>'+
+      '• Aadhaar (mandatory)<br>'+
+      '• Mobile linked to Aadhaar<br>'+
+      '• Bank account in your name<br>'+
+      '• Caste / family details<br>'+
+      '• Trade proof (existing work samples / family-trade declaration)<br>'+
+      (hasRegistered ?
+        '<br><strong>Next step:</strong> Sign in at <a href="https://pmvishwakarma.gov.in/" rel="noopener">pmvishwakarma.gov.in</a> and check your application status. After Gram Panchayat / ULB verification, complete basic skill training to unlock the toolkit grant.'
+        :
+        '<br><strong>Next step:</strong> Register at <a href="https://pmvishwakarma.gov.in/" rel="noopener">pmvishwakarma.gov.in</a> via a CSC (Common Service Centre). Self-registration is also available but the CSC route is faster.');
+  } else {
+    // Mudra path
+    var slab, rangeText, repay;
+    if(stage === 'new'){
+      slab = 'Shishu';
+      rangeText = 'up to ₹50,000';
+      repay = 'usually 12-60 months';
+    } else if(stage === 'early'){
+      slab = 'Kishore';
+      rangeText = '₹50,001 to ₹5 lakh';
+      repay = '36-60 months term loan, or working-capital revolving';
+    } else if(stage === 'growth'){
+      slab = 'Tarun';
+      rangeText = '₹5,00,001 to ₹10 lakh';
+      repay = '36-84 months';
+    } else {
+      slab = 'Tarun Plus (only for repeat borrowers with on-time history)';
+      rangeText = '₹10L to ₹20 lakh';
+      repay = '36-84 months';
+    }
+
+    verdict = '<strong>You qualify for PM Mudra — '+slab+' slab.</strong> Loan range '+rangeText+', no collateral, repayment '+repay+'.';
+    details =
+      '<strong>Apply through:</strong> any PSU bank (SBI, BoB, PNB, Canara), Regional Rural Bank, NBFC-MFI, or <a href="https://www.udyamimitra.in/" rel="noopener">udyamimitra.in</a> (online).<br>'+
+      '<strong>Interest rate:</strong> typically 8.5%-12% (MCLR-linked, varies by lender; PSU banks usually cheapest for Shishu).<br>'+
+      '<strong>Mudra card:</strong> for working-capital loans, lenders issue a RuPay Mudra Card you can use for daily purchases.';
+    docs =
+      '<strong>What you need to apply:</strong><br>'+
+      '• Identity & address proof (Aadhaar, PAN, voter ID)<br>'+
+      '• Business proof (GST registration if applicable, shop / utility bill, lease agreement)<br>'+
+      '• Bank statements (6 months)<br>'+
+      (slab === 'Tarun' || slab.indexOf('Tarun Plus') === 0 ?
+        (hasUdyam ? '• Udyam registration (you have it ✓)<br>' : '• <strong>Udyam registration recommended</strong> for Tarun — register at <a href="https://udyamregistration.gov.in/" rel="noopener">udyamregistration.gov.in</a>, free.<br>') : '') +
+      '• Business plan / cost estimate (especially for Tarun)<br>'+
+      '• Photographs of business premises<br>'+
+      '<br><strong>Tip:</strong> Apply at multiple PSU banks if rejected — Mudra disbursal targets vary across branches and quarters.';
+  }
+
+  var verdictEl = document.getElementById('loanVerdict');
+  verdictEl.style.background = verdictBg;
+  verdictEl.style.borderLeft = '4px solid ' + verdictBorder;
+  verdictEl.innerHTML = verdict;
+
+  document.getElementById('loanDetails').innerHTML = details;
+  document.getElementById('loanDocs').innerHTML = docs;
+  document.getElementById('loanResult').style.display = 'block';
+}
+</script>
