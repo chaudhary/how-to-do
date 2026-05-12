@@ -1,0 +1,183 @@
+---
+layout: tool
+title: CUET / JEE / NEET Percentile-to-Rank Estimator (2026)
+description: "Convert your NTA percentile to an estimated all-India rank for JEE Main, CUET UG, NEET UG, and NEET PG. Based on the 2025 candidate-count distribution; expect ±10% variation."
+category: "Education"
+tagline: "Convert your NTA percentile to an estimated all-India rank for JEE Main, CUET UG, NEET UG/PG, and CUET PG."
+search: "cuet jee neet percentile to rank estimator nta score air all india rank exam 2026 candidates appeared total education"
+card_title: "CUET / JEE / NEET Percentile to Rank"
+---
+
+<div class="tool-header">
+  <h1>Percentile to Rank Estimator</h1>
+  <p>NTA reports your score as a percentile, but college admissions and counselling go by rank. This tool converts percentile to an estimated all-India rank using last year's candidate counts. Useful while you wait for the official rank list.</p>
+</div>
+
+<div class="calc-form">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+    <div class="form-group">
+      <label for="exam">Exam</label>
+      <select id="exam" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;" onchange="onExamChange()">
+        <option value="jee">JEE Main (BE/BTech)</option>
+        <option value="neetug">NEET UG (MBBS/BDS)</option>
+        <option value="neetpg">NEET PG</option>
+        <option value="cuetug">CUET UG</option>
+        <option value="cuetpg">CUET PG</option>
+        <option value="custom">Other / Custom</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="percentile">Your percentile (NTA score)</label>
+      <input type="number" id="percentile" placeholder="e.g. 98.5" min="0" max="100" step="0.0001" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);">NTA reports up to 7 decimals — use what's on your scorecard for accuracy.</small>
+    </div>
+    <div class="form-group">
+      <label for="candidates">Total candidates appeared</label>
+      <input type="number" id="candidates" placeholder="auto-fills from exam" min="1" style="width:100%;padding:0.6rem 0.75rem;border:1px solid var(--color-border);border-radius:var(--radius);font-size:1rem;">
+      <small style="color:var(--color-muted);" id="candidatesHelp">Default: 2025 figures.</small>
+    </div>
+  </div>
+
+  <div style="margin-top:1rem;">
+    <button class="btn" onclick="calcRank()">Estimate rank</button>
+  </div>
+</div>
+
+<div id="rankResult" style="display:none;margin-top:1.5rem;">
+  <div id="rankSummary" style="padding:1.25rem;border-radius:var(--radius);margin-bottom:1rem;background:#dcfce7;border-left:4px solid #15803d;font-size:1.05rem;line-height:1.7;"></div>
+  <div id="rankDetails" style="padding:1rem;background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:var(--radius);font-size:0.95rem;line-height:1.85;"></div>
+  <div id="rankBands" style="margin-top:1rem;"></div>
+</div>
+
+<div style="margin-top:2rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">How NTA percentile works</h2>
+  <p style="font-size:0.95rem;">Percentile is <em>not</em> percentage. It's the share of candidates who scored equal to or below you. NTA computes it per session and normalizes across sessions:</p>
+  <p style="font-size:0.95rem;background:var(--color-card-bg);padding:0.75rem;border-radius:var(--radius);margin-top:0.5rem;font-family:monospace;">
+    Percentile = (number of candidates with score ≤ yours / total candidates) × 100
+  </p>
+  <p style="font-size:0.95rem;margin-top:0.5rem;">So 99 percentile means you beat 99% of candidates, not that you scored 99/100. The corresponding rank ≈ (1 − percentile/100) × total candidates.</p>
+
+  <h3 style="font-size:1.1rem;margin:1.25rem 0 0.5rem;">Why the estimate has ±10% variation</h3>
+  <ul style="margin:0 0 0 1.5rem;font-size:0.95rem;line-height:1.85;">
+    <li>Total candidates fluctuate year-on-year (NEET UG dropped 2-3% in 2025 from 2024; JEE typically grows).</li>
+    <li>Tie-breaking: equal percentile gets ordered by NTA's tie-breaking rules (subject scores, age) — your final AIR may shift.</li>
+    <li>Multi-session exams (JEE Main, CUET) take the best of attempts, so the merit list is computed differently from single-shot exams.</li>
+  </ul>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">2025 candidate counts (rough)</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+    <thead>
+      <tr style="background:var(--color-card-bg);">
+        <th style="text-align:left;padding:0.5rem;border:1px solid var(--color-border);">Exam</th>
+        <th style="text-align:left;padding:0.5rem;border:1px solid var(--color-border);">Appeared</th>
+        <th style="text-align:left;padding:0.5rem;border:1px solid var(--color-border);">Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">JEE Main</td><td style="padding:0.5rem;border:1px solid var(--color-border);">~14,00,000</td><td style="padding:0.5rem;border:1px solid var(--color-border);">2 sessions; best score used</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">NEET UG</td><td style="padding:0.5rem;border:1px solid var(--color-border);">~22,00,000</td><td style="padding:0.5rem;border:1px solid var(--color-border);">Single session, marks-based</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">NEET PG</td><td style="padding:0.5rem;border:1px solid var(--color-border);">~2,30,000</td><td style="padding:0.5rem;border:1px solid var(--color-border);">Percentile-based</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">CUET UG</td><td style="padding:0.5rem;border:1px solid var(--color-border);">~13,50,000</td><td style="padding:0.5rem;border:1px solid var(--color-border);">Multi-paper, normalized score</td></tr>
+      <tr><td style="padding:0.5rem;border:1px solid var(--color-border);">CUET PG</td><td style="padding:0.5rem;border:1px solid var(--color-border);">~4,00,000</td><td style="padding:0.5rem;border:1px solid var(--color-border);">Subject-specific merit</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h2 style="font-size:1.25rem;margin-bottom:0.75rem;">FAQ</h2>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Is 99 percentile a good JEE Main score?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">99 percentile in JEE Main = approximate AIR 14,000 (out of 14 lakh). That's enough to qualify for JEE Advanced (top 2.5L → AIR ~35K cutoff). For NIT or IIIT seats, you typically need 99.5+ percentile (AIR < 7,000). For top-5 NIT branches, 99.9+ (AIR < 1,400).</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Why does NEET UG report marks but not percentile on my scorecard?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">NEET UG is marks-based — the official scorecard shows marks and AIR directly. Use this tool for NEET-PG (percentile-based) or to back-calculate your effective percentile for comparison.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">Two candidates with the same percentile — same rank?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">No. NTA breaks ties using subject-wise scores (Maths/Physics for JEE; Biology for NEET) and age (older candidate ranked higher). So the rank list is unique even when percentile is identical.</p>
+  </details>
+  <details style="margin-bottom:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem 1rem;">
+    <summary style="cursor:pointer;font-weight:600;">When is the official rank declared?</summary>
+    <p style="margin-top:0.5rem;font-size:0.95rem;">JEE Main: a few days after each session result; final composite rank after Session 2 (typically late April). NEET UG: 2-4 weeks after exam (June for May 2026 exam). CUET UG: late June (for May 2026 sittings). NEET PG: within 4-6 weeks of exam.</p>
+  </details>
+</div>
+
+<div style="margin-top:1.5rem;padding:1rem;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:var(--radius);font-size:0.9rem;">
+  <strong>Note:</strong> This is an estimate based on percentile mathematics and the prior year's candidate count. Use the official rank list once it's published — counselling and seat allotment go by the official AIR, not estimates. Reservation category ranks (SC/ST/OBC/EWS) follow separate cutoffs not modelled here.
+</div>
+
+<script>
+var examData = {
+  jee:    { name: 'JEE Main', candidates: 1400000, note: '~14 lakh appeared in 2025 (combined Session 1 + 2). Best score used.' },
+  neetug: { name: 'NEET UG', candidates: 2200000, note: '~22 lakh appeared in 2025. NEET UG officially reports marks + AIR; percentile here is for comparison only.' },
+  neetpg: { name: 'NEET PG', candidates: 230000,  note: '~2.3 lakh appeared in 2025. Percentile-based.' },
+  cuetug: { name: 'CUET UG', candidates: 1350000, note: '~13.5 lakh appeared in 2025. Composite merit varies by university and subject combo.' },
+  cuetpg: { name: 'CUET PG', candidates: 400000,  note: '~4 lakh appeared in 2025. Subject-specific merit.' },
+  custom: { name: 'Custom', candidates: '', note: 'Enter the appeared-candidate count for your exam.' }
+};
+
+function onExamChange(){
+  var key = document.getElementById('exam').value;
+  var d = examData[key];
+  document.getElementById('candidates').value = d.candidates;
+  document.getElementById('candidatesHelp').textContent = d.note;
+}
+onExamChange();
+
+function fmtNum(n){
+  return n.toLocaleString('en-IN');
+}
+
+function calcRank(){
+  var key = document.getElementById('exam').value;
+  var pct = parseFloat(document.getElementById('percentile').value);
+  var total = parseFloat(document.getElementById('candidates').value);
+
+  if(isNaN(pct) || pct < 0 || pct > 100){
+    alert('Enter a percentile between 0 and 100.');
+    return;
+  }
+  if(isNaN(total) || total < 1){
+    alert('Enter a positive candidate count.');
+    return;
+  }
+
+  var rank = Math.max(1, Math.round((1 - pct / 100) * total));
+  var lower = Math.max(1, Math.round(rank * 0.9));
+  var upper = Math.round(rank * 1.1);
+
+  var examName = examData[key].name;
+
+  document.getElementById('rankSummary').innerHTML =
+    '<strong>Estimated AIR: '+fmtNum(rank)+'</strong> (range '+fmtNum(lower)+' – '+fmtNum(upper)+')<br>'+
+    '<span style="font-size:0.95rem;">For '+examName+', '+pct.toFixed(4)+' percentile → top '+(100-pct).toFixed(4)+'% of '+fmtNum(total)+' candidates.</span>';
+
+  document.getElementById('rankDetails').innerHTML =
+    'Percentile entered: <strong>'+pct.toFixed(4)+'</strong><br>'+
+    'Total candidates: <strong>'+fmtNum(total)+'</strong><br>'+
+    'Estimated rank: <strong>'+fmtNum(rank)+'</strong><br>'+
+    'Likely range (±10%): <strong>'+fmtNum(lower)+' to '+fmtNum(upper)+'</strong><br>'+
+    'Candidates above you: ~'+fmtNum(rank - 1)+'<br>'+
+    'Candidates at or below: ~'+fmtNum(total - rank + 1);
+
+  // Quick reference bands
+  var bands = [99.99, 99.9, 99.5, 99, 95, 90, 80, 50];
+  var html = '<div style="padding:1rem;background:#eef2ff;border-left:3px solid #4f46e5;border-radius:var(--radius);">'+
+             '<strong>'+examName+' rank reference (current candidate count: '+fmtNum(total)+')</strong>'+
+             '<table style="width:100%;border-collapse:collapse;margin-top:0.5rem;font-size:0.85rem;">'+
+             '<tr><th style="text-align:left;padding:0.3rem 0;">Percentile</th><th style="text-align:right;padding:0.3rem 0;">Approx AIR</th></tr>';
+  bands.forEach(function(p){
+    var r = Math.max(1, Math.round((1 - p / 100) * total));
+    var hi = Math.abs(p - pct) < 0.01;
+    html += '<tr style="'+(hi ? 'background:#fef9c3;' : '')+'"><td style="padding:0.3rem 0;">'+p+'</td><td style="text-align:right;padding:0.3rem 0;">'+fmtNum(r)+'</td></tr>';
+  });
+  html += '</table></div>';
+  document.getElementById('rankBands').innerHTML = html;
+
+  document.getElementById('rankResult').style.display = 'block';
+  document.getElementById('rankResult').scrollIntoView({behavior:'smooth', block:'start'});
+}
+</script>
